@@ -886,7 +886,7 @@ async function carregarUsuarios(){
 
   let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
 
-  let res = await fetch(`"https://sistema-futebol.onrender.com/usuarios/"${usuario.turma_id}`)
+  let res = await fetch(`https://sistema-futebol.onrender.com/usuarios/${usuario.turma_id}`)
   let dados = await res.json()
 
   let lista = document.getElementById("listaUsuarios")
@@ -937,7 +937,7 @@ function editarUsuario(id){
 
   let usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"))
 
-  fetch(`"https://sistema-futebol.onrender.com/usuarios/"${usuarioLogado.turma_id}`)
+  fetch(`https://sistema-futebol.onrender.com/usuarios/${usuarioLogado.turma_id}`)
     .then(res => res.json())
     .then(dados => {
 
