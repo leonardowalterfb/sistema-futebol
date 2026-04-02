@@ -138,7 +138,7 @@ async function removerPagamento(id){
     return
   }
 
-  await fetch("http://localhost:3000/pagamentos/" + id, {
+  await fetch("https://sistema-futebol.onrender.com/pagamentos/" + id, {
     method: "DELETE"
   })
 
@@ -196,7 +196,7 @@ let despesa = {
 }
 
 // 🔥 SALVAR NO BACKEND
-await fetch("http://localhost:3000/despesas", {
+await fetch("https://sistema-futebol.onrender.com/despesas", {
   method: "POST",
   headers: {
     "Content-Type": "application/json"
@@ -218,7 +218,7 @@ async function carregarDespesas(){
   let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
   let turmaId = usuario.turma_id
 
-  let resposta = await fetch(`http://localhost:3000/despesas/${turmaId}`)
+  let resposta = await fetch(`https://sistema-futebol.onrender.com/despesas/${turmaId}`)
   despesas = await resposta.json()
 
   console.log("Despesas carregadas:", despesas)
@@ -263,7 +263,7 @@ async function removerDespesa(id){
     return
   }
 
-  await fetch("http://localhost:3000/despesas/" + id, {
+  await fetch("https://sistema-futebol.onrender.com/despesas/" + id, {
     method: "DELETE"
   })
 
