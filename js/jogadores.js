@@ -281,12 +281,8 @@ select.appendChild(option)
 
 async function inativarJogador(id){
 
-  await fetch("http://localhost:3000/jogadores/" + id, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ status: "inativo" })
+  await apiPut(`/jogadores/${id}`, {
+    status: "inativo"
   })
 
   await carregarJogadores()
@@ -294,12 +290,8 @@ async function inativarJogador(id){
 
 async function ativarJogador(id){
 
-  await fetch("http://localhost:3000/jogadores/" + id, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ status: "ativo" })
+  await apiPut(`/jogadores/${id}`, {
+    status: "ativo"
   })
 
   await carregarJogadores()
@@ -307,16 +299,13 @@ async function ativarJogador(id){
 
 async function excluirJogador(id){
 
-  console.log("CLICOU EXCLUIR", id) // 👈 ADICIONE AQUI
+  if(!confirm("Deseja excluir esse jogador?")) return
 
-  if(confirm("Deseja excluir esse jogador?")){
+  await apiDelete(`/jogadores/${id}`)
 
-    await fetch("http://localhost:3000/jogadores/" + id, {
-      method: "DELETE"
-    })
+  mostrarToast("Jogador excluído com sucesso")
 
-    await carregarJogadores()
-  }
+  await carregarJogadores()
 }
 
 function editarJogador(id){

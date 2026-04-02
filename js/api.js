@@ -5,8 +5,22 @@ const API =
 
 // GET
 async function apiGet(url){
+
   let res = await fetch(API + url)
-  return res.json()
+
+  let data
+
+  try {
+    data = await res.json()
+  } catch {
+    throw { erro: "Erro ao buscar dados" }
+  }
+
+  if(!res.ok){
+    throw data
+  }
+
+  return data
 }
 
 // POST
@@ -63,8 +77,23 @@ async function apiPut(url, body){
 
 // DELETE
 async function apiDelete(url){
-  return fetch(API + url, {
+
+  let res = await fetch(API + url, {
     method: "DELETE"
   })
+
+  let data
+
+  try {
+    data = await res.json()
+  } catch {
+    throw { erro: "Erro inesperado ao deletar" }
+  }
+
+  if(!res.ok){
+    throw data
+  }
+
+  return data
 }
 
