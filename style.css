@@ -1,0 +1,333 @@
+/* RESET */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* BODY */
+body {
+  background: #eef2f7;
+  color: #1e293b;
+}
+
+/* LAYOUT */
+.container {
+  display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 230px;
+  height: 100vh;
+  padding: 20px;
+  background: linear-gradient(180deg, #0f172a, #020617);
+  color: white;
+}
+
+.sidebar button {
+  width: 100%;
+  margin: 6px 0;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(6px);
+  transition: 0.2s;
+}
+
+.sidebar button:hover {
+  background: rgba(255,255,255,0.15);
+  transform: translateX(3px);
+}
+
+/* CONTENT */
+.content {
+  flex: 1;
+  padding: 25px;
+}
+
+/* CARDS */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+  gap: 15px;
+}
+
+.card {
+  background: white;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card h3 {
+  margin-bottom: 10px;
+  color: #475569;
+}
+
+.card p {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1e293b;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+table th {
+  background: #1e293b;
+  color: white;
+  padding: 12px;
+}
+
+table td {
+  padding: 10px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+table tr:hover {
+  background: #f8fafc;
+}
+
+/* INPUTS */
+input, select {
+  padding: 10px;
+  margin: 5px;
+  border-radius: 8px;
+  border: 1px solid #cbd5f5;
+}
+
+/* BUTTONS */
+button {
+  background: #1e293b;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #1e293b;
+}
+
+button[onclick*="excluir"],
+button[onclick*="remover"] {
+  background: #ef4444;
+}
+
+button[onclick*="excluir"]:hover,
+button[onclick*="remover"]:hover {
+  background: #dc2626;
+}
+
+/* ANIVERSÁRIOS */
+.aniversario-card {
+  background: white;
+  padding: 14px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  border-left: 5px solid #1e293b;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  transition: 0.2s;
+}
+
+.aniversario-card:hover {
+  transform: translateX(4px);
+  background: #f8fafc;
+}
+
+/* RANKING */
+.ranking-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  margin-bottom: 10px;
+  padding: 12px 15px;
+  border-radius: 10px;
+  border-left: 5px solid #1e293b;
+}
+
+/* HISTÓRICO */
+.historico-card {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+/* LOGIN */
+.login-container {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+}
+
+.login-box {
+  background:#1e293b;
+  padding:40px 30px;
+  border-radius:12px;
+  width:320px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+}
+
+.login-box h2 {
+  color:#fff;
+  margin-bottom:20px;
+}
+
+.login-box input {
+  width:100%;
+  padding:12px;
+  margin-bottom:12px;
+  border-radius:8px;
+  border:none;
+  background:#f1f5f9;
+}
+
+#btnLogin {
+  width:100%;
+  padding:12px;
+  background:#1e293b;
+  color:white;
+  border:none;
+  border-radius:8px;
+}
+
+#btnLogin:hover {
+  background:#1e293b;
+}
+
+/* MODAL */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: #1e293b;
+  padding: 30px;
+  border-radius: 12px;
+  width: 300px;
+  text-align: center;
+  color: white;
+}
+
+/* TOAST */
+#toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #1e293b;
+  color: #fff;
+  padding: 14px;
+  border-radius: 8px;
+}
+
+hr {
+  margin: 30px 0;
+  border: none;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+h2 {
+  margin-top: 25px;
+  margin-bottom: 15px;
+}
+
+.cards {
+  margin-bottom: 30px;
+}
+
+.btn-editar {
+  background: #1e293b;
+  margin-right: 5px;
+}
+
+.btn-excluir {
+  background: #ef4444;
+}
+
+/* CONFIGURAÇÕES - ESPAÇAMENTO */
+#configuracoes h2 {
+  margin-bottom: 15px;
+}
+
+.menu-config {
+  margin-bottom: 20px;
+}
+
+#configuracoes h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+/* INPUT + BOTÃO */
+#configuracoes input {
+  margin-top: 10px;
+}
+
+#configuracoes button {
+  margin-left: 10px;
+}
+
+.cards-abaixo {
+  display: flex;
+  margin-top: 15px;
+  gap: 15px;
+}
+
+.card-grande {
+  flex: 1; /* ocupa toda largura */
+}
+
+#listaAniversarios {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+#listaAniversarios {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.card-aniversario.hoje {
+  background: linear-gradient(135deg, #ff9800, #ff5722);
+  color: #fff;
+  font-weight: bold;
+}

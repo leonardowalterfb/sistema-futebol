@@ -1,0 +1,338 @@
+//JOGADORES//
+let jogadores = []
+let idEditando = null
+//let jogadorEditando = null
+
+// Cadastro de Jogadores: //
+
+async function cadastrar(){
+
+  console.log("Clicou em cadastrar")
+  console.log("ID EDITANDO:", idEditando)
+  console.log("URL:", "http://localhost:3000/jogadores/" + idEditando)
+
+  let nome=document.getElementById("nome").value
+  let telefone=document.getElementById("telefone").value
+  let cpf=document.getElementById("cpf").value
+  let nascimento=document.getElementById("nascimento").value
+  let posicao=document.getElementById("posicao").value
+
+  if(nome===""){
+    mostrarToast("Digite o nome do jogador")
+    return
+  }
+
+  let hoje = new Date()
+
+  let dataCadastro =
+  hoje.getDate().toString().padStart(2,"0") + "/" +
+  (hoje.getMonth()+1).toString().padStart(2,"0") + "/" +
+  hoje.getFullYear()
+
+  let jogador={
+    nome:nome,
+    telefone:telefone,
+    cpf:cpf,
+    nascimento:nascimento,
+    posicao:posicao,
+    dataCadastro:dataCadastro,
+    status:"ativo"
+  }
+
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+let turmaId = usuario.turma_id
+
+jogador.turma_id = turmaId
+
+  // 🔥 EDITAR
+  if(idEditando !== null){
+
+    try {
+
+  await apiPut(`/jogadores/${idEditando}`, jogador)
+
+  mostrarToast("Jogador atualizado com sucesso!")
+
+  idEditando = null
+
+} catch (erro) {
+
+  console.error("Erro:", erro)
+  mostrarToast(erro.erro || "Erro ao atualizar jogador")
+  return
+}
+
+ } else {
+
+  let cpfLimpo = cpf.replace(/\D/g, "")
+
+  let existeCpf = jogadores.find(j => 
+    j.cpf?.replace(/\D/g, "") === cpfLimpo &&
+    j.id != idEditando
+  )
+
+  if(existeCpf){
+    mostrarToast("Já existe um jogador com esse CPF")
+    return
+  }
+
+  try {
+
+    await apiPost('/jogadores', jogador)
+
+    mostrarToast("Jogador cadastrado com sucesso!")
+
+  } catch (erro) {
+
+    console.error("Erro:", erro)
+    mostrarToast(erro.erro || "Erro ao cadastrar jogador")
+    return
+  }
+
+}
+
+
+  // 🔥 RECARREGA
+  await carregarJogadores()
+
+  // 🔥 LIMPA CAMPOS
+  document.getElementById("nome").value=""
+  document.getElementById("telefone").value=""
+  document.getElementById("cpf").value=""
+  document.getElementById("nascimento").value=""
+  document.getElementById("posicao").value=""
+
+  atualizarSelectJogadores()
+  atualizarPainel()
+  mostrarAniversarios()
+}
+
+// Mostrar Lista de Jogadores na Tabela: //
+
+async function carregarJogadores(){
+
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaId = usuario.turma_id
+
+  jogadores = await apiGet(`/jogadores/${turmaId}`)
+
+  console.log("Jogadores carregados:", jogadores)
+
+  mostrarJogadores()
+  atualizarSelectJogadores()
+  atualizarPainel()
+  mostrarAniversarios()
+}
+
+async function salvarJogadorBackend(jogador){
+
+  try {
+
+    let url = "/jogadores"
+    let metodo = "POST"
+
+    if(idEditando !== null){
+      url = `/jogadores/${idEditando}`
+      metodo = "PUT"
+    }
+
+    console.log("Enviando pro backend:", jogador)
+
+    let res
+
+    if(metodo === "POST"){
+      res = await apiPost(url, jogador)
+    } else {
+      res = await apiPut(url, jogador)
+    }
+
+    // 🔴 TRATAR ERRO DO BACKEND
+    if(res?.erro){
+      mostrarToast(res.erro)
+      return
+    }
+
+    // 🔥 DEFINE MENSAGEM ANTES DE RESETAR
+    let mensagem = idEditando !== null 
+      ? "Jogador atualizado com sucesso!" 
+      : "Jogador cadastrado com sucesso!"
+
+    // 🔥 RESETA CONTROLE
+    idEditando = null
+
+    // 🔥 LIMPA FORMULÁRIO (SE EXISTIR)
+    if(typeof limparFormulario === "function"){
+      limparFormulario()
+    }
+
+    // 🔥 ATUALIZA LISTA (AGUARDANDO)
+    await carregarJogadores()
+
+    // 🔥 MOSTRA MENSAGEM POR ÚLTIMO
+    mostrarToast(mensagem)
+
+  } catch(e){
+    console.error("Erro ao salvar jogador:", e)
+    mostrarToast("Erro ao salvar jogador")
+  }
+
+}
+
+function mostrarJogadores(){
+
+  console.log("lista:", document.getElementById("listaJogadores"))
+
+  // 🔥 ORDENA ALFABETICAMENTE
+  jogadores.sort((a, b) => 
+  (a.nome || "").localeCompare(b.nome || "")
+)
+
+  let lista=document.getElementById("listaJogadores")
+  let listaInativos=document.getElementById("listaInativos")
+
+  if(!lista || !listaInativos){
+    console.error("Tabela não encontrada")
+    return
+  }
+
+  lista.innerHTML=""
+  listaInativos.innerHTML=""
+
+  //let contador = 1
+
+  for(let i=0;i<jogadores.length;i++){
+
+    let j = jogadores[i]
+
+    let idade = j.nascimento ? calcularIdade(j.nascimento) : "-"
+
+    let status = j.status || "ativo"
+
+     let numero = i + 1
+
+let linhaAtivo = `
+<tr>
+<td>${numero}</td>
+<td>${j.nome || "-"}</td>
+<td>${j.cpf || "-"}</td>
+<td>${j.telefone || "-"}</td>
+<td>${j.posicao || "-"}</td>
+<td>${formatarDataBR(j.nascimento) || "-"}</td> <!-- 👈 NOVO -->
+<td>${idade}</td>
+<td>${j.dataCadastro || "-"}</td>
+<td>
+<button onclick="editarJogador(${j.id})">✏️ Editar</button>
+<button onclick="inativarJogador(${j.id})">🚫 Inativar</button>
+<button onclick="excluirJogador(${j.id})">🗑️ Excluir</button>
+</td>
+</tr>
+`
+
+let linhaInativo = `
+<tr>
+<td>${numero}</td>
+<td>${j.nome || "-"}</td>
+<td>${j.cpf || "-"}</td>
+<td>${j.telefone || "-"}</td>
+<td>${j.posicao || "-"}</td>
+<td>${formatarDataBR(j.nascimento) || "-"}</td> <!-- 👈 NOVO -->
+<td>${idade}</td>
+<td>${j.dataCadastro || "-"}</td>
+<td>
+<button onclick="ativarJogador(${j.id})">✅ Ativar</button>
+<button onclick="excluirJogador(${j.id})">🗑️ Excluir</button>
+</td>
+</tr>
+`
+
+ if(status === "ativo"){
+  lista.innerHTML += linhaAtivo
+}else{
+  listaInativos.innerHTML += linhaInativo
+}
+
+  }
+
+}
+  
+
+function atualizarSelectJogadores(){
+
+let select=document.getElementById("jogadorPagamento")
+
+select.innerHTML=""
+
+for(let i=0;i<jogadores.length;i++){
+
+if(jogadores[i].status==="ativo"){
+
+let option=document.createElement("option")
+option.value=jogadores[i].nome
+option.text=jogadores[i].nome
+
+select.appendChild(option)
+
+}
+
+}
+}
+
+// ATIVAR INATIVAR JOGADOR //
+
+async function inativarJogador(id){
+
+  await fetch("http://localhost:3000/jogadores/" + id, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ status: "inativo" })
+  })
+
+  await carregarJogadores()
+}
+
+async function ativarJogador(id){
+
+  await fetch("http://localhost:3000/jogadores/" + id, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ status: "ativo" })
+  })
+
+  await carregarJogadores()
+}
+
+async function excluirJogador(id){
+
+  console.log("CLICOU EXCLUIR", id) // 👈 ADICIONE AQUI
+
+  if(confirm("Deseja excluir esse jogador?")){
+
+    await fetch("http://localhost:3000/jogadores/" + id, {
+      method: "DELETE"
+    })
+
+    await carregarJogadores()
+  }
+}
+
+function editarJogador(id){
+
+  idEditando = id
+
+  let jogador = jogadores.find(j => j.id == id)
+
+  if(!jogador){
+    console.error("Jogador não encontrado:", id)
+    return
+  }
+
+  document.getElementById("nome").value = jogador.nome || ""
+  document.getElementById("telefone").value = jogador.telefone || ""
+  document.getElementById("cpf").value = jogador.cpf || ""
+  document.getElementById("nascimento").value = jogador.nascimento || ""
+  document.getElementById("posicao").value = jogador.posicao || ""
+}

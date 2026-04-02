@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Sistema Para controle de Turmas Esportivas</title>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body> 
+
+<div id="telaLogin" class="login-container">
+
+  <div class="login-box">
+
+    <h2>🔐 Login</h2>
+
+    <input type="text" id="login" name="login" placeholder="Usuário">
+    <input type="password" id="senha" name="senha" placeholder="Senha">
+
+    <button onclick="fazerLogin()" id="btnLogin">
+      Entrar
+    </button>
+
+  </div>
+
+</div>
+
+<div class="container" id="sistema" style="display:none;">
+
+<!-- MENU LATERAL -->
+
+<div class="sidebar">
+
+<h2>⚽ Futebol</h2>
+
+<p id="nomeUsuarioLogado" style="margin-bottom:10px;font-weight:bold;"></p>
+
+<button onclick="mostrarSecao('painel')">📊 Painel</button>
+<button onclick="mostrarSecao('configuracoes'); abrirAbaConfig('usuarios')">⚙️ Configurações</button>
+<button onclick="mostrarSecao('jogadores')">👥 Jogadores</button>
+<button onclick="mostrarSecao('financeiro')">💰 Financeiro</button>
+<button onclick="mostrarSecao('jogos')">⚽ Jogos</button>
+<button onclick="mostrarSecao('ranking')">🏆 Ranking</button>
+<button onclick="mostrarSecao('historico')">📜 Histórico</button>
+<button onclick="logout()">🚪 Sair</button>
+
+</div>
+
+<!-- CONTEÚDO DO SISTEMA -->
+
+<div class="content">
+
+<!-- ======================= -->
+<!-- PAINEL -->
+<!-- ======================= -->
+
+<div id="painel" class="secao">
+
+<h1 id="tituloSistema">⚽ Sistema</h1>
+
+<h2>📊 Painel </h2>
+
+<!-- 🔹 LINHA 1 -->
+<div class="cards">
+
+  <div class="card">
+    <h3>Elenco</h3>
+    <p id="totalJogadores"></p>
+  </div>
+
+  <div class="card">
+    <h3>Pagamentos</h3>
+    <p id="totalPagamentos"></p>
+  </div>
+
+  <div class="card">
+    <h3>Mês Atual</h3>
+    <p id="totalMesAtual"></p>
+  </div>
+
+  <div class="card">
+    <h3>Total Recebido</h3>
+    <p id="totalAno"></p>
+  </div>
+
+  <div class="card">
+    <h3>Despesas</h3>
+    <p id="totalDespesas"></p>
+  </div>
+
+  <div class="card">
+    <h3>Saldo</h3>
+    <p id="saldoTurma"></p>
+  </div>
+
+</div>
+
+<!-- 🔹 LINHA 2 -->
+<div class="cards-abaixo">
+  <div class="card card-grande">
+    <h3>📊 Receita por Mês</h3>
+    <div id="receitaPorMes"></div>
+  </div>
+</div>
+
+<!-- 🔹 LINHA 3 (ANIVERSÁRIOS) -->
+<div class="cards-abaixo">
+  <div class="card card-grande">
+    <h3>🎂 Próximos Aniversários</h3>
+    <div id="listaAniversarios"></div>
+  </div>
+</div>
+
+</div> <!-- ✅ FECHA PAINEL CORRETAMENTE -->
+
+<!-- ======================= -->
+<!-- CONFIGURAÇÕES -->
+<!-- ======================= -->
+
+<div id="configuracoes" class="secao" style="display:none">
+
+  <h2>⚙️ Configurações</h2>
+
+  <!-- MENU DE BOTÕES -->
+  <div class="menu-config">
+
+    <button onclick="abrirAbaConfig('usuarios')">👤 Usuários</button>
+    <button onclick="abrirAbaConfig('permissoes')">🔐 Permissões</button>
+    <button onclick="abrirAbaConfig('sistema')">⚙️ Sistema</button>
+
+  </div>
+
+  <!-- ABA USUÁRIOS -->
+  <div id="aba-usuarios" class="aba-config">
+
+    <h3>Cadastrar Usuário</h3>
+
+    <input type="text" id="nomeUsuario" placeholder="Nome">
+    <input type="text" id="loginUsuario" placeholder="Login">
+    <input type="password" id="senhaUsuario" placeholder="Senha">
+
+    <button onclick="cadastrarUsuario()">Salvar</button>
+
+    <h3>Usuários cadastrados</h3>
+    <table>
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Login</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody id="listaUsuarios"></tbody>
+</table>
+
+  </div>
+
+  <!-- ABA FUTURA -->
+  <div id="aba-permissoes" class="aba-config" style="display:none">
+    <h3>Permissões (em breve)</h3>
+  </div>
+
+  <div id="aba-sistema" class="aba-config" style="display:none">
+
+    <h3>Configurações do sistema</h3>
+
+    <h3>Nome da Turma</h3>
+
+     <input type="text" id="nomeSistema" placeholder="Ex: Turma da Quinta Santistas">
+
+     <button onclick="salvarConfiguracoesSistema()">Salvar</button>
+  </div>
+
+  <h3>Valor da Mensalidade</h3>
+
+   <input type="number" id="valorMensalidade" placeholder="Ex: 50">
+
+   <button onclick="salvarConfiguracoesSistema()">Salvar</button>
+
+</div>
+
+<!-- ======================= -->
+<!-- JOGADORES -->
+<!-- ======================= -->
+
+<div id="jogadores" class="secao">
+
+<h3>🔎 Buscar Jogador</h3>
+
+<input type="text" id="buscarJogador" placeholder="Digite o nome..." onkeyup="buscarJogador()">
+
+<h2>Cadastrar Jogador</h2>
+
+<input type="text" id="nome" placeholder="Nome do jogador">
+<input type="text" id="telefone" placeholder="Telefone">
+<input type="text" id="cpf" placeholder="CPF">
+<input type="date" id="nascimento">
+
+<select id="posicao">
+<option value="">Posição</option>
+<option>Goleiro</option>
+<option>Zagueiro</option>
+<option>Lateral</option>
+<option>Meia</option>
+<option>Atacante</option>
+</select>
+
+<button onclick="cadastrar()">
+Salvar
+</button>
+
+<h2>Jogadores Ativos</h2>
+
+<table border="1">
+
+<thead>
+<tr>
+<th>N°</th>
+<th>Nome</th>
+<th>CPF</th>
+<th>Telefone</th>
+<th>Posição</th>
+<th>Nascimento</th>
+<th>Idade</th>
+<th>Cadastro</th>
+<th>Ações</th>
+</tr>
+</thead>
+
+<tbody id="listaJogadores"></tbody>
+
+</table>
+
+<h2>Jogadores Inativos</h2>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>N°</th>
+      <th>Nome</th>
+      <th>CPF</th>
+      <th>Telefone</th>
+      <th>Posição</th>
+      <th>Nascimento</th>
+      <th>Idade</th>
+      <th>Cadastro</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody id="listaInativos"></tbody>
+</table>
+
+</div>
+
+
+<!-- ======================= -->
+<!-- FINANCEIRO -->
+<!-- ======================= -->
+
+<div id="financeiro" class="secao">
+
+<h2>💰 Controle de Mensalidades</h2>
+
+<select id="jogadorPagamento"></select>
+
+<select id="mesPagamento">
+<option>Janeiro</option>
+<option>Fevereiro</option>
+<option>Março</option>
+<option>Abril</option>
+<option>Maio</option>
+<option>Junho</option>
+<option>Julho</option>
+<option>Agosto</option>
+<option>Setembro</option>
+<option>Outubro</option>
+<option>Novembro</option>
+<option>Dezembro</option>
+</select>
+
+<button onclick="registrarPagamento()">Registrar Pagamento (R$50)</button>
+
+<h3>Pagamentos</h3>
+
+<table id="tabelaPagamentos">
+
+<tbody id="listaPagamentos"></tbody>
+
+</table>
+
+<h3>⚠ Inadimplentes</h3>
+
+<table id="tabelaInadimplentes" style="width:100%;border-collapse:collapse;">
+<tbody id="listaInadimplentes"></tbody>
+</table>
+
+<hr>
+
+<h2>💸 Controle de Despesas</h2>
+
+<input type="text" id="descricaoDespesa" placeholder="Descrição da despesa">
+<input type="number" id="valorDespesa" placeholder="Valor">
+
+<button onclick="registrarDespesa()">Registrar Despesa</button>
+
+<h3>Lista de Despesas</h3>
+<table id="tabelaDespesas">
+  <thead>
+    <tr>
+      <th>Descrição</th>
+      <th>Valor</th>
+      <th>Data</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody id="listaDespesas"></tbody>
+</table>
+
+</div>
+
+
+<!-- ======================= -->
+<!-- JOGOS -->
+<!-- ======================= -->
+
+<div id="jogos" class="secao">
+
+<h2>⚽ Presença no Jogo</h2>
+
+<input type="date" id="dataJogo">
+<input type="text" id="localJogo" placeholder="Local do jogo">
+
+<button onclick="criarJogo()">⚽Criar Jogo</button>
+<button onclick="salvarHistorico()">Salvar Jogo</button>
+
+<button onclick="gerarLinksConfirmacao()">📲 Gerar links para WhatsApp</button>
+
+<h3 id="tituloJogadores">Jogadores (0)</h3>
+
+<table style="width:100%; border-collapse:collapse;">
+<thead>
+<tr style="background:#2d7cc1;color:white;">
+<th style="text-align:left;padding:8px;">Jogador</th>
+<th style="padding:8px;">Ação</th>
+</tr>
+</thead>
+
+<tbody id="listaPresenca"></tbody>
+</table>
+
+<h3 id="tituloConfirmados">Confirmados (0)</h3>
+
+<table style="width:100%;border-collapse:collapse;">
+<thead>
+<tr style="background:#2d7cc1;color:white;">
+<th style="text-align:left;padding:8px;">Jogador</th>
+<th style="padding:8px;">Ação</th>
+</tr>
+</thead>
+
+<tbody id="confirmados"></tbody>
+</table>
+
+<h3 id="tituloNaoConfirmados">Não Confirmados (0)</h3>
+
+<table style="width:100%;border-collapse:collapse;">
+<thead>
+<tr style="background:#2d7cc1;color:white;">
+<th style="text-align:left;padding:8px;">Jogador</th>
+<th style="padding:8px;">Ação</th>
+</tr>
+</thead>
+
+<tbody id="naoConfirmados"></tbody>
+</table>
+
+<h2>🎲 Sorteio de Times</h2>
+
+<button onclick="sortearTimes()">Sortear Times</button>
+<button onclick="limparSorteio()">Limpar Sorteio</button>
+
+<h3>Time A</h3>
+<ul id="timeA"></ul>
+
+<h3>Time B</h3>
+<ul id="timeB"></ul>
+
+</div>
+
+
+<!-- ======================= -->
+<!-- RANKING -->
+<!-- ======================= -->
+
+<div id="ranking" class="secao">
+
+<h2>🏆 Ranking de Presença</h2>
+
+<ul id="rankingPresenca"></ul>
+
+</div>
+
+
+<!-- ======================= -->
+<!-- HISTÓRICO -->
+<!-- ======================= -->
+
+<div id="historico" class="secao">
+
+<h2>📜 Histórico de Jogos</h2>
+
+<ul id="historicoJogos"></ul>
+
+</div>
+
+</div>
+</div>
+
+<div id="toast"></div>
+
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/jogadores.js"></script>
+<script src="js/financeiro.js"></script>
+<script src="js/jogos.js"></script>
+
+<!-- ======================= -->
+<!-- JAVASCRIPT -->
+<!-- ======================= -->
+
+<script>
+
+   // mostrarToast("Login Efetuado")
+
+// 🔐 LOGIN
+async function fazerLogin(){
+
+  let btn = document.getElementById("btnLogin")
+  btn.innerText = "Entrando..."
+  btn.disabled = true
+
+  let login = document.getElementById("login").value
+  let senha = document.getElementById("senha").value
+
+  let dados = await apiPost("/login", {
+    login: login,
+    senha: senha
+  })
+
+  if(!dados.ok){
+    mostrarToast("Login ou senha inválido")
+
+    btn.innerText = "Entrar"
+    btn.disabled = false
+    return
+  }
+
+  localStorage.setItem("usuarioLogado", JSON.stringify(dados.usuario))
+
+  document.getElementById("telaLogin").style.display = "none"
+  document.getElementById("sistema").style.display = "flex"
+
+  location.reload()
+}
+
+let dataSalva = localStorage.getItem("dataJogo")
+let localSalvo = localStorage.getItem("localJogo")
+
+const mapaMeses = {
+  "Janeiro": 1,
+  "Fevereiro": 2,
+  "Março": 3,
+  "Abril": 4,
+  "Maio": 5,
+  "Junho": 6,
+  "Julho": 7,
+  "Agosto": 8,
+  "Setembro": 9,
+  "Outubro": 10,
+  "Novembro": 11,
+  "Dezembro": 12
+}
+
+if(dataSalva){
+  document.getElementById("dataJogo").value = dataSalva
+}
+
+if(localSalvo){
+  document.getElementById("localJogo").value = localSalvo
+}
+
+// 🔥 SALVAR DATA E LOCAL AUTOMATICAMENTE
+
+document.getElementById("dataJogo").addEventListener("change", function(){
+})
+
+document.getElementById("localJogo").addEventListener("input", function(){
+})
+
+// Link Para WhatsApp//
+
+function verificarConfirmacaoLink(){
+
+let params = new URLSearchParams(window.location.search)
+
+let jogador = params.get("jogador")
+let presenca = params.get("presenca")
+
+if(!jogador || !presenca) return
+
+for(let i=0;i<presencas.length;i++){
+
+  if(!presencas) return
+
+if(presencas[i].nome === jogador){
+
+presencas[i].respondido = true
+
+if(presenca === "sim"){
+presencas[i].confirmado = true
+}
+
+if(presenca === "nao"){
+presencas[i].confirmado = false
+}
+
+mostrarToast("Presença registrada!")
+
+}
+
+}
+
+}
+
+function gerarLinksConfirmacao(){
+
+let base = window.location.href.split("?")[0]
+
+let mensagem = "⚽ Jogo da Turma da Quinta\n\n"
+
+for(let i=0;i<presencas.length;i++){
+
+let nome = presencas[i].nome
+
+let linkSim = base + "?jogador="+encodeURIComponent(nome)+"&presenca=sim"
+let linkNao = base + "?jogador="+encodeURIComponent(nome)+"&presenca=nao"
+
+mensagem += nome + "\n"
+mensagem += "✅ Vou jogar: " + linkSim + "\n"
+mensagem += "❌ Não vou: " + linkNao + "\n\n"
+
+}
+
+console.log(mensagem)
+mostrarToast("Links gerados! Veja no console (F12).")
+
+}
+
+function atualizarPainel(){
+
+let mesAtual = new Date().toLocaleString('pt-BR',{month:'long'})
+mesAtual = mesAtual.charAt(0).toUpperCase()+mesAtual.slice(1)
+
+
+let total = jogadores.length
+let ativos = 0
+let inativos = 0
+
+for(let i = 0; i < jogadores.length; i++){
+
+  if(jogadores[i].status === "ativo"){
+    ativos++
+  } else {
+    inativos++
+  }
+}
+
+document.getElementById("totalJogadores").innerHTML =
+`
+<strong>Total:</strong> ${total}<br>
+🟢 Ativos: ${ativos}<br>
+🔴 Inativos: ${inativos}
+`
+
+let totalMesPagamentos = 0
+
+for(let i=0;i<pagamentos.length;i++){
+
+  if(pagamentos[i].mes === mesAtual){
+    totalMesPagamentos++
+  }
+
+}
+
+document.getElementById("totalPagamentos").innerHTML =
+`
+Pagamentos em ${mesAtual}: <br>
+<strong>${totalMesPagamentos}</strong>
+`
+
+let totalAno=0
+
+for(let i=0;i<pagamentos.length;i++){
+totalAno+=pagamentos[i].valor
+}
+
+document.getElementById("totalAno").innerText=
+"Total Recebido no Ano: "+formatarMoeda(totalAno)
+
+let totalMes=0
+
+for(let i=0;i<pagamentos.length;i++){
+
+if(pagamentos[i].mes===mesAtual){
+totalMes+=pagamentos[i].valor
+}
+
+}
+
+document.getElementById("totalMesAtual").innerText=
+"Recebido em "+mesAtual+": "+formatarMoeda(totalMes)
+
+let totalDespesas = 0
+
+for(let i=0;i<despesas.length;i++){
+totalDespesas += despesas[i].valor
+}
+
+document.getElementById("totalDespesas").innerText =
+"Total de Despesas: "+formatarMoeda(totalDespesas)
+
+let saldo = totalAno - totalDespesas
+
+document.getElementById("saldoTurma").innerText =
+"Saldo da Turma: "+formatarMoeda(saldo)
+
+}
+
+// Aniversario//
+
+function mostrarAniversarios(){
+
+  let hoje = new Date()
+  hoje.setHours(0,0,0,0)
+
+  let limite = new Date()
+  limite.setDate(hoje.getDate() + 30)
+
+  let lista = document.getElementById("listaAniversarios")
+  lista.innerHTML = ""
+
+  let aniversarios = jogadores
+    .filter(j => j.nascimento)
+    .map(j => {
+
+      let nascimento = new Date(j.nascimento)
+
+      let aniversario = new Date(
+        hoje.getFullYear(),
+        nascimento.getMonth(),
+        nascimento.getDate()
+      )
+
+      // se já passou esse ano → joga pro próximo
+      if(aniversario < hoje){
+        aniversario.setFullYear(hoje.getFullYear() + 1)
+      }
+
+      return {
+        ...j,
+        proximaData: aniversario
+      }
+    })
+    // 🔥 FILTRA APENAS PRÓXIMOS 30 DIAS
+    .filter(j => j.proximaData <= limite)
+    // 🔥 ORDENA
+    .sort((a, b) => a.proximaData - b.proximaData)
+
+  // 🔥 MOSTRAR
+  for(let i=0;i<aniversarios.length;i++){
+
+    let j = aniversarios[i]
+
+    let dataFormatada = formatarDataBR(j.nascimento)
+    let idade = calcularIdade(j.nascimento)
+
+    let isHoje = j.proximaData.toDateString() === hoje.toDateString()
+
+   lista.innerHTML += `
+  <div class="card-aniversario ${isHoje ? "hoje" : ""}">
+    <strong>${isHoje ? "🎉 HOJE! " : "🎂 "} ${j.nome}</strong><br>
+    📅 ${dataFormatada}<br>
+    🎂 ${idade} anos
+  </div>
+`
+  }
+
+}
+
+function mostrarConfirmados(){
+
+let lista = document.getElementById("confirmados")
+
+lista.innerHTML=""
+
+for(let i=0;i<presencas.length;i++){
+
+if(presencas[i].confirmado){
+
+lista.innerHTML +=
+"<li>"+presencas[i].nome+
+" <button onclick='voltarLista("+i+")'>↩ Voltar</button></li>"
+
+}
+}
+}
+
+// Pesquisar Jogador//
+
+function buscarJogador(){
+
+let busca = document.getElementById("buscarJogador").value.toLowerCase()
+
+let linhas = document.querySelectorAll("#listaJogadores tr")
+
+for(let i=0;i<linhas.length;i++){
+
+let nome = linhas[i].children[1].innerText.toLowerCase()
+
+if(nome.includes(busca)){
+linhas[i].style.display = ""
+}else{
+linhas[i].style.display = "none"
+}
+}
+}
+
+// Expandir/Recolher Mes //
+
+function toggleMes(id){
+
+let tabela = document.getElementById(id)
+
+if(tabela.style.display === "none"){
+tabela.style.display = "table-row-group"
+}else{
+tabela.style.display = "none"
+}
+}
+
+//Jogadores Inadimplentes //
+
+function mostrarInadimplentes(){
+
+let lista = document.getElementById("listaInadimplentes")
+lista.innerHTML=""
+
+let hoje = new Date()
+let mesAtual = hoje.getMonth() + 1
+
+let meses = [
+"Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+"Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+]
+
+for(let mes of meses){
+
+  let numeroMes = mapaMeses[mes]
+
+  // 🔥 BLOQUEIA MESES FUTUROS
+  if(numeroMes > mesAtual){
+    continue
+  }
+
+let titulo = document.createElement("tr")
+
+titulo.innerHTML =
+"<td colspan='5' style='font-weight:bold;background:#eee;cursor:pointer;text-align:left;padding-left:10px' onclick='toggleMes(\"inad_"+mes+"\")'>▶ "+mes+"</td>"
+
+lista.appendChild(titulo)
+
+let grupo = document.createElement("tbody")
+grupo.id = "inad_"+mes
+grupo.style.display="none"
+
+for(let j=0;j<jogadores.length;j++){
+
+  let jogador = jogadores[j]
+
+  // 🚫 IGNORA GOLEIROS
+if(jogador.posicao && jogador.posicao.toLowerCase() === "goleiro") continue
+
+  // 🔥 PEGA MÊS DO CADASTRO
+  let dataCadastro = jogador.dataCadastro
+
+  let partes = dataCadastro.split("/") // dd/mm/yyyy
+  let mesCadastro = parseInt(partes[1])
+
+  let numeroMes = mapaMeses[mes]
+
+  // 🔥 IGNORA MESES ANTES DO CADASTRO
+  if(numeroMes < mesCadastro){
+    continue
+}
+
+if(jogadores[j].status !== "ativo") continue
+
+let pagou = pagamentos.find(p =>
+p.jogador === jogadores[j].nome && p.mes === mes
+)
+
+if(!pagou){
+
+let tr = document.createElement("tr")
+
+tr.innerHTML =
+"<td style='text-align:left;padding-left:10px'>"+jogadores[j].nome+"</td>"
+
+grupo.appendChild(tr)
+
+}
+}
+
+lista.appendChild(grupo)
+
+}
+}
+
+// CONFIGURAÇÕES 
+function abrirConfiguracoes(){
+
+  let tela = document.getElementById("telaConfiguracoes")
+
+  tela.style.display = tela.style.display === "none" ? "block" : "none"
+
+}
+
+async function cadastrarUsuario(){
+
+  let nome = document.getElementById("nomeUsuario").value
+  let login = document.getElementById("loginUsuario").value
+  let senha = document.getElementById("senhaUsuario").value
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turma_id = usuario.turma_id
+
+  if(!nome || !login || !senha){
+    mostrarToast("Preencha todos os campos")
+    return
+  }
+
+  // 🔥 EDITAR
+  if(usuarioEditando){
+
+    await fetch("http://localhost:3000/usuarios/" + usuarioEditando, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome, login, senha, turma_id })
+    })
+
+    mostrarToast("Usuário atualizado")
+
+    usuarioEditando = null
+
+  } else {
+
+    // 🔥 NOVO
+    await fetch("http://localhost:3000/usuarios", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome, login, senha, turma_id })
+    })
+
+    mostrarToast("Usuário cadastrado")
+  }
+
+  carregarUsuarios()
+
+  // limpar campos
+  document.getElementById("nomeUsuario").value = ""
+  document.getElementById("loginUsuario").value = ""
+  document.getElementById("senhaUsuario").value = ""
+}
+
+async function carregarUsuarios(){
+
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
+  let res = await fetch(`http://localhost:3000/usuarios/${usuario.turma_id}`)
+  let dados = await res.json()
+
+  let lista = document.getElementById("listaUsuarios")
+
+  lista.innerHTML = ""
+
+for(let i=0;i<dados.length;i++){
+
+  // 🚫 ESCONDE ADMIN
+  if(dados[i].login === "Admin") continue
+
+  lista.innerHTML += `
+    <tr>
+      <td>${dados[i].nome}</td>
+      <td>${dados[i].login}</td>
+      <td>
+  <button class="btn-editar" onclick="editarUsuario(${dados[i].id})">✏️ Editar</button>
+  <button class="btn-excluir" onclick="excluirUsuario(${dados[i].id})">🗑️ Excluir</button>
+      </td>
+    </tr>
+  `
+}
+}
+
+async function excluirUsuario(id){
+
+  let confirmar = confirm("Deseja excluir este usuário?")
+
+  if(!confirmar) return
+
+  await fetch("http://localhost:3000/usuarios/" + id, {
+    method: "DELETE"
+  })
+
+  mostrarToast("Usuário excluído")
+
+  carregarUsuarios()
+}
+
+let usuarioEditando = null
+
+function editarUsuario(id){
+
+  let usuario = document.querySelectorAll("#listaUsuarios li")
+
+  // 🔥 melhorar isso depois com find no backend
+  usuarioEditando = id
+
+  let usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"))
+
+  fetch(`http://localhost:3000/usuarios/${usuarioLogado.turma_id}`)
+    .then(res => res.json())
+    .then(dados => {
+
+      let u = dados.find(u => u.id === id)
+
+      if(!u) return
+
+      document.getElementById("nomeUsuario").value = u.nome
+      document.getElementById("loginUsuario").value = u.login
+      document.getElementById("senhaUsuario").value = ""
+
+    })
+}
+
+function abrirAbaConfig(aba){
+
+  let abas = document.querySelectorAll(".aba-config")
+
+  // esconde todas
+  for(let i=0;i<abas.length;i++){
+    abas[i].style.display = "none"
+  }
+
+  // mostra a selecionada
+  let ativa = document.getElementById("aba-" + aba)
+
+  if(ativa){
+    ativa.style.display = "block"
+  }
+
+  // 🔥 carregamento automático
+  if(aba === "usuarios"){
+    carregarUsuarios()
+  }
+
+  if(aba === "sistema"){
+    document.getElementById("nomeSistema").value =
+      localStorage.getItem("nomeSistema") || ""
+  }
+}
+
+async function selecionarTurmaAdmin(){
+
+  let turmas = await apiGet("/turmas")
+
+  let select = document.getElementById("selectTurma")
+  select.innerHTML = "<option value=''>Selecione uma turma</option>"
+
+  turmas.forEach(t => {
+    select.innerHTML += `<option value="${t.id}">${t.nome}</option>`
+  })
+
+  document.getElementById("modalTurma").style.display = "flex"
+}
+
+function confirmarTurma(){
+
+  let select = document.getElementById("selectTurma")
+  let turmaId = select.value
+
+  if(!turmaId){
+    mostrarToast("Selecione uma turma")
+    return
+  }
+
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
+  usuario.turma_id = Number(turmaId)
+
+  localStorage.setItem("usuarioLogado", JSON.stringify(usuario))
+
+  // 🔥 CONTROLE DO MODAL (ESSA É A CHAVE)
+  localStorage.setItem("turmaSelecionada", "true")
+
+  document.getElementById("modalTurma").style.display = "none"
+
+  window.location.reload()
+}
+
+async function salvarConfiguracoesSistema(){
+
+  let nome = document.getElementById("nomeSistema").value
+
+  if(!nome){
+    mostrarToast("Informe um nome")
+    return
+  }
+
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
+  if(!usuario || !usuario.turma_id){
+    mostrarToast("Erro: turma não identificada")
+    return
+  }
+
+  // 🔥 AQUI ESTÁ A CHAVE
+  await fetch(`http://localhost:3000/turmas/${usuario.turma_id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      nome: nome
+    })
+  })
+
+  mostrarToast("Nome salvo com sucesso!")
+
+  atualizarTituloSistema()
+}
+
+async function atualizarTituloSistema(){
+
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
+  if(!usuario || !usuario.turma_id) return
+
+  let res = await fetch(`http://localhost:3000/turmas/${usuario.turma_id}`)
+  let turma = await res.json()
+
+  let titulo = document.getElementById("tituloSistema")
+
+  if(turma && turma.nome){
+    titulo.innerText = "⚽ " + turma.nome
+  } else {
+    titulo.innerText = "⚽ Sistema Para controle de Turmas Esportivas"
+  }
+}
+
+function mostrarPagina(pagina){
+
+  let paginas = document.querySelectorAll(".secao")
+
+  for(let i=0;i<paginas.length;i++){
+    paginas[i].style.display = "none"
+  }
+
+  document.getElementById(pagina).style.display = "block"
+}
+
+function logout(){
+
+  // 🔥 LIMPA SESSÃO
+  localStorage.removeItem("usuarioLogado")
+
+  // 🔥 LIMPA CONTROLE DA TURMA (ESSENCIAL)
+  localStorage.removeItem("turmaSelecionada")
+
+  // 🔥 VOLTA PRO LOGIN
+  document.getElementById("sistema").style.display = "none"
+  document.getElementById("telaLogin").style.display = "flex"
+
+}
+
+document.addEventListener("DOMContentLoaded", async function(){
+
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaSelecionada = localStorage.getItem("turmaSelecionada")
+
+  if(usuario?.tipo === "admin" && !turmaSelecionada){
+    await selecionarTurmaAdmin()
+    return
+  }
+
+  if(!usuario){
+    document.getElementById("telaLogin").style.display = "flex"
+    document.getElementById("sistema").style.display = "none"
+    return
+  }
+
+  let turmaId = usuario.turma_id
+
+  let el = document.getElementById("nomeUsuarioLogado")
+  if(el){
+    el.innerText = "👤 " + usuario.nome
+  }
+
+  document.getElementById("telaLogin").style.display = "none"
+  document.getElementById("sistema").style.display = "flex"
+
+  await carregarJogadores()
+  await carregarPagamentos()
+  await carregarDespesas()
+  await carregarRanking()
+
+  atualizarSelectJogadores()
+  mostrarPagamentos()
+  mostrarInadimplentes()
+  atualizarPainel()
+  mostrarAniversarios()
+  mostrarPresenca()
+  await carregarHistorico()
+  mostrarRanking()
+  mostrarDespesas()
+  mostrarSecao("painel")
+  verificarConfirmacaoLink()
+  atualizarTituloSistema()
+
+})
+
+</script>
+
+<div id="modalTurma" class="modal">
+  <div class="modal-content">
+
+    <h2>🏆 Selecionar Turma</h2>
+
+    <select id="selectTurma">
+      <option value="">Selecione uma turma</option>
+    </select>
+
+    <button onclick="confirmarTurma()">Entrar</button>
+
+  </div>
+</div>
+
+</body>
+</html>
