@@ -1,6 +1,7 @@
-const API = window.location.hostname.includes("localhost")
-  ? "http://localhost:3000"
-  : "https://sistema-futebol.onrender.com"
+const API =
+  window.location.hostname === "localhost"
+    ? "http://localhost:3000"
+    : "https://sistema-futebol.onrender.com";
 
 // GET
 async function apiGet(url){

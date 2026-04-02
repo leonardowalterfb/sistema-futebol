@@ -32,7 +32,7 @@ let turmaId = usuario.turma_id
 let pagamento={
   jogador:jogador,
   mes:mes,
-  valor:50,
+  valor: parseFloat(getMensalidade()),
   data:dataPagamento,
   turma_id: turmaId
 }
@@ -138,13 +138,15 @@ async function removerPagamento(id){
     return
   }
 
-  await fetch("https://sistema-futebol.onrender.com/pagamentos/" + id, {
-    method: "DELETE"
-  })
+  await apiDelete("/pagamentos/" + id)
 
   mostrarToast("Pagamento removido com sucesso")
 
+  // 🔥 FORÇA atualização real
   await carregarPagamentos()
+
+  // 🔥 GARANTE render correto
+  //mostrarPagamentos()
 }
 
 function calcularTotalMes(){
@@ -196,13 +198,7 @@ let despesa = {
 }
 
 // 🔥 SALVAR NO BACKEND
-await fetch("https://sistema-futebol.onrender.com/despesas", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify(despesa)
-})
+await apiPost("/despesas", despesa)
 
 // 🔥 RECARREGAR DO BACKEND
 await carregarDespesas()
@@ -218,8 +214,7 @@ async function carregarDespesas(){
   let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
   let turmaId = usuario.turma_id
 
-  let resposta = await fetch(`https://sistema-futebol.onrender.com/despesas/${turmaId}`)
-  despesas = await resposta.json()
+  despesas = await apiGet(`/despesas/${turmaId}`)
 
   console.log("Despesas carregadas:", despesas)
 
@@ -263,9 +258,7 @@ async function removerDespesa(id){
     return
   }
 
-  await fetch("https://sistema-futebol.onrender.com/despesas/" + id, {
-    method: "DELETE"
-  })
+  await apiDelete(`/despesas/${id}`)
 
   mostrarToast("Despesa removida com sucesso")
 
@@ -317,4 +310,23 @@ function mostrarReceitaPorMes(){
       `
     }
   })
+}
+
+  function atualizarBotaoPagamento(){
+  const botao = document.getElementById("btnPagamento");
+
+  if(botao){
+    botao.innerText = `Registrar Pagamento (${formatarMoeda(getMensalidade())})`
+  }
+}
+
+async function salvarMensalidade(){
+  const valor = document.getElementById("valorMensalidade").value;
+
+  // salva localmente
+  setMensalidade(valor);
+
+  mostrarToast("Mensalidade atualizada!");
+
+  atualizarBotaoPagamento();
 }

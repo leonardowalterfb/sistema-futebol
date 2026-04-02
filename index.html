@@ -156,7 +156,7 @@
 
   </div>
 
-  <!-- ABA FUTURA -->
+  
   <div id="aba-permissoes" class="aba-config" style="display:none">
     <h3>Permissões (em breve)</h3>
   </div>
@@ -170,15 +170,16 @@
      <input type="text" id="nomeSistema" placeholder="Ex: Turma da Quinta Santistas">
 
      <button onclick="salvarConfiguracoesSistema()">Salvar</button>
-  </div>
 
-  <h3>Valor da Mensalidade</h3>
+     <h3>Valor da Mensalidade</h3>
 
    <input type="number" id="valorMensalidade" placeholder="Ex: 50">
 
-   <button onclick="salvarConfiguracoesSistema()">Salvar</button>
+   <button onclick="salvarMensalidade()">Salvar</button>
 
 </div>
+
+  </div>
 
 <!-- ======================= -->
 <!-- JOGADORES -->
@@ -279,7 +280,9 @@ Salvar
 <option>Dezembro</option>
 </select>
 
-<button onclick="registrarPagamento()">Registrar Pagamento (R$50)</button>
+<button id="btnPagamento" onclick="registrarPagamento()">
+  Registrar Pagamento (R$0)
+</button>
 
 <h3>Pagamentos</h3>
 
@@ -1115,6 +1118,14 @@ document.addEventListener("DOMContentLoaded", async function(){
     el.innerText = "👤 " + usuario.nome
   }
 
+  function atualizarBotaoPagamento(){
+  const botao = document.getElementById("btnPagamento");
+
+  if(botao){
+    botao.innerText = `Registrar Pagamento (${formatarMoeda(getMensalidade())})`;
+  }
+}
+
   document.getElementById("telaLogin").style.display = "none"
   document.getElementById("sistema").style.display = "flex"
 
@@ -1135,6 +1146,7 @@ document.addEventListener("DOMContentLoaded", async function(){
   mostrarSecao("painel")
   verificarConfirmacaoLink()
   atualizarTituloSistema()
+  atualizarBotaoPagamento()
 
 })
 
