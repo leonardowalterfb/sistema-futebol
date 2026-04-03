@@ -27,12 +27,14 @@ app.get("/jogadores/:turmaId", async (req, res) => {
     const { turmaId } = req.params
 
     const result = await db.query(
-      "SELECT * FROM jogadores WHERE turma_id = $1",
+      "SELECT * FROM jogadores WHERE turma_id = $1 ORDER BY nome",
       [turmaId]
     )
 
     res.json(result.rows)
+
   } catch (err) {
+    console.error("Erro ao buscar jogadores:", err)
     res.status(500).json({ erro: err.message })
   }
 })
