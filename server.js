@@ -19,6 +19,7 @@ app.get("/teste-db", async (req, res) => {
     const result = await db.query("SELECT NOW()")
     res.json(result.rows)
   } catch (err) {
+    console.error("ERRO REAL:", err) // 👈 ISSO AQUI
     res.status(500).json({ erro: err.message })
   }
 })
