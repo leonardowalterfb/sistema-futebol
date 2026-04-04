@@ -2,6 +2,12 @@ require("dotenv").config()
 
 console.log("DATABASE_URL:", process.env.DATABASE_URL)
 
+if (!process.env.DATABASE_URL) {
+  console.error("❌ DATABASE_URL NÃO DEFINIDA")
+} else {
+  console.log("✅ DATABASE_URL carregada")
+}
+
 const express = require("express")
 const cors = require("cors")
 const bcrypt = require("bcrypt")
