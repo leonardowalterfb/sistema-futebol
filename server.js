@@ -280,8 +280,8 @@ app.post("/login", async (req, res) => {
       return res.status(401).json({ erro: "Login inválido" })
     }
 
-    //const ok = await bcrypt.compare(senha, user.senha)
-    const ok = senha === user.senha
+    const ok = await bcrypt.compare(senha, user.senha)
+    //const ok = senha === user.senha
 
     if (!ok) {
       return res.status(401).json({ erro: "Login inválido" })
