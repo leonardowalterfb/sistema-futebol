@@ -166,10 +166,10 @@ app.post("/pagamentos", async (req, res) => {
     }
 
     await pool.query(
-      `INSERT INTO pagamentos (jogador, mes, valor, data, turma_id)
-       VALUES ($1,$2,$3,$4,$5)`,
-      [jogador, mes, valor, data, turma_id]
-    )
+  `INSERT INTO pagamentos (jogador_nome, mes, valor, data, turma_id)
+   VALUES ($1,$2,$3,$4,$5)`,
+  [jogador, mes, valor, data, turma_id]
+)
 
     res.json({ ok: true })
   } catch (err) {
