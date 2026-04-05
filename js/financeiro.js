@@ -112,7 +112,7 @@ for(let mes in pagamentosPorMes){
     tr.innerHTML = `
       <td>${p.jogador_nome || p.jogador}</td>
       <td>${p.mes}</td>
-      <td>${formatarMoeda(p.valor)}</td>
+      <td>${formatarMoeda(Number(p.valor))}</td>
       <td>${formatarDataBR(p.data)}</td>
       <td>
         <button onclick="removerPagamento(${p.id})">🗑️</button>
@@ -237,8 +237,8 @@ function mostrarDespesas(){
     lista.innerHTML += `
       <tr>
         <td>${d.descricao}</td>
-        <td>${formatarMoeda(d.valor)}</td>
-        <td>${d.data}</td>
+        <td>${formatarMoeda(Number(d.valor))}</td>
+        <td>${formatarDataBR(d.data)}</td>
         <td>
           <button onclick="removerDespesa(${d.id})">🗑️</button>
         </td>

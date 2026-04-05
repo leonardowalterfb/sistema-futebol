@@ -24,11 +24,10 @@ carregarMensalidadeLocal();
 
 function formatarMoeda(valor){
 
-return valor.toLocaleString("pt-BR", {
-style: "currency",
-currency: "BRL"
-})
-
+  return Number(valor).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  })
 }
 
 function formatarData(dataISO){
