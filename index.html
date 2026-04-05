@@ -459,14 +459,23 @@ async function fazerLogin(){
     return
   }
 
-  localStorage.setItem("usuarioLogado", JSON.stringify(dados.usuario))
+  const usuario = dados.usuario
+
+  localStorage.setItem("usuarioLogado", JSON.stringify(usuario))
+
+  // 🔥 AQUI É A CHAVE
+  if(usuario.tipo === "admin"){
+    await selecionarTurmaAdmin()
+    return
+  } else {
+    localStorage.setItem("turmaSelecionada", "true")
+  }
 
   document.getElementById("telaLogin").style.display = "none"
   document.getElementById("sistema").style.display = "flex"
 
   location.reload()
 }
-
 let dataSalva = localStorage.getItem("dataJogo")
 let localSalvo = localStorage.getItem("localJogo")
 
