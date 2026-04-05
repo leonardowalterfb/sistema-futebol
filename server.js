@@ -304,13 +304,17 @@ app.get("/ranking/:turmaId", async (req, res) => {
     const { turmaId } = req.params
 
     const result = await pool.query(
-      `SELECT nome, presencas FROM ranking WHERE turma_id = $1 ORDER BY presencas DESC`,
+      `SELECT nome, presencas 
+       FROM ranking 
+       WHERE turma_id = $1
+       ORDER BY presencas DESC`,
       [turmaId]
     )
 
     res.json(result.rows)
+
   } catch (err) {
-    console.error(err)
+    console.error("ERRO RANKING:", err)
     res.status(500).json({ erro: "Erro ao buscar ranking" })
   }
 })
