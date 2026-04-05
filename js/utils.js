@@ -31,27 +31,13 @@ function formatarMoeda(valor){
 }
 
 function formatarData(dataISO){
-
   if(!dataISO) return "-"
 
-  let partes = dataISO.split("-") // yyyy-mm-dd
+  const data = new Date(dataISO)
 
-  return partes[2] + "/" + partes[1] + "/" + partes[0]
-}
+  if(isNaN(data)) return "-"
 
-function formatarDataBR(data){
-
-  if(!data) return "-"
-
-  let d = new Date(data)
-
-  if(isNaN(d)) return data
-
-  let dia = String(d.getDate()).padStart(2, "0")
-  let mes = String(d.getMonth() + 1).padStart(2, "0")
-  let ano = d.getFullYear()
-
-  return `${dia}/${mes}/${ano}`
+  return data.toLocaleDateString("pt-BR")
 }
 
 function calcularIdade(data){
