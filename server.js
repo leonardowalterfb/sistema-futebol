@@ -79,20 +79,20 @@ app.post("/jogadores", async (req, res) => {
       return res.status(400).json({ erro: "Jogador já existe" })
     }
 
-    const result = await pool.query(
+   const result = await pool.query(
   `INSERT INTO jogadores
-      (nome, telefone, cpf, nascimento, posicao, turma_id, dataCadastro, status)
-      VALUES ($1,$2,$3,$4,$5,$6,NOW(),'ativo')
-      RETURNING id`,
-      [
-        j.nome,
-        j.telefone,
-        cpfLimpo,
-        j.nascimento,
-        j.posicao,
-        j.turma_id
-      ]
-    )
+   (nome, telefone, cpf, nascimento, posicao, turma_id, data_cadastro, status)
+   VALUES ($1,$2,$3,$4,$5,$6,NOW(),'ativo')
+   RETURNING id`,
+  [
+    j.nome,
+    j.telefone,
+    cpfLimpo,
+    j.nascimento,
+    j.posicao,
+    j.turma_id
+  ]
+)
 
     res.json({ ok: true, id: result.rows[0].id })
 
@@ -304,12 +304,10 @@ app.get("/ranking/:turmaId", async (req, res) => {
     const { turmaId } = req.params
 
     const result = await pool.query(
-      `SELECT nome, presencas 
-       FROM ranking 
-       WHERE turma_id = $1
-       ORDER BY presencas DESC`,
-      [turmaId]
-    )
+  `SELECT nome, presencas 
+   FROM ranking 
+   ORDER BY presencas DESC`
+)
 
     res.json(result.rows)
 
