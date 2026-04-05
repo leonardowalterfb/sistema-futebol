@@ -17,6 +17,8 @@ const bcrypt = require("bcrypt")
 
 const app = express()
 
+const pool = require("./db")
+
 app.use(cors())
 app.use(express.json())
 
