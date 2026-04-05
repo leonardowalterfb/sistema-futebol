@@ -157,7 +157,7 @@ app.post("/pagamentos", async (req, res) => {
     const { jogador, mes, valor, data, turma_id } = req.body
 
     const existe = await pool.query(
-      "SELECT id FROM pagamentos WHERE jogador=$1 AND mes=$2 AND turma_id=$3",
+      "SELECT id FROM pagamentos WHERE jogador_nome=$1 AND mes=$2 AND turma_id=$3",
       [jogador, mes, turma_id]
     )
 
