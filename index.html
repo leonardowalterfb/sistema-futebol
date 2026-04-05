@@ -795,12 +795,12 @@ for(let j=0;j<jogadores.length;j++){
 if(jogador.posicao && jogador.posicao.toLowerCase() === "goleiro") continue
 
   // 🔥 PEGA MÊS DO CADASTRO
-  let dataCadastro = jogador.dataCadastro
+let dataCadastro = jogador.dataCadastro || jogador.data_cadastro
 
-  let partes = dataCadastro.split("/") // dd/mm/yyyy
-  let mesCadastro = parseInt(partes[1])
+if(!dataCadastro) continue
 
-  let numeroMes = mapaMeses[mes]
+let data = new Date(dataCadastro)
+let mesCadastro = data.getMonth() + 1
 
   // 🔥 IGNORA MESES ANTES DO CADASTRO
   if(numeroMes < mesCadastro){
