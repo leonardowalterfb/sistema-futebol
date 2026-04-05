@@ -297,6 +297,32 @@ app.post("/login", async (req, res) => {
   }
 })
 
+//RANKING
+
+
+app.get("/ranking/:turmaId", async (req, res) => {
+  try {
+    const { turmaId } = req.params
+
+    const result = await pool.query(
+      `
+      SELECT nome, COUNT(*) as presencas
+      FROM jogos,
+      unnest(presentes) AS nome
+      WHERE turma_id = $1
+      GROUP BY nome
+      ORDER BY presencas DESC
+      `,
+      [turmaId]
+    )
+
+    res.json(result.rows)
+  } catch (err) {
+    console.error("Erro ao buscar ranking:", err)
+    res.status(500).json({ erro: "Erro ao buscar ranking" })
+  }
+})
+
 // ================= START =================
 const PORT = process.env.PORT || 3000
 
