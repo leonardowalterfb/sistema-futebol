@@ -33,6 +33,15 @@ app.get("/teste-db", async (req, res) => {
   }
 })
 
+app.get("/teste-jogadores", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM jogadores LIMIT 10")
+    res.json(result.rows)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ erro: err.message })
+  }
+})
 // ================= JOGADORES =================
 app.get("/jogadores/:turmaId", async (req, res) => {
   try {
