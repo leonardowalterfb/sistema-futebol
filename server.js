@@ -319,6 +319,25 @@ app.get("/ranking/:turmaId", async (req, res) => {
   }
 })
 
+//JOGOS
+
+app.get("/jogos/:turmaId", async (req, res) => {
+  try {
+    const { turmaId } = req.params
+
+    const result = await pool.query(
+      "SELECT * FROM jogos WHERE turma_id = $1 ORDER BY data DESC",
+      [turmaId]
+    )
+
+    res.json(result.rows)
+
+  } catch (err) {
+    console.error("ERRO JOGOS:", err)
+    res.status(500).json({ erro: "Erro ao buscar jogos" })
+  }
+})
+
 // ================= START =================
 const PORT = process.env.PORT || 3000
 
