@@ -1,15 +1,15 @@
 const { Pool } = require("pg")
+const dns = require("dns")
 
-const connectionString = process.env.DATABASE_URL
+// 🔥 FORÇA IPv4
+dns.setDefaultResultOrder("ipv4first")
 
 const pool = new Pool({
-  connectionString,
+  connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false
   },
-  max: 5, // 👈 importante pro Render free
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 20000
+  family: 4 // 👈 força IPv4
 })
 
 module.exports = pool
