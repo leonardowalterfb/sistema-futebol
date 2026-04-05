@@ -110,10 +110,10 @@ for(let mes in pagamentosPorMes){
     let tr = document.createElement("tr")
 
     tr.innerHTML = `
-      <td>${p.jogador}</td>
+      <td>${p.jogador_nome || p.jogador}</td>
       <td>${p.mes}</td>
       <td>${formatarMoeda(p.valor)}</td>
-      <td>${p.data}</td>
+      <td>${formatarDataBR(p.data)}</td>
       <td>
         <button onclick="removerPagamento(${p.id})">🗑️</button>
       </td>
