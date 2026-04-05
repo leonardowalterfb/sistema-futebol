@@ -219,7 +219,7 @@ let linhaAtivo = `
 <td>${j.posicao || "-"}</td>
 <td>${formatarDataBR(j.nascimento) || "-"}</td> <!-- 👈 NOVO -->
 <td>${idade}</td>
-<td>${j.dataCadastro || "-"}</td>
+<td>${formatarDataBR(j.dataCadastro || j.data_cadastro)}</td>
 <td>
 <button onclick="editarJogador(${j.id})">✏️ Editar</button>
 <button onclick="inativarJogador(${j.id})">🚫 Inativar</button>
@@ -237,7 +237,7 @@ let linhaInativo = `
 <td>${j.posicao || "-"}</td>
 <td>${formatarDataBR(j.nascimento) || "-"}</td> <!-- 👈 NOVO -->
 <td>${idade}</td>
-<td>${j.dataCadastro || "-"}</td>
+<td>${formatarDataBR(j.dataCadastro || j.data_cadastro)}</td>
 <td>
 <button onclick="ativarJogador(${j.id})">✅ Ativar</button>
 <button onclick="excluirJogador(${j.id})">🗑️ Excluir</button>
