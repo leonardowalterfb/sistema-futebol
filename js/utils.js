@@ -40,6 +40,21 @@ function formatarData(dataISO){
   return data.toLocaleDateString("pt-BR")
 }
 
+function formatarDataBR(data){
+
+  if(!data) return "-"
+
+  let d = new Date(data)
+
+  if(isNaN(d)) return data
+
+  let dia = String(d.getDate()).padStart(2, "0")
+  let mes = String(d.getMonth() + 1).padStart(2, "0")
+  let ano = d.getFullYear()
+
+  return `${dia}/${mes}/${ano}`
+}
+
 function calcularIdade(data){
 
 let hoje = new Date()
