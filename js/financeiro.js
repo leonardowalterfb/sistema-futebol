@@ -161,7 +161,7 @@ function calcularTotalMes(){
       totais[mes] = 0
     }
 
-    totais[mes] += pagamentos[i].valor
+    totais[mes] += Number(pagamentos[i].valor || 0)
   }
 
   // 🔥 NÃO MOSTRA MAIS NA TELA
@@ -280,7 +280,7 @@ function mostrarReceitaPorMes(){
       totais[mes] = 0
     }
 
-    totais[mes] += pagamentos[i].valor
+    totais[mes] += Number(pagamentos[i].valor || 0)
   }
 
   let div = document.getElementById("receitaPorMes")
