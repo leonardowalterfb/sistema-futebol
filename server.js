@@ -27,7 +27,7 @@ app.use(express.json())
 // ================= TESTE =================
 app.get("/teste-db", async (req, res) => {
   try {
-    const result = await db.query("SELECT NOW()")
+    const result = await pool.query("SELECT NOW()")
     res.json(result.rows)
   } catch (err) {
     console.error("ERRO REAL:", err) // 👈 ISSO AQUI
@@ -49,10 +49,10 @@ app.get("/jogadores/:turmaId", async (req, res) => {
   try {
     const { turmaId } = req.params
 
-    const result = await db.query(
-      "SELECT * FROM jogadores WHERE turma_id = $1 ORDER BY nome",
-      [turmaId]
-    )
+    const result = await pool.query(
+  "SELECT * FROM jogadores WHERE turma_id = $1 ORDER BY nome",
+  [turmaId]
+)
 
     res.json(result.rows)
 
@@ -68,7 +68,7 @@ app.post("/jogadores", async (req, res) => {
 
     const cpfLimpo = j.cpf.replace(/\D/g, "")
 
-    const existe = await db.query(
+    const existe = await pool.query(
       `SELECT id FROM jogadores 
        WHERE (cpf = $1 OR LOWER(nome) = LOWER($2)) 
        AND turma_id = $3`,
@@ -79,8 +79,8 @@ app.post("/jogadores", async (req, res) => {
       return res.status(400).json({ erro: "Jogador já existe" })
     }
 
-    const result = await db.query(
-      `INSERT INTO jogadores 
+    const result = await pool.query(
+  `INSERT INTO jogadores
       (nome, telefone, cpf, nascimento, posicao, turma_id, dataCadastro, status)
       VALUES ($1,$2,$3,$4,$5,$6,NOW(),'ativo')
       RETURNING id`,
@@ -107,7 +107,7 @@ app.put("/jogadores/:id", async (req, res) => {
     const d = req.body
 
     if (d.status && Object.keys(d).length === 1) {
-      await db.query(
+      await pool.query(
         "UPDATE jogadores SET status = $1 WHERE id = $2",
         [d.status, id]
       )
@@ -116,7 +116,7 @@ app.put("/jogadores/:id", async (req, res) => {
 
     const cpfLimpo = d.cpf.replace(/\D/g, "")
 
-    await db.query(
+    await pool.query(
       `UPDATE jogadores SET
       nome=$1, telefone=$2, cpf=$3, nascimento=$4, posicao=$5
       WHERE id=$6`,
@@ -132,7 +132,7 @@ app.put("/jogadores/:id", async (req, res) => {
 
 app.delete("/jogadores/:id", async (req, res) => {
   try {
-    await db.query("DELETE FROM jogadores WHERE id=$1", [req.params.id])
+    await pool.query("DELETE FROM jogadores WHERE id=$1", [req.params.id])
     res.json({ ok: true })
   } catch (err) {
     res.status(500).json({ erro: err.message })
@@ -142,7 +142,7 @@ app.delete("/jogadores/:id", async (req, res) => {
 // ================= PAGAMENTOS =================
 app.get("/pagamentos/:turmaId", async (req, res) => {
   try {
-    const result = await db.query(
+    const result = await pool.query(
       "SELECT * FROM pagamentos WHERE turma_id=$1",
       [req.params.turmaId]
     )
@@ -156,7 +156,7 @@ app.post("/pagamentos", async (req, res) => {
   try {
     const { jogador, mes, valor, data, turma_id } = req.body
 
-    const existe = await db.query(
+    const existe = await pool.query(
       "SELECT id FROM pagamentos WHERE jogador=$1 AND mes=$2 AND turma_id=$3",
       [jogador, mes, turma_id]
     )
@@ -165,7 +165,7 @@ app.post("/pagamentos", async (req, res) => {
       return res.status(400).json({ erro: "Pagamento já existe" })
     }
 
-    await db.query(
+    await pool.query(
       `INSERT INTO pagamentos (jogador, mes, valor, data, turma_id)
        VALUES ($1,$2,$3,$4,$5)`,
       [jogador, mes, valor, data, turma_id]
@@ -179,7 +179,7 @@ app.post("/pagamentos", async (req, res) => {
 
 app.delete("/pagamentos/:id", async (req, res) => {
   try {
-    await db.query("DELETE FROM pagamentos WHERE id=$1", [req.params.id])
+    await pool.query("DELETE FROM pagamentos WHERE id=$1", [req.params.id])
     res.json({ ok: true })
   } catch (err) {
     res.status(500).json({ erro: err.message })
@@ -189,7 +189,7 @@ app.delete("/pagamentos/:id", async (req, res) => {
 // ================= DESPESAS =================
 app.get("/despesas/:turmaId", async (req, res) => {
   try {
-    const result = await db.query(
+    const result = await pool.query(
       "SELECT * FROM despesas WHERE turma_id=$1",
       [req.params.turmaId]
     )
@@ -203,7 +203,7 @@ app.post("/despesas", async (req, res) => {
   try {
     const { descricao, valor, data, turma_id } = req.body
 
-    await db.query(
+    await pool.query(
       `INSERT INTO despesas (descricao, valor, data, turma_id)
        VALUES ($1,$2,$3,$4)`,
       [descricao, valor, data, turma_id]
@@ -217,7 +217,7 @@ app.post("/despesas", async (req, res) => {
 
 app.delete("/despesas/:id", async (req, res) => {
   try {
-    await db.query("DELETE FROM despesas WHERE id=$1", [req.params.id])
+    await pool.query("DELETE FROM despesas WHERE id=$1", [req.params.id])
     res.json({ ok: true })
   } catch (err) {
     res.status(500).json({ erro: err.message })
@@ -227,7 +227,7 @@ app.delete("/despesas/:id", async (req, res) => {
 // ================= USUÁRIOS =================
 app.get("/usuarios/:turmaId", async (req, res) => {
   try {
-    const result = await db.query(
+    const result = await pool.query(
       "SELECT * FROM usuarios WHERE turma_id=$1",
       [req.params.turmaId]
     )
@@ -243,7 +243,7 @@ app.post("/usuarios", async (req, res) => {
 
     const hash = await bcrypt.hash(senha, 10)
 
-    await db.query(
+    await pool.query(
       `INSERT INTO usuarios (nome, login, senha, turma_id)
        VALUES ($1,$2,$3,$4)`,
       [nome, login, hash, turma_id]
@@ -257,7 +257,7 @@ app.post("/usuarios", async (req, res) => {
 
 app.delete("/usuarios/:id", async (req, res) => {
   try {
-    await db.query("DELETE FROM usuarios WHERE id=$1", [req.params.id])
+    await pool.query("DELETE FROM usuarios WHERE id=$1", [req.params.id])
     res.json({ ok: true })
   } catch (err) {
     res.status(500).json({ erro: err.message })
@@ -269,10 +269,10 @@ app.post("/login", async (req, res) => {
   try {
     const { login, senha } = req.body
 
-    const result = await db.query(
-      "SELECT * FROM usuarios WHERE login=$1",
-      [login]
-    )
+    const result = await pool.query(
+  "SELECT * FROM usuarios WHERE login=$1",
+  [login]
+)
 
     const user = result.rows[0]
 
