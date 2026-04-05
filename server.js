@@ -22,7 +22,7 @@ const pool = require("./db")
 app.use(cors())
 app.use(express.json())
 
-const db = require("./config/db")
+//const db = require("./config/db")
 
 // ================= TESTE =================
 app.get("/teste-db", async (req, res) => {
