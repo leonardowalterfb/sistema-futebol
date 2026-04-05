@@ -463,19 +463,27 @@ async function fazerLogin(){
 
   localStorage.setItem("usuarioLogado", JSON.stringify(usuario))
 
-  // 🔥 AQUI É A CHAVE
   if(usuario.tipo === "admin"){
-    await selecionarTurmaAdmin()
-    return
-  } else {
+
+  // 🔥 MOSTRAR SISTEMA PRIMEIRO
+  document.getElementById("telaLogin").style.display = "none"
+  document.getElementById("sistema").style.display = "flex"
+
+  await selecionarTurmaAdmin()
+  return
+}
+ else {
     localStorage.setItem("turmaSelecionada", "true")
   }
 
   document.getElementById("telaLogin").style.display = "none"
   document.getElementById("sistema").style.display = "flex"
 
+if(usuario.tipo !== "admin"){
   location.reload()
 }
+
+
 let dataSalva = localStorage.getItem("dataJogo")
 let localSalvo = localStorage.getItem("localJogo")
 
