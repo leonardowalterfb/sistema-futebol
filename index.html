@@ -451,7 +451,7 @@ async function fazerLogin(){
     senha: senha
   })
 
-  if(!dados.ok){
+  if(!dados || dados.erro){
     mostrarToast("Login ou senha inválido")
 
     btn.innerText = "Entrar"
@@ -605,18 +605,18 @@ Pagamentos em ${mesAtual}: <br>
 let totalAno=0
 
 for(let i=0;i<pagamentos.length;i++){
-totalAno+=pagamentos[i].valor
+totalAno += Number(pagamentos[i].valor || 0)
 }
 
 document.getElementById("totalAno").innerText=
-"Total Recebido no Ano: "+formatarMoeda(totalAno)
+"Total Recebido no Ano: "+formatarMoeda(Number(totalAno || 0))
 
 let totalMes=0
 
 for(let i=0;i<pagamentos.length;i++){
 
 if(pagamentos[i].mes===mesAtual){
-totalMes+=pagamentos[i].valor
+totalMes += Number(pagamentos[i].valor || 0)
 }
 
 }
@@ -627,13 +627,13 @@ document.getElementById("totalMesAtual").innerText=
 let totalDespesas = 0
 
 for(let i=0;i<despesas.length;i++){
-totalDespesas += despesas[i].valor
+totalDespesas += Number(despesas[i].valor || 0)
 }
 
 document.getElementById("totalDespesas").innerText =
 "Total de Despesas: "+formatarMoeda(totalDespesas)
 
-let saldo = totalAno - totalDespesas
+let saldo = Number(totalAno || 0) - Number(totalDespesas || 0)
 
 document.getElementById("saldoTurma").innerText =
 "Saldo da Turma: "+formatarMoeda(saldo)
