@@ -855,7 +855,7 @@ async function cadastrarUsuario(){
   // 🔥 EDITAR
   if(usuarioEditando){
 
-    await fetch("https://sistema-futebol.onrender.com/usuarios/" + usuarioEditando, {
+    await fetch("https://sistema-futebol-1.onrender.com/usuarios/" + usuarioEditando, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nome, login, senha, turma_id })
@@ -868,7 +868,7 @@ async function cadastrarUsuario(){
   } else {
 
     // 🔥 NOVO
-    await fetch("https://sistema-futebol.onrender.com/usuarios/", {
+    await fetch("https://sistema-futebol-1.onrender.com/usuarios/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nome, login, senha, turma_id })
@@ -889,7 +889,7 @@ async function carregarUsuarios(){
 
   let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
 
-  let res = await fetch(`https://sistema-futebol.onrender.com/usuarios/${usuario.turma_id}`)
+  let res = await fetch(`https://sistema-futebol-1.onrender.com/usuarios/${usuario.turma_id}`)
   let dados = await res.json()
 
   let lista = document.getElementById("listaUsuarios")
@@ -920,7 +920,7 @@ async function excluirUsuario(id){
 
   if(!confirmar) return
 
-  await fetch("https://sistema-futebol.onrender.com/usuarios/" + id, {
+  await fetch("https://sistema-futebol-1.onrender.com/usuarios/" + id, {
     method: "DELETE"
   })
 
@@ -940,7 +940,7 @@ function editarUsuario(id){
 
   let usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"))
 
-  fetch(`https://sistema-futebol.onrender.com/usuarios/${usuarioLogado.turma_id}`)
+  fetch(`https://sistema-futebol-1.onrender.com/usuarios/${usuarioLogado.turma_id}`)
     .then(res => res.json())
     .then(dados => {
 
@@ -1037,7 +1037,7 @@ async function salvarConfiguracoesSistema(){
   }
 
   // 🔥 AQUI ESTÁ A CHAVE
-  await fetch(`https://sistema-futebol.onrender.com/turmas/${usuario.turma_id}`, {
+  await fetch(`https://sistema-futebol-1.onrender.com/turmas/${usuario.turma_id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"
@@ -1058,7 +1058,7 @@ async function atualizarTituloSistema(){
 
   if(!usuario || !usuario.turma_id) return
 
-  let res = await fetch(`https://sistema-futebol.onrender.com/turmas/${usuario.turma_id}`)
+  let res = await fetch(`https://sistema-futebol-1.onrender.com/turmas/${usuario.turma_id}`)
   let turma = await res.json()
 
   let titulo = document.getElementById("tituloSistema")
