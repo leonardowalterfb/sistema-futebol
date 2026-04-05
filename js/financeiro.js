@@ -88,7 +88,7 @@ index:i
 for(let mes in pagamentosPorMes){
 
   pagamentosPorMes[mes].sort((a,b) =>
-    a.dados.jogador.localeCompare(b.dados.jogador)
+    (a.dados.jogador || "").localeCompare(b.dados.jogador || "")
   )
 
   let titulo = document.createElement("tr")

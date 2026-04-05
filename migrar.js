@@ -9,7 +9,7 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL
 })
 
-// 🔥 helper para usar sqlite com await
+// helper sqlite
 function querySQLite(sql) {
   return new Promise((resolve, reject) => {
     sqlite.all(sql, (err, rows) => {
@@ -33,7 +33,9 @@ async function migrar() {
   const turmas = await querySQLite("SELECT * FROM turmas")
   for (const t of turmas) {
     await pool.query(
-      "INSERT INTO turmas (id, nome, valor_mensalidade) VALUES ($1,$2,$3)",
+      `INSERT INTO turmas (id, nome, valor_mensalidade)
+       VALUES ($1,$2,$3)
+       ON CONFLICT (id) DO NOTHING`,
       [t.id, t.nome, t.valor_mensalidade]
     )
   }
@@ -45,7 +47,8 @@ async function migrar() {
     await pool.query(
       `INSERT INTO jogadores 
       (id,nome,telefone,cpf,nascimento,posicao,data_cadastro,status,turma_id)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      ON CONFLICT (id) DO NOTHING`,
       [
         j.id,
         j.nome,
@@ -67,23 +70,37 @@ async function migrar() {
     await pool.query(
       `INSERT INTO pagamentos 
       (id,jogador_nome,mes,valor,data,turma_id)
-      VALUES ($1,$2,$3,$4,$5,$6)`,
+      VALUES ($1,$2,$3,$4,$5,$6)
+      ON CONFLICT (id) DO NOTHING`,
       [p.id, p.jogador, p.mes, p.valor, formatarData(p.data), p.turma_id]
     )
   }
   console.log("✅ Pagamentos migrados")
 
-  // 🔥 DESPESAS (AGORA SIM FUNCIONA)
+  // 🔥 DESPESAS
   const despesas = await querySQLite("SELECT * FROM despesas")
   for (const d of despesas) {
     await pool.query(
       `INSERT INTO despesas 
       (id,descricao,valor,data,turma_id)
-      VALUES ($1,$2,$3,$4,$5)`,
+      VALUES ($1,$2,$3,$4,$5)
+      ON CONFLICT (id) DO NOTHING`,
       [d.id, d.descricao, d.valor, formatarData(d.data), d.turma_id]
     )
   }
   console.log("✅ Despesas migradas")
+
+  // 🔥 USUÁRIOS (AGORA NO LUGAR CERTO)
+  const usuarios = await querySQLite("SELECT * FROM usuarios")
+  for (const u of usuarios) {
+    await pool.query(
+      `INSERT INTO usuarios (id, nome, senha, turma_id)
+       VALUES ($1,$2,$3,$4)
+       ON CONFLICT (id) DO NOTHING`,
+      [u.id, u.nome, u.senha, u.turma_id]
+    )
+  }
+  console.log("✅ Usuários migrados")
 
   console.log("🎉 MIGRAÇÃO FINALIZADA COM SUCESSO")
 }
