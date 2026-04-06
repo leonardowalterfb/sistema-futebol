@@ -1135,36 +1135,25 @@ document.addEventListener("DOMContentLoaded", async function(){
   let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
   let turmaSelecionada = localStorage.getItem("turmaSelecionada")
 
-  if(usuario?.tipo === "admin" && !turmaSelecionada){
-
-  // 🔥 MOSTRA O SISTEMA
-  document.getElementById("telaLogin").style.display = "none"
-  document.getElementById("sistema").style.display = "flex"
-
-  await selecionarTurmaAdmin()
-  return
-}
-
+  // 🔥 NÃO LOGADO
   if(!usuario){
     document.getElementById("telaLogin").style.display = "flex"
     document.getElementById("sistema").style.display = "none"
     return
   }
 
-  let turmaId = usuario.turma_id
+  // 🔥 ADMIN SEM TURMA → MOSTRA MODAL E PARA TUDO
+  if(usuario.tipo === "admin" && !turmaSelecionada){
 
-  let el = document.getElementById("nomeUsuarioLogado")
-  if(el){
-    el.innerText = "👤 " + usuario.nome
+    document.getElementById("telaLogin").style.display = "none"
+    document.getElementById("sistema").style.display = "flex"
+
+    await selecionarTurmaAdmin()
+
+    return // 🚨 ESSA LINHA É CRÍTICA
   }
 
-  function atualizarBotaoPagamento(){
-  const botao = document.getElementById("btnPagamento");
-
-  if(botao){
-    botao.innerText = `Registrar Pagamento (${formatarMoeda(getMensalidade())})`;
-  }
-}
+  // 🔥 DAQUI PRA BAIXO SÓ EXECUTA COM TURMA DEFINIDA
 
   document.getElementById("telaLogin").style.display = "none"
   document.getElementById("sistema").style.display = "flex"
@@ -1186,8 +1175,6 @@ document.addEventListener("DOMContentLoaded", async function(){
   mostrarSecao("painel")
   verificarConfirmacaoLink()
   atualizarTituloSistema()
-  atualizarBotaoPagamento()
-
 })
 
 </script>
