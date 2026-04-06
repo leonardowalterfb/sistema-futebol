@@ -439,11 +439,6 @@ Salvar
 // 🔐 LOGIN
 async function fazerLogin(){
 
-    console.log("CHAMOU MODAL ADMIN 🔥")
-
-  let turmas = await apiGet("/turmas")
-
-
   let btn = document.getElementById("btnLogin")
   btn.innerText = "Entrando..."
   btn.disabled = true
@@ -470,23 +465,19 @@ async function fazerLogin(){
 
   if(usuario.tipo === "admin"){
 
-  // 🔥 MOSTRAR SISTEMA PRIMEIRO
-  document.getElementById("telaLogin").style.display = "none"
-  document.getElementById("sistema").style.display = "flex"
+    document.getElementById("telaLogin").style.display = "none"
+    document.getElementById("sistema").style.display = "flex"
 
-  await selecionarTurmaAdmin()
-  return
-}
- else {
-    localStorage.setItem("turmaSelecionada", "true")
+    await selecionarTurmaAdmin()
+    return
   }
 
+  localStorage.setItem("turmaSelecionada", "true")
+
   document.getElementById("telaLogin").style.display = "none"
   document.getElementById("sistema").style.display = "flex"
 
-if(usuario.tipo !== "admin"){
   location.reload()
-}
 }
 
 let dataSalva = localStorage.getItem("dataJogo")
