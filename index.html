@@ -463,14 +463,17 @@ async function fazerLogin(){
 
   localStorage.setItem("usuarioLogado", JSON.stringify(usuario))
 
-  if(usuario.tipo === "admin"){
+if(usuario.tipo === "admin"){
 
-    document.getElementById("telaLogin").style.display = "none"
-    document.getElementById("sistema").style.display = "flex"
+  // 🔥 LIMPA QUALQUER TURMA ANTERIOR
+  localStorage.removeItem("turmaSelecionada")
 
-    await selecionarTurmaAdmin()
-    return
-  }
+  document.getElementById("telaLogin").style.display = "none"
+  document.getElementById("sistema").style.display = "flex"
+
+  await selecionarTurmaAdmin()
+  return
+}
 
   localStorage.setItem("turmaSelecionada", "true")
 
@@ -1143,15 +1146,17 @@ document.addEventListener("DOMContentLoaded", async function(){
   }
 
   // 🔥 ADMIN SEM TURMA → MOSTRA MODAL E PARA TUDO
-  if(usuario.tipo === "admin" && !turmaSelecionada){
+if(usuario.tipo === "admin"){
+
+  if(!turmaSelecionada){
 
     document.getElementById("telaLogin").style.display = "none"
     document.getElementById("sistema").style.display = "flex"
 
     await selecionarTurmaAdmin()
-
-    return // 🚨 ESSA LINHA É CRÍTICA
+    return
   }
+}
 
   // 🔥 DAQUI PRA BAIXO SÓ EXECUTA COM TURMA DEFINIDA
 
