@@ -465,13 +465,17 @@ async function fazerLogin(){
 
 if(usuario.tipo === "admin"){
 
-  // 🔥 LIMPA QUALQUER TURMA ANTERIOR
+  // limpa estado
   localStorage.removeItem("turmaSelecionada")
 
   document.getElementById("telaLogin").style.display = "none"
   document.getElementById("sistema").style.display = "flex"
 
-  await selecionarTurmaAdmin()
+  // 🔥 FORÇA O MODAL APARECER DEPOIS DE TUDO
+  setTimeout(async () => {
+    await selecionarTurmaAdmin()
+  }, 300)
+
   return
 }
 
