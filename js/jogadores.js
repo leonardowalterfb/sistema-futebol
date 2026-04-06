@@ -74,6 +74,7 @@ jogador.turma_id = turmaId
 
   let existeCpf = jogadores.find(j => 
     j.cpf?.replace(/\D/g, "") === cpfLimpo &&
+    j.turma_id === turmaId &&
     j.id != idEditando
   )
 
