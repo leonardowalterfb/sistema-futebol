@@ -463,28 +463,41 @@ async function fazerLogin(){
 
   localStorage.setItem("usuarioLogado", JSON.stringify(usuario))
 
-if(usuario.tipo === "admin"){
+  // 🔥 ADMIN
+  if(usuario.tipo === "admin"){
+    localStorage.removeItem("turmaSelecionada")
+  }
 
-  // limpa estado
-  localStorage.removeItem("turmaSelecionada")
-
-  document.getElementById("telaLogin").style.display = "none"
-  document.getElementById("sistema").style.display = "flex"
-
-  // 🔥 FORÇA O MODAL APARECER DEPOIS DE TUDO
-  setTimeout(async () => {
-    await selecionarTurmaAdmin()
-  }, 300)
-
-  return
+  // 🔥 CHAMA SISTEMA (ESSA LINHA RESOLVE TUDO)
+  await iniciarSistema()
 }
 
-  localStorage.setItem("turmaSelecionada", "true")
+
+async function iniciarSistema(){
+
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaSelecionada = localStorage.getItem("turmaSelecionada")
 
   document.getElementById("telaLogin").style.display = "none"
   document.getElementById("sistema").style.display = "flex"
 
-  location.reload()
+  // 🔥 ADMIN SEM TURMA
+  if(usuario.tipo === "admin" && !turmaSelecionada){
+
+    await selecionarTurmaAdmin()
+    return
+  }
+
+  // 🔥 CARREGA SISTEMA NORMAL
+  await carregarJogadores()
+  await carregarPagamentos()
+  await carregarDespesas()
+  await carregarRanking()
+
+  atualizarSelectJogadores()
+  mostrarPagamentos()
+  mostrarDespesas()
+  atualizarPainel()
 }
 
 let dataSalva = localStorage.getItem("dataJogo")
@@ -520,6 +533,7 @@ document.getElementById("dataJogo").addEventListener("change", function(){
 
 document.getElementById("localJogo").addEventListener("input", function(){
 })
+
 
 // Link Para WhatsApp//
 
@@ -1140,7 +1154,6 @@ function logout(){
 document.addEventListener("DOMContentLoaded", async function(){
 
   let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-  let turmaSelecionada = localStorage.getItem("turmaSelecionada")
 
   // 🔥 NÃO LOGADO
   if(!usuario){
@@ -1149,18 +1162,9 @@ document.addEventListener("DOMContentLoaded", async function(){
     return
   }
 
-  // 🔥 ADMIN SEM TURMA → MOSTRA MODAL E PARA TUDO
-if(usuario.tipo === "admin"){
+  // 🔥 CHAMA O SISTEMA CENTRAL (ESSA LINHA RESOLVE)
+  await iniciarSistema()
 
-  if(!turmaSelecionada){
-
-    document.getElementById("telaLogin").style.display = "none"
-    document.getElementById("sistema").style.display = "flex"
-
-    await selecionarTurmaAdmin()
-    return
-  }
-}
 
   // 🔥 DAQUI PRA BAIXO SÓ EXECUTA COM TURMA DEFINIDA
 
