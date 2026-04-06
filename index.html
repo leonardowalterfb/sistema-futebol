@@ -472,6 +472,17 @@ async function fazerLogin(){
   await iniciarSistema()
 }
 
+if(usuario.tipo === "admin"){
+
+  document.getElementById("telaLogin").style.display = "none"
+  document.getElementById("sistema").style.display = "flex"
+
+  setTimeout(() => {
+    selecionarTurmaAdmin()
+  }, 500)
+
+  return
+}
 
 async function iniciarSistema(){
 
