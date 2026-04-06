@@ -40,6 +40,12 @@ async function cadastrar(){
   }
 
   let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
+  if(!usuario || !usuario.turma_id){
+  mostrarToast("Selecione uma turma primeiro")
+  return
+}
+
 let turmaId = usuario.turma_id
 
 jogador.turma_id = turmaId
