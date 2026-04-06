@@ -1043,7 +1043,16 @@ function confirmarTurma(){
 
   document.getElementById("modalTurma").style.display = "none"
 
-  window.location.reload()
+  document.getElementById("modalTurma").style.display = "none"
+
+// carregar sistema manualmente
+carregarJogadores()
+carregarPagamentos()
+carregarDespesas()
+carregarRanking()
+atualizarPainel()
+mostrarPagamentos()
+mostrarDespesas()
 }
 
 async function salvarConfiguracoesSistema(){
