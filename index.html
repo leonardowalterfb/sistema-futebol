@@ -1006,22 +1006,20 @@ function abrirAbaConfig(aba){
 
 async function selecionarTurmaAdmin(){
 
-  console.log("🔥 CHAMOU MODAL ADMIN")
+  console.log("🔥 entrou na função")
 
-  let turmas
+  let turmas = []
 
   try {
     turmas = await apiGet("/turmas")
+    console.log("✅ turmas carregadas:", turmas)
   } catch (err) {
-    console.error("Erro ao buscar turmas:", err)
+    console.error("❌ erro ao buscar turmas:", err)
     mostrarToast("Erro ao carregar turmas")
-    
-    // 🔥 MESMO COM ERRO, MOSTRA O MODAL
-    document.getElementById("modalTurma").style.display = "flex"
-    return
   }
 
-  console.log("Turmas:", turmas)
+  // 🔥 GARANTE QUE O MODAL SEMPRE ABRE
+  document.getElementById("modalTurma").style.display = "flex"
 
   let select = document.getElementById("selectTurma")
   select.innerHTML = "<option value=''>Selecione uma turma</option>"
@@ -1030,7 +1028,7 @@ async function selecionarTurmaAdmin(){
     select.innerHTML += `<option value="${t.id}">${t.nome}</option>`
   })
 
-  document.getElementById("modalTurma").style.display = "flex"
+  console.log("🔥 modal aberto")
 }
 
 function confirmarTurma(){
