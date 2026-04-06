@@ -338,6 +338,21 @@ app.get("/jogos/:turmaId", async (req, res) => {
 
 // TURMAS
 
+app.get("/turmas", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM turmas ORDER BY id"
+    )
+
+    res.json(result.rows)
+
+  } catch (err) {
+    console.error("ERRO TURMAS:", err)
+    res.status(500).json({ erro: "Erro ao buscar turmas" })
+  }
+})
+
+
 app.get("/turmas/:id", async (req, res) => {
   try {
     const { id } = req.params
