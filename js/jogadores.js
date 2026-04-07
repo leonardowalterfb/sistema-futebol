@@ -274,8 +274,8 @@ for(let i=0;i<jogadores.length;i++){
 if(jogadores[i].status==="ativo"){
 
 let option=document.createElement("option")
-option.value=jogadores[i].nome
-option.text=jogadores[i].nome
+option.value = jogadores[i].id
+option.text = jogadores[i].nome
 
 select.appendChild(option)
 

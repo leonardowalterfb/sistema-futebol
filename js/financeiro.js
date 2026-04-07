@@ -7,11 +7,12 @@ async function registrarPagamento(){
 
   console.log("Clicou em registrar pagamento")
 
-  let jogador=document.getElementById("jogadorPagamento").value
+  let jogadorId = document.getElementById("jogadorPagamento").value
+  let jogador = jogadores.find(j => j.id == jogadorId)
   let mes=document.getElementById("mesPagamento").value
 
   let pagamentoExistente = pagamentos.find(p =>
-    p.jogador===jogador && p.mes===mes
+    p.jogador_id == jogadorId && p.mes === mes
   )
 
   if(pagamentoExistente){
