@@ -7,7 +7,7 @@ const pool = new Pool({
   },
   max: 5, // 🔥 limite de conexões (IMPORTANTE pro Neon)
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 1000
+  connectionTimeoutMillis: 10000
 })
 
 pool.on("error", (err) => {
