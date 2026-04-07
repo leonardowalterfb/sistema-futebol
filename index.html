@@ -844,9 +844,14 @@ let mesCadastro = data.getMonth() + 1
 
 if(jogadores[j].status !== "ativo") continue
 
-let pagou = pagamentos.find(p =>
-p.jogador === jogadores[j].nome && p.mes === mes
-)
+
+console.log("JOGADOR:", jogador)
+console.log("PAGAMENTOS:", pagamentos)
+
+let pagou = pagamentos.find(p => {
+  console.log("Comparando:", jogador.id, p.jogador_id)
+  return p.jogador_id == jogador.id && p.mes === mes
+})
 
 if(!pagou){
 
