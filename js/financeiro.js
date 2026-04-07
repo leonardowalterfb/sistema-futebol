@@ -7,7 +7,12 @@ async function registrarPagamento(){
 
   console.log("Clicou em registrar pagamento")
 
-  let jogadorId = document.getElementById("jogadorPagamento").value
+  let jogadorId = Number(document.getElementById("jogadorPagamento").value)
+  if (!jogadorId || isNaN(jogadorId)) {
+  console.error("ID inválido:", jogadorId)
+  mostrarToast("Erro ao selecionar jogador")
+  return
+}
   let jogador = jogadores.find(j => j.id == jogadorId)
   let mes=document.getElementById("mesPagamento").value
 
