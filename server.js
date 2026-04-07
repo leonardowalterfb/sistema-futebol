@@ -157,7 +157,7 @@ app.get("/pagamentos/:turmaId", async (req, res) => {
 
 app.post("/pagamentos", async (req, res) => {
   try {
-    const { jogador, mes, valor, data, turma_id } = req.body
+    const { jogador, jogador_id, mes, valor, data, turma_id } = req.body
 
     const existe = await pool.query(
       "SELECT id FROM pagamentos WHERE jogador_nome=$1 AND mes=$2 AND turma_id=$3",
@@ -169,9 +169,10 @@ app.post("/pagamentos", async (req, res) => {
     }
 
     await pool.query(
-  `INSERT INTO pagamentos (jogador_nome, mes, valor, data, turma_id)
-   VALUES ($1,$2,$3,$4,$5)`,
-  [jogador, mes, valor, data, turma_id]
+  `INSERT INTO pagamentos (jogador_id, jogador_nome, mes, valor, data, turma_id)
+   VALUES ($1,$2,$3,$4,$5,$6)`,
+  [jogador_id, jogador, mes, valor, data, turma_id]
+
 )
 
     res.json({ ok: true })

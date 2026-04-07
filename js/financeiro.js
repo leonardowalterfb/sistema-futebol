@@ -29,11 +29,14 @@ async function registrarPagamento(){
  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
 let turmaId = usuario.turma_id
 
-let pagamento={
-  jogador:jogador,
-  mes:mes,
+console.log(jogador)
+
+let pagamento = {
+  jogador: jogador.nome,
+  jogador_id: jogador.id, // 🔥 AQUI
+  mes: mes,
   valor: parseFloat(getMensalidade()),
-  data:dataPagamento,
+  data: dataPagamento,
   turma_id: turmaId
 }
 
