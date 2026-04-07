@@ -96,3 +96,15 @@ function logout(){
   localStorage.removeItem("usuarioLogado")
   location.reload()
 }
+
+//VALOR MENSALIDADE 
+
+function setMensalidade(valor){
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  localStorage.setItem("mensalidade_" + usuario.turma_id, valor)
+}
+
+function getMensalidade(){
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  return Number(localStorage.getItem("mensalidade_" + usuario.turma_id) || 0)
+}
