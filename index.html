@@ -1168,8 +1168,10 @@ document.addEventListener("DOMContentLoaded", async function(){
     return
   }
 
-  // 🔥 CHAMA O SISTEMA CENTRAL (ESSA LINHA RESOLVE)
+  // 🔥 CHAMA O SISTEMA CENTRAL
   await iniciarSistema()
+
+  atualizarBotaoPagamento()
 
 
   // 🔥 DAQUI PRA BAIXO SÓ EXECUTA COM TURMA DEFINIDA

@@ -1,25 +1,3 @@
-// CONFIG GLOBAL
-let valorMensalidade = 0;
-
-function setMensalidade(valor){
-  valorMensalidade = Number(valor);
-  localStorage.setItem("mensalidade", valorMensalidade);
-}
-
-function getMensalidade(){
-  return valorMensalidade;
-}
-
-function carregarMensalidadeLocal(){
-  const valor = localStorage.getItem("mensalidade");
-  if(valor){
-    valorMensalidade = Number(valor);
-  }
-}
-
-// já carrega quando abrir o sistema
-carregarMensalidadeLocal();
-
 //FORMATAÇÕES//
 
 function formatarMoeda(valor){
