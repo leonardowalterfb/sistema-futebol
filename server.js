@@ -18,6 +18,9 @@ const bcrypt = require("bcrypt")
 const app = express()
 
 const pool = require("./db")
+pool.query("SELECT NOW()")
+  .then(() => console.log("✅ Banco conectado"))
+  .catch(err => console.error("❌ Erro ao conectar:", err))
 
 app.use(cors())
 app.use(express.json())

@@ -7,7 +7,12 @@ const pool = new Pool({
   },
   max: 5, // 🔥 limite de conexões (IMPORTANTE pro Neon)
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000
+  connectionTimeoutMillis: 1000
 })
+
+pool.on("error", (err) => {
+  console.error("🔥 Erro inesperado no pool:", err)
+})
+
 
 module.exports = pool
