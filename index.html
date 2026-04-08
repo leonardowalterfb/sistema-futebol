@@ -745,12 +745,19 @@ function mostrarAniversarios(){
 function toggleGrupo(id, el){
   let div = document.getElementById(id)
 
-  if(div.style.display === "none"){
-    div.style.display = "block"
-    el.innerHTML = el.innerHTML.replace("▶", "▼")
-  }else{
-    div.style.display = "none"
-    el.innerHTML = el.innerHTML.replace("▼", "▶")
+  if(!div) return
+
+  let aberto = div.style.display === "block"
+
+  div.style.display = aberto ? "none" : "block"
+
+  // 🔥 PROTEÇÃO TOTAL
+  if(el){
+    if(aberto){
+      el.innerHTML = el.innerHTML.replace("▼", "▶")
+    }else{
+      el.innerHTML = el.innerHTML.replace("▶", "▼")
+    }
   }
 }
 
