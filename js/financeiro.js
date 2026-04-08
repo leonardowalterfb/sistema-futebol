@@ -310,6 +310,7 @@ ordemMeses.forEach(mes => {
   lista.appendChild(grupo)
 
 })
+}
 
 async function removerDespesa(id){
 
