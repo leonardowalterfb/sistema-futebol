@@ -340,6 +340,25 @@ app.get("/jogos/:turmaId", async (req, res) => {
   }
 })
 
+app.post("/jogos", async (req, res) => {
+  try {
+    const { data, local, presentes, faltaram, turma_id } = req.body
+
+    const result = await pool.query(
+      `INSERT INTO jogos (data, local, presentes, faltaram, turma_id)
+       VALUES ($1,$2,$3,$4,$5)
+       RETURNING id`,
+      [data, local, presentes, faltaram, turma_id]
+    )
+
+    res.json({ ok: true, id: result.rows[0].id })
+
+  } catch (err) {
+    console.error("ERRO AO SALVAR JOGO:", err)
+    res.status(500).json({ erro: err.message })
+  }
+})
+
 // TURMAS
 
 app.get("/turmas", async (req, res) => {
