@@ -305,7 +305,7 @@ ordemMeses.forEach(mes => {
 
     let tr = document.createElement("tr")
     tr.classList.add(grupoId)
-    tr.style.display = "none"
+    //tr.style.display = "none"
 
     tr.innerHTML = `
       <td>${d.descricao}</td>
