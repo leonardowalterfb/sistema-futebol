@@ -449,7 +449,7 @@ document.getElementById("timeB").innerHTML=""
 
 }
 
-function mostrarSecao(secao){
+async function mostrarSecao(secao){
 
   // esconde todas
   document.querySelectorAll(".secao").forEach(s => {
@@ -463,9 +463,9 @@ function mostrarSecao(secao){
     ativa.style.display = "block"
   }
 
-  // 🔥 GARANTE carga dos jogos
+  // 🔥 CORREÇÃO AQUI
   if(secao === "jogos"){
-    carregarJogadores()
+    await carregarJogadores()
     mostrarPresenca()
   }
 }

@@ -368,3 +368,14 @@ h2 {
   margin-top: 25px;
   margin-bottom: 15px;
 }
+
+.secao {
+  display: none;
+}
+
+.content {
+  flex: 1;
+  padding: 25px;
+  overflow-y: auto;
+  height: 100vh;
+}
