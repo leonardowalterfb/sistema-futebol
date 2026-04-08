@@ -147,7 +147,6 @@ return
 presencas[index].confirmado = false
 presencas[index].respondido = true
 
-salvarJogo()
 mostrarPresenca()
 
 }
