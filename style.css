@@ -18,11 +18,7 @@ body {
 ========================= */
 .container {
   display: flex;
-}
-
-.content {
-  flex: 1;
-  padding: 25px;
+  height: 100vh;
 }
 
 /* =========================
@@ -371,6 +367,7 @@ h2 {
 
 .secao {
   display: none;
+  width: 100%;
 }
 
 .content {
