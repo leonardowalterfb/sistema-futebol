@@ -804,15 +804,19 @@ linhas[i].style.display = "none"
 
 // Expandir/Recolher Mes //
 
-function toggleMes(id){
+function toggleMes(classe){
 
-let tabela = document.getElementById(id)
+  let linhas = document.getElementsByClassName(classe)
 
-if(tabela.style.display === "none"){
-tabela.style.display = "table-row-group"
-}else{
-tabela.style.display = "none"
-}
+  for(let i=0;i<linhas.length;i++){
+
+    if(linhas[i].style.display === "none"){
+      linhas[i].style.display = ""
+    }else{
+      linhas[i].style.display = "none"
+    }
+
+  }
 }
 
 //Jogadores Inadimplentes //

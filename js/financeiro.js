@@ -275,20 +275,21 @@ ordemMeses.forEach(mes => {
 
   if(!despesasPorMes[mes]) return
 
+  let grupoId = "desp_" + mes
+
   let titulo = document.createElement("tr")
 
   titulo.innerHTML =
-`<td colspan="4" style="cursor:pointer;font-weight:bold;background:#eee;text-align:left;padding-left:20px" onclick="toggleMes('desp_${mes}')">▶ ${mes}</td>`
+  `<td colspan="4" style="cursor:pointer;font-weight:bold;background:#eee;text-align:left;padding-left:20px"
+  onclick="toggleMes('${grupoId}')">▶ ${mes}</td>`
 
   lista.appendChild(titulo)
-
-  let grupo = document.createElement("tbody")
-  grupo.id = "desp_" + mes
-  grupo.style.display = "none"
 
   despesasPorMes[mes].forEach(d => {
 
     let tr = document.createElement("tr")
+    tr.classList.add(grupoId)
+    tr.style.display = "none"
 
     tr.innerHTML = `
       <td>${d.descricao}</td>
@@ -299,12 +300,12 @@ ordemMeses.forEach(mes => {
       </td>
     `
 
-    grupo.appendChild(tr)
+    lista.appendChild(tr)
+
   })
 
-  lista.appendChild(grupo)
-
 })
+
 }
 
 async function removerDespesa(id){
