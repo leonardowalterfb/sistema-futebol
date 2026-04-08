@@ -451,24 +451,23 @@ document.getElementById("timeB").innerHTML=""
 
 function mostrarSecao(secao){
 
-  let secoes = document.querySelectorAll(".secao")
+  // esconde todas
+  document.querySelectorAll(".secao").forEach(s => {
+    s.style.display = "none"
+  })
 
-  for(let i=0;i<secoes.length;i++){
-    secoes[i].style.display = "none"
-  }
-
+  // mostra a correta
   let ativa = document.getElementById(secao)
 
   if(ativa){
     ativa.style.display = "block"
   }
 
-  // 🔥 ADICIONA ISSO
+  // 🔥 GARANTE carga dos jogos
   if(secao === "jogos"){
     carregarJogadores()
     mostrarPresenca()
   }
-
 }
 
 function embaralhar(lista){
