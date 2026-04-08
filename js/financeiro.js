@@ -278,12 +278,8 @@ ordemMeses.forEach(mes => {
 
   let titulo = document.createElement("tr")
 
-  titulo.innerHTML = `
-    <td colspan="4" style="cursor:pointer;font-weight:bold;background:#eee;text-align:left;padding-left:20px"
-    onclick="toggleMes('desp_${mes}')">
-    ▶ ${mes}
-    </td>
-  `
+  titulo.innerHTML =
+`<td colspan="4" style="cursor:pointer;font-weight:bold;background:#eee;text-align:left;padding-left:20px" onclick="toggleMes('desp_${mes}')">▶ ${mes}</td>`
 
   lista.appendChild(titulo)
 
