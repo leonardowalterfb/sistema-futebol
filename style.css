@@ -48,6 +48,13 @@ body {
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
 }
 
+.logo-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
 .sidebar button {
   width: 100%;
   margin: 6px 0;
