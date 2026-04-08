@@ -1,4 +1,6 @@
-/* RESET */
+/* =========================
+   RESET / BASE
+========================= */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -6,24 +8,37 @@
   font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-/* BODY */
 body {
   background: #eef2f7;
   color: #1e293b;
 }
 
-/* LAYOUT */
+/* =========================
+   LAYOUT PRINCIPAL
+========================= */
 .container {
   display: flex;
 }
 
-/* SIDEBAR */
+.content {
+  flex: 1;
+  padding: 25px;
+}
+
+/* =========================
+   SIDEBAR (MENU LATERAL)
+========================= */
 .sidebar {
   width: 230px;
   height: 100vh;
   padding: 20px;
   background: linear-gradient(180deg, #0f172a, #020617);
   color: white;
+}
+
+.sidebar h2 {
+  text-align: center;
+  width: 100%;
 }
 
 .sidebar button {
@@ -41,17 +56,14 @@ body {
   transform: translateX(3px);
 }
 
-/* CONTENT */
-.content {
-  flex: 1;
-  padding: 25px;
-}
-
-/* CARDS */
+/* =========================
+   DASHBOARD (CARDS)
+========================= */
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
   gap: 15px;
+  margin-bottom: 30px;
 }
 
 .card {
@@ -77,7 +89,9 @@ body {
   color: #1e293b;
 }
 
-/* TABLE */
+/* =========================
+   TABELAS (GERAL)
+========================= */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -103,7 +117,9 @@ table tr:hover {
   background: #f8fafc;
 }
 
-/* INPUTS */
+/* =========================
+   FORMULÁRIOS
+========================= */
 input, select {
   padding: 10px;
   margin: 5px;
@@ -111,7 +127,9 @@ input, select {
   border: 1px solid #cbd5f5;
 }
 
-/* BUTTONS */
+/* =========================
+   BOTÕES
+========================= */
 button {
   background: #1e293b;
   color: white;
@@ -136,7 +154,18 @@ button[onclick*="remover"]:hover {
   background: #dc2626;
 }
 
-/* ANIVERSÁRIOS */
+.btn-editar {
+  background: #1e293b;
+  margin-right: 5px;
+}
+
+.btn-excluir {
+  background: #ef4444;
+}
+
+/* =========================
+   ANIVERSÁRIOS
+========================= */
 .aniversario-card {
   background: white;
   padding: 14px;
@@ -152,7 +181,22 @@ button[onclick*="remover"]:hover {
   background: #f8fafc;
 }
 
-/* RANKING */
+#listaAniversarios {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.card-aniversario.hoje {
+  background: linear-gradient(135deg, #ff9800, #ff5722);
+  color: #fff;
+  font-weight: bold;
+}
+
+/* =========================
+   RANKING
+========================= */
 .ranking-item {
   display: flex;
   justify-content: space-between;
@@ -164,7 +208,9 @@ button[onclick*="remover"]:hover {
   border-left: 5px solid #1e293b;
 }
 
-/* HISTÓRICO */
+/* =========================
+   HISTÓRICO
+========================= */
 .historico-card {
   background: white;
   border-radius: 12px;
@@ -172,7 +218,9 @@ button[onclick*="remover"]:hover {
   margin-bottom: 15px;
 }
 
-/* LOGIN */
+/* =========================
+   LOGIN
+========================= */
 .login-container {
   display:flex;
   justify-content:center;
@@ -217,7 +265,9 @@ button[onclick*="remover"]:hover {
   background:#1e293b;
 }
 
-/* MODAL */
+/* =========================
+   MODAL
+========================= */
 .modal {
   position: fixed;
   top: 0;
@@ -239,7 +289,9 @@ button[onclick*="remover"]:hover {
   color: white;
 }
 
-/* TOAST */
+/* =========================
+   TOAST (NOTIFICAÇÕES)
+========================= */
 #toast {
   position: fixed;
   bottom: 20px;
@@ -248,6 +300,43 @@ button[onclick*="remover"]:hover {
   color: #fff;
   padding: 14px;
   border-radius: 8px;
+}
+
+/* =========================
+   CONFIGURAÇÕES
+========================= */
+#configuracoes h2 {
+  margin-bottom: 15px;
+}
+
+.menu-config {
+  margin-bottom: 20px;
+}
+
+#configuracoes h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+#configuracoes input {
+  margin-top: 10px;
+}
+
+#configuracoes button {
+  margin-left: 10px;
+}
+
+/* =========================
+   UTILIDADES / EXTRAS
+========================= */
+.cards-abaixo {
+  display: flex;
+  margin-top: 15px;
+  gap: 15px;
+}
+
+.card-grande {
+  flex: 1;
 }
 
 hr {
@@ -264,70 +353,4 @@ h1 {
 h2 {
   margin-top: 25px;
   margin-bottom: 15px;
-}
-
-.cards {
-  margin-bottom: 30px;
-}
-
-.btn-editar {
-  background: #1e293b;
-  margin-right: 5px;
-}
-
-.btn-excluir {
-  background: #ef4444;
-}
-
-/* CONFIGURAÇÕES - ESPAÇAMENTO */
-#configuracoes h2 {
-  margin-bottom: 15px;
-}
-
-.menu-config {
-  margin-bottom: 20px;
-}
-
-#configuracoes h3 {
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-
-/* INPUT + BOTÃO */
-#configuracoes input {
-  margin-top: 10px;
-}
-
-#configuracoes button {
-  margin-left: 10px;
-}
-
-.cards-abaixo {
-  display: flex;
-  margin-top: 15px;
-  gap: 15px;
-}
-
-.card-grande {
-  flex: 1; /* ocupa toda largura */
-}
-
-#listaAniversarios {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px;
-  margin-top: 10px;
-}
-
-#listaAniversarios {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px;
-  margin-top: 10px;
-}
-
-.card-aniversario.hoje {
-  background: linear-gradient(135deg, #ff9800, #ff5722);
-  color: #fff;
-  font-weight: bold;
 }
