@@ -314,6 +314,7 @@ Salvar
 <button onclick="registrarDespesa()">Registrar Despesa</button>
 
 <h3>Lista de Despesas</h3>
+
 <table id="tabelaDespesas">
   <thead>
     <tr>
@@ -323,7 +324,9 @@ Salvar
       <th>Ações</th>
     </tr>
   </thead>
-  <tbody id="listaDespesas"></tbody>
+
+  <tbody id="listaDespesas"></tbody> 
+
 </table>
 
 </div>
@@ -843,7 +846,8 @@ titulo.innerHTML =
 
 lista.appendChild(titulo)
 
-let grupo = document.createElement("tbody")
+let grupo = document.createElement("tr")
+let container = document.createElement("tbody")
 grupo.id = "inad_"+mes
 grupo.style.display="none"
 
