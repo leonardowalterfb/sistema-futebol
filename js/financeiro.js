@@ -249,8 +249,7 @@ let despesasPorMes = {}
 
 for(let i=0;i<despesas.length;i++){
 
-  let data = despesas[i].data
-  let partes = data.split("/") // dd/mm/yyyy
+  let partes = despesas[i].data.split("/") // "20/03/2026"
   let mesNumero = Number(partes[1])
 
   const nomesMeses = [
