@@ -63,30 +63,29 @@ lista.innerHTML=""
 confirmados.innerHTML=""
 naoConfirmados.innerHTML=""
 
+// 🔥 CORREÇÃO AQUI (ANTES DO LOOP)
+if(presencas.length === 0){
+
+  lista.innerHTML =
+    "<tr><td colspan='2'>Nenhum jogo criado ainda</td></tr>"
+
+  return
+}
+
+// 🔥 LOOP NORMAL
 for(let i=0;i<presencas.length;i++){
 
-if(presencas[i].confirmado === true){
+  if(presencas[i].confirmado === true){
 
-totalConfirmados++
+    totalConfirmados++
 
-confirmados.innerHTML +=
-"<tr>"+
-"<td style='padding:6px'>"+presencas[i].nome+"</td>"+
-"<td><button onclick='voltarLista("+i+")'>↩ Voltar</button></td>"+
-"</tr>"
+    confirmados.innerHTML +=
+    "<tr>"+
+    "<td style='padding:6px'>"+presencas[i].nome+"</td>"+
+    "<td><button onclick='voltarLista("+i+")'>↩ Voltar</button></td>"+
+    "</tr>"
 
-}
-else if(presencas[i].respondido && presencas[i].confirmado === false){
-
-totalNaoConfirmados++
-
-naoConfirmados.innerHTML +=
-"<tr>"+
-"<td style='padding:6px'>"+presencas[i].nome+"</td>"+
-"<td><button onclick='voltarLista("+i+")'>↩ Voltar</button></td>"+
-"</tr>"
-
-}
+  }
 else{
 
 lista.innerHTML +=
@@ -452,17 +451,23 @@ document.getElementById("timeB").innerHTML=""
 
 function mostrarSecao(secao){
 
-let secoes = document.querySelectorAll(".secao")
+  let secoes = document.querySelectorAll(".secao")
 
-for(let i=0;i<secoes.length;i++){
-secoes[i].style.display = "none"
-}
+  for(let i=0;i<secoes.length;i++){
+    secoes[i].style.display = "none"
+  }
 
-let ativa = document.getElementById(secao)
+  let ativa = document.getElementById(secao)
 
-if(ativa){
-ativa.style.display = "block"
-}
+  if(ativa){
+    ativa.style.display = "block"
+  }
+
+  // 🔥 ADICIONA ISSO
+  if(secao === "jogos"){
+    carregarJogadores()
+    mostrarPresenca()
+  }
 
 }
 

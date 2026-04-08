@@ -342,6 +342,33 @@ Salvar
 
 <div id="jogos" class="secao">
 
+  <div id="jogos" class="secao" style="display:none;">
+
+  <h2>⚽ Controle de Jogos</h2>
+
+  <div style="margin-bottom:15px;">
+    <input type="date" id="dataJogo">
+    <input type="text" id="localJogo" placeholder="Local do jogo">
+    <button onclick="criarJogo()">Criar Jogo</button>
+  </div>
+
+  <h3 id="tituloJogadores">Jogadores</h3>
+  <table>
+    <tbody id="listaPresenca"></tbody>
+  </table>
+
+  <h3 id="tituloConfirmados">Confirmados</h3>
+  <table>
+    <tbody id="confirmados"></tbody>
+  </table>
+
+  <h3 id="tituloNaoConfirmados">Não Confirmados</h3>
+  <table>
+    <tbody id="naoConfirmados"></tbody>
+  </table>
+
+</div>
+
 <h2>⚽ Presença no Jogo</h2>
 
 <input type="date" id="dataJogo">
