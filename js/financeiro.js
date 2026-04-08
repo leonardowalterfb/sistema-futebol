@@ -248,9 +248,25 @@ lista.innerHTML = ""
 let despesasPorMes = {}
 
 for(let i=0;i<despesas.length;i++){
+  
+  console.log("DESPESA:", despesas[i])
 
-  let partes = despesas[i].data.split("/") // "20/03/2026"
-  let mesNumero = Number(partes[1])
+  let data = despesas[i].data
+
+if(!data){
+  console.warn("Despesa sem data:", despesas[i])
+  continue
+}
+
+let mesNumero
+
+if(data.includes("/")){
+  let partes = data.split("/")
+  mesNumero = Number(partes[1])
+}else{
+  let dataObj = new Date(data)
+  mesNumero = dataObj.getMonth() + 1
+}
 
   const nomesMeses = [
     "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
