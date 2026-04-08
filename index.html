@@ -284,21 +284,31 @@ Salvar
   Registrar Pagamento (R$0)
 </button>
 
-<h3>Pagamentos</h3>
+<h3 onclick="toggleGrupo('grupoPagamentos', this)" style="cursor:pointer"></h3>
 
-<table id="tabelaPagamentos">
+<!-- PAGAMENTOS -->
+<h3 onclick="toggleGrupo('grupoPagamentos')" style="cursor:pointer">
+  ▶ Pagamentos
+</h3>
 
-<tbody id="listaPagamentos"></tbody>
+<div id="grupoPagamentos" style="display:none">
+  <table>
+    <tbody id="listaPagamentos"></tbody>
+  </table>
+</div>
 
-</table>
+<h3 onclick="toggleGrupo('grupoInad', this)" style="cursor:pointer"></h3>
 
-<h3>⚠ Inadimplentes</h3>
+<!-- INADIMPLENTES -->
+<h3 onclick="toggleGrupo('grupoInad')" style="cursor:pointer">
+  ▶ ⚠ Inadimplentes
+</h3>
 
-<table id="tabelaInadimplentes" style="width:100%;border-collapse:collapse;">
-<tbody id="listaInadimplentes"></tbody>
-</table>
-
-<hr>
+<div id="grupoInad" style="display:none">
+  <table>
+    <tbody id="listaInadimplentes"></tbody>
+  </table>
+</div>
 
 <h2>💸 Controle de Despesas</h2>
 
@@ -734,6 +744,18 @@ function mostrarAniversarios(){
 `
   }
 
+}
+
+function toggleGrupo(id, el){
+  let div = document.getElementById(id)
+
+  if(div.style.display === "none"){
+    div.style.display = "block"
+    el.innerHTML = el.innerHTML.replace("▶", "▼")
+  }else{
+    div.style.display = "none"
+    el.innerHTML = el.innerHTML.replace("▼", "▶")
+  }
 }
 
 function mostrarConfirmados(){
