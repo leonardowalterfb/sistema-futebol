@@ -243,24 +243,73 @@ function mostrarDespesas(){
 
   if(!lista) return
 
-  lista.innerHTML = ""
+lista.innerHTML = ""
 
-  for(let i = 0; i < despesas.length; i++){
+let despesasPorMes = {}
 
-    let d = despesas[i]
+for(let i=0;i<despesas.length;i++){
 
-    lista.innerHTML += `
-      <tr>
-        <td>${d.descricao}</td>
-        <td>${formatarMoeda(Number(d.valor))}</td>
-        <td>${formatarDataBR(d.data)}</td>
-        <td>
-          <button onclick="removerDespesa(${d.id})">🗑️</button>
-        </td>
-      </tr>
-    `
+  let data = despesas[i].data
+  let partes = data.split("/") // dd/mm/yyyy
+  let mesNumero = Number(partes[1])
+
+  const nomesMeses = [
+    "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+    "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+  ]
+
+  let mes = nomesMeses[mesNumero - 1]
+
+  if(!despesasPorMes[mes]){
+    despesasPorMes[mes] = []
   }
+
+  despesasPorMes[mes].push(despesas[i])
 }
+
+const ordemMeses = [
+  "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+  "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+]
+
+ordemMeses.forEach(mes => {
+
+  if(!despesasPorMes[mes]) return
+
+  let titulo = document.createElement("tr")
+
+  titulo.innerHTML = `
+    <td colspan="4" style="cursor:pointer;font-weight:bold;background:#eee;text-align:left;padding-left:20px"
+    onclick="toggleMes('desp_${mes}')">
+    ▶ ${mes}
+    </td>
+  `
+
+  lista.appendChild(titulo)
+
+  let grupo = document.createElement("tbody")
+  grupo.id = "desp_" + mes
+  grupo.style.display = "none"
+
+  despesasPorMes[mes].forEach(d => {
+
+    let tr = document.createElement("tr")
+
+    tr.innerHTML = `
+      <td>${d.descricao}</td>
+      <td>${formatarMoeda(Number(d.valor))}</td>
+      <td>${formatarDataBR(d.data)}</td>
+      <td>
+        <button onclick="removerDespesa(${d.id})">🗑️</button>
+      </td>
+    `
+
+    grupo.appendChild(tr)
+  })
+
+  lista.appendChild(grupo)
+
+})
 
 async function removerDespesa(id){
 
