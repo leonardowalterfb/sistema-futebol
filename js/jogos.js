@@ -46,6 +46,16 @@ for(let i=0;i<jogadores.length;i++){
 
 jogoAberto = true
 
+salvarJogo()
+
+// 🔥 SALVAR JOGO COMPLETO
+localStorage.setItem("jogoAtual", JSON.stringify({
+  data: data,
+  local: local,
+  presencas: presencas,
+  jogoAberto: true
+}))
+
 mostrarPresenca()
 }
 
@@ -122,6 +132,7 @@ return
 presencas[index].confirmado = true
 presencas[index].respondido = true
 
+salvarJogo()
 mostrarPresenca()
 
 }
@@ -136,8 +147,36 @@ return
 presencas[index].confirmado = false
 presencas[index].respondido = true
 
+salvarJogo()
 mostrarPresenca()
 
+}
+
+function salvarJogo(){
+
+  localStorage.setItem("jogoAtual", JSON.stringify({
+    data: document.getElementById("dataJogo").value,
+    local: document.getElementById("localJogo").value,
+    presencas: presencas,
+    jogoAberto: jogoAberto
+  }))
+}
+
+function carregarJogoSalvo(){
+
+let jogo = localStorage.getItem("jogoAtual")
+
+if(!jogo) return
+
+let dados = JSON.parse(jogo)
+
+presencas = dados.presencas || []
+jogoAberto = dados.jogoAberto || false
+
+document.getElementById("dataJogo").value = dados.data || ""
+document.getElementById("localJogo").value = dados.local || ""
+
+mostrarPresenca()
 }
 
 //HISTORICO//
@@ -467,6 +506,7 @@ async function mostrarSecao(secao){
   if(secao === "jogos"){
     await carregarJogadores()
     mostrarPresenca()
+    carregarJogoSalvo()
   }
 }
 
