@@ -93,8 +93,13 @@ index:i
 })
 
 }
+const ordemMeses = [
+  "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+  "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+]
+ordemMeses.forEach(mes => {
 
-for(let mes in pagamentosPorMes){
+  if(!pagamentosPorMes[mes]) return
 
   pagamentosPorMes[mes].sort((a,b) =>
     (a.dados.jogador || "").localeCompare(b.dados.jogador || "")
@@ -132,7 +137,8 @@ for(let mes in pagamentosPorMes){
   }
 
   lista.appendChild(grupo)
-}
+
+})
 
 calcularTotalMes()
 
