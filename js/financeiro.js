@@ -282,8 +282,7 @@ ordemMeses.forEach(mes => {
 
   lista.appendChild(titulo)
 
-  let grupo = document.createElement("tr")
-  let container = document.createElement("tbody")
+  let grupo = document.createElement("tbody")
   grupo.id = "desp_" + mes
   grupo.style.display = "none"
 
