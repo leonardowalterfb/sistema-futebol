@@ -804,6 +804,19 @@ linhas[i].style.display = "none"
 
 // Expandir/Recolher Mes //
 
+function toggleMes(id){
+
+  let tabela = document.getElementById(id)
+
+  if(!tabela) return
+
+  if(tabela.style.display === "none"){
+    tabela.style.display = "table-row-group"
+  }else{
+    tabela.style.display = "none"
+  }
+}
+
 function toggleMes(classe){
 
   let linhas = document.getElementsByClassName(classe)

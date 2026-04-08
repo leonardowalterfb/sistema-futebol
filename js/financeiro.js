@@ -297,7 +297,7 @@ ordemMeses.forEach(mes => {
 
   titulo.innerHTML =
   `<td colspan="4" style="cursor:pointer;font-weight:bold;background:#eee;text-align:left;padding-left:20px"
-  onclick="toggleMes('${grupoId}')">▶ ${mes}</td>`
+  onclick="toggleMesDespesa('${grupoId}')">▶ ${mes}</td>`
 
   lista.appendChild(titulo)
 
