@@ -313,21 +313,25 @@ Salvar
 
 <button onclick="registrarDespesa()">Registrar Despesa</button>
 
-<h3>Lista de Despesas</h3>
+<h3 onclick="toggleGrupo('grupoDespesas', this)" style="cursor:pointer">
+  ▶ Lista de Despesas
+</h3>
 
-<table id="tabelaDespesas">
-  <thead>
-    <tr>
-      <th>Descrição</th>
-      <th>Valor</th>
-      <th>Data</th>
-      <th>Ações</th>
-    </tr>
-  </thead>
+<div id="grupoDespesas" style="display:none">
 
-  <tbody id="listaDespesas"></tbody> 
+  <table id="tabelaDespesas">
+    <thead>
+      <tr>
+        <th>Descrição</th>
+        <th>Valor</th>
+        <th>Data</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
 
-</table>
+    <tbody id="listaDespesas"></tbody>
+
+  </table>
 
 </div>
 
