@@ -103,7 +103,7 @@ lista.innerHTML +=
 "<td style='padding:6px'>"+presencas[i].nome+"</td>"+
 "<td>"+
 "<button onclick='confirmar("+i+")'>✅ Confirmar</button> "+
-"<button onclick='faltar("+i+")'>❌ Faltar</button>"+
+"<button onclick='faltar(${i})'>❌ Faltar</button>"+
 "</td>"+
 "</tr>"
 
@@ -147,6 +147,7 @@ return
 presencas[index].confirmado = false
 presencas[index].respondido = true
 
+salvarJogo()
 mostrarPresenca()
 
 }
