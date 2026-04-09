@@ -401,3 +401,12 @@ async function salvarMensalidade(){
 
   atualizarBotaoPagamento();
 }
+
+function formatarDataBR(dataISO){
+
+  if(!dataISO) return ""
+
+  let partes = dataISO.split("T")[0].split("-")
+
+  return `${partes[2]}/${partes[1]}/${partes[0]}`
+}
