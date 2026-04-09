@@ -95,7 +95,7 @@ for(let i=0;i<presencas.length;i++){
     naoConfirmados.innerHTML +=
     "<tr>"+
     "<td style='padding:6px'>"+presencas[i].nome+"</td>"+
-    "<td><button onclick='voltarLista("+i+")'>🔙 Voltar</button></td>"+
+    "<td><button onclick='voltarLista("+i+")'>↩ Voltar</button></td>"+
     "</tr>"
 
   }
@@ -152,6 +152,17 @@ function faltar(index){
 
   mostrarPresenca()
 }
+
+function voltarLista(index){
+
+  presencas[index].confirmado = false
+  presencas[index].respondido = false
+
+  salvarJogo()
+
+  mostrarPresenca()
+}
+
 function salvarJogo(){
 
   localStorage.setItem("jogoAtual", JSON.stringify({
