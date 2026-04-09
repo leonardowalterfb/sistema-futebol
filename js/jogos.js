@@ -98,14 +98,15 @@ for(let i=0;i<presencas.length;i++){
   }
 else{
 
-lista.innerHTML +=
-"<tr>"+
-"<td style='padding:6px'>"+presencas[i].nome+"</td>"+
-"<td>"+
-"<button onclick='confirmar("+i+")'>✅ Confirmar</button> "+
-"<button onclick=faltar(${i})>❌ Faltar</button>"+
-"</td>"+
-"</tr>"
+lista.innerHTML += `
+<tr>
+  <td style="padding:6px">${presencas[i].nome}</td>
+  <td>
+    <button onclick="confirmar(${i})">✅ Confirmar</button>
+    <button onclick="faltar(${i})">❌ Faltar</button>
+  </td>
+</tr>
+`
 
 }
 
