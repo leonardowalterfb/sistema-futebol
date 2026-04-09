@@ -27,10 +27,7 @@ async function registrarPagamento(){
 
   let hoje = new Date()
 
-  let dataPagamento =
-    hoje.getDate().toString().padStart(2,"0") + "/" +
-    (hoje.getMonth()+1).toString().padStart(2,"0") + "/" +
-    hoje.getFullYear()
+  let dataPagamento = new Date().toISOString()
 
  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
 let turmaId = usuario.turma_id
@@ -197,10 +194,7 @@ return
 
 let hoje = new Date()
 
-let data =
-hoje.getDate().toString().padStart(2,"0") + "/" +
-(hoje.getMonth()+1).toString().padStart(2,"0") + "/" +
-hoje.getFullYear()
+let data = new Date().toISOString()
 
 let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
 let turmaId = usuario.turma_id
