@@ -48,14 +48,6 @@ jogoAberto = true
 
 salvarJogo()
 
-// 🔥 SALVAR JOGO COMPLETO
-localStorage.setItem("jogoAtual", JSON.stringify({
-  data: data,
-  local: local,
-  presencas: presencas,
-  jogoAberto: true
-}))
-
 mostrarPresenca()
 }
 
@@ -82,7 +74,6 @@ if(presencas.length === 0){
   return
 }
 
-// 🔥 LOOP NORMAL
 for(let i=0;i<presencas.length;i++){
 
   if(presencas[i].confirmado === true){
@@ -97,30 +88,30 @@ for(let i=0;i<presencas.length;i++){
 
   }
 
-if(presencas[i].respondido === true && presencas[i].confirmado === false){
+  else if(presencas[i].respondido === true){
 
-  totalNaoConfirmados++
+    totalNaoConfirmados++
 
-  naoConfirmados.innerHTML +=
-  "<tr>"+
-  "<td style='padding:6px'>"+presencas[i].nome+"</td>"+
-  "<td><button onclick='voltarLista("+i+")'>🔙 Voltar</button></td>"+
-  "</tr>"
-}
+    naoConfirmados.innerHTML +=
+    "<tr>"+
+    "<td style='padding:6px'>"+presencas[i].nome+"</td>"+
+    "<td><button onclick='voltarLista("+i+")'>🔙 Voltar</button></td>"+
+    "</tr>"
 
-else{
+  }
 
-lista.innerHTML += `
-<tr>
-  <td style="padding:6px">${presencas[i].nome}</td>
-  <td>
-    <button onclick="confirmar(${i})">✅ Confirmar</button>
-    <button onclick="faltar(${i})">❌ Faltar</button>
-  </td>
-</tr>
-`
+  else{
 
-}
+    lista.innerHTML += `
+    <tr>
+      <td style="padding:6px">${presencas[i].nome}</td>
+      <td>
+        <button onclick="confirmar(${i})">✅ Confirmar</button>
+        <button onclick="faltar(${i})">❌ Faltar</button>
+      </td>
+    </tr>
+    `
+  }
 
 }
 
