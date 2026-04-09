@@ -140,19 +140,15 @@ mostrarPresenca()
 
 function faltar(index){
 
-if(!jogoAberto){
-mostrarToast("Crie um jogo antes de registrar presença.")
-return
+  console.log("clicou faltar", index) // 👈 TESTE
+
+  presencas[index].confirmado = false
+  presencas[index].respondido = true
+
+  salvarJogo()
+
+  mostrarPresenca()
 }
-
-presencas[index].confirmado = false
-presencas[index].respondido = true
-
-salvarJogo()
-mostrarPresenca()
-
-}
-
 function salvarJogo(){
 
   localStorage.setItem("jogoAtual", JSON.stringify({
