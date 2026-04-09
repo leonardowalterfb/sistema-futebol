@@ -96,6 +96,18 @@ for(let i=0;i<presencas.length;i++){
     "</tr>"
 
   }
+
+if(presencas[i].respondido === true && presencas[i].confirmado === false){
+
+  totalNaoConfirmados++
+
+  naoConfirmados.innerHTML +=
+  "<tr>"+
+  "<td style='padding:6px'>"+presencas[i].nome+"</td>"+
+  "<td><button onclick='voltarLista("+i+")'>🔙 Voltar</button></td>"+
+  "</tr>"
+}
+
 else{
 
 lista.innerHTML += `
