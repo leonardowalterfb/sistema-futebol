@@ -2,6 +2,7 @@ let presencas = []
 let historicoJogos = []
 let ranking = {}
 let jogoAberto = false
+let mostrarTodosRanking = false
 
 //CRIAR JOGO//
 
