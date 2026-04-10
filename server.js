@@ -348,7 +348,11 @@ app.post("/jogos", async (req, res) => {
       `INSERT INTO jogos (data, local, presentes, faltaram, turma_id)
        VALUES ($1,$2,$3,$4,$5)
        RETURNING id`,
-      [data, local, presentes, faltaram, turma_id]
+       [data,
+        local,
+        JSON.stringify(presentes),
+        JSON.stringify(faltaram),
+        turma_id]
     )
 
     res.json({ ok: true, id: result.rows[0].id })
