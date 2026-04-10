@@ -289,6 +289,8 @@ function mostrarHistorico(){
 
   lista.innerHTML = ""
 
+  historicoJogos.sort((a, b) => new Date(b.data) - new Date(a.data))
+
   for(let i=historicoJogos.length - 1; i >= 0; i--){
 
     let jogo = historicoJogos[i]
@@ -350,6 +352,8 @@ async function carregarRanking(){
   let turmaId = usuario.turma_id
 
   let dados = await apiGet(`/ranking/${turmaId}`)
+
+  console.log("DADOS RANKING:", dados)  // LOG
 
   ranking = {}
 
