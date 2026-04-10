@@ -384,7 +384,9 @@ function mostrarRanking(){
 
   rankingArray.sort((a,b) => b.presencas - a.presencas)
 
-  for(let i=0;i<rankingArray.length;i++){
+  let limite = mostrarTodosRanking ? rankingArray.length : 3
+
+  for(let i=0; i < limite; i++){
 
     let posicao = i + 1
 
@@ -407,7 +409,16 @@ function mostrarRanking(){
       </li>
     `
   }
+if(rankingArray.length > 3){
 
+  lista.innerHTML += `
+    <div style="text-align:center; margin-top:10px;">
+      <button onclick="toggleRankingLista()" style="padding:8px 16px; border:none; border-radius:8px; cursor:pointer;">
+        ${mostrarTodosRanking ? "🔼 Ocultar" : "🔽 Ver mais"}
+      </button>
+    </div>
+  `
+}
 }
 
 
@@ -550,4 +561,9 @@ function toggleJogo(index){
   } else {
     el.style.display = "none"
   }
+}
+
+function toggleRankingLista(){
+  mostrarTodosRanking = !mostrarTodosRanking
+  mostrarRanking()
 }
