@@ -397,18 +397,28 @@ function mostrarRanking(){
     else if(posicao === 3) medalha = "🥉"
 
     lista.innerHTML += `
-      <li class="ranking-item">
-        <div class="ranking-left">
-          <span class="ranking-pos">${medalha} ${posicao}º</span>
-          <span class="ranking-nome">${rankingArray[i].nome}</span>
-        </div>
+  <li class="ranking-item">
 
-        <div class="ranking-right">
-          <span class="ranking-pontos">${rankingArray[i].presencas} jogos</span>
-          <button onclick='removerRanking("${rankingArray[i].nome}")'>🗑️</button>
-        </div>
-      </li>
-    `
+    <div class="ranking-header" onclick="toggleRanking(${i})" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+      
+      <div>
+        <span class="ranking-pos">${medalha} ${posicao}º</span>
+        <span class="ranking-nome">${rankingArray[i].nome}</span>
+      </div>
+
+      <div>
+        <span class="ranking-pontos">${rankingArray[i].presencas} jogos</span>
+        <button onclick='event.stopPropagation(); removerRanking("${rankingArray[i].nome}")'>🗑️</button>
+      </div>
+
+    </div>
+
+    <div class="ranking-body" id="ranking-${i}" style="display:none; margin-top:10px;">
+      ${gerarGraficoJogador(rankingArray[i].nome)}
+    </div>
+
+  </li>
+`
   }
 if(rankingArray.length > 3){
 
@@ -434,6 +444,71 @@ async function removerRanking(nome){
   // 🔥 ATUALIZA DO BANCO
   await carregarRanking()
 
+}
+
+function toggleRanking(index){
+
+  let el = document.getElementById("ranking-" + index)
+
+  if(el.style.display === "none"){
+    el.style.display = "block"
+  } else {
+    el.style.display = "none"
+  }
+}
+
+function gerarGraficoJogador(nome){
+
+  let meses = {}
+
+  for(let jogo of historicoJogos){
+
+    let data = new Date(jogo.data)
+    let mes = data.toLocaleString("pt-BR", { month: "short" })
+
+    let presentes = jogo.presentes || []
+
+    if(typeof presentes === "string"){
+      try{
+        presentes = JSON.parse(presentes)
+      }catch{
+        presentes = []
+      }
+    }
+
+    if(!meses[mes]){
+      meses[mes] = { total: 0, presencas: 0 }
+    }
+
+    meses[mes].total++
+
+    if(presentes.includes(nome)){
+      meses[mes].presencas++
+    }
+  }
+
+  let html = ""
+
+  for(let mes in meses){
+
+    let total = meses[mes].total
+    let pres = meses[mes].presencas
+
+    let percentual = total > 0 ? Math.round((pres / total) * 100) : 0
+
+    html += `
+      <div style="margin-bottom:8px;">
+        <small>${mes}</small>
+        <div class="barra">
+          <div class="progresso" style="width:${percentual}%">
+            <span>${percentual}%</span>
+          </div>
+        </div>
+      </div>
+    `
+  }
+
+  return html
 }
 
 //SORTEAR JOGO//

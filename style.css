@@ -381,3 +381,21 @@ h2 {
 #jogos {
   color: black;
 }
+
+.barra {
+  background: #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 20px;
+}
+
+.progresso {
+  background: #2d7cc1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
