@@ -303,23 +303,44 @@ app.post("/login", async (req, res) => {
 
 //RANKING
 
-app.get("/ranking/:turmaId", async (req, res) => {
-  try {
-    const { turmaId } = req.params
+let ranking = {}
 
-    const result = await pool.query(
-  `SELECT nome, presencas 
-   FROM ranking 
-   ORDER BY presencas DESC`
-)
+for(let jogo of jogos.rows){
 
-    res.json(result.rows)
+  let presentes = jogo.presentes
 
-  } catch (err) {
-    console.error("ERRO RANKING:", err)
-    res.status(500).json({ erro: "Erro ao buscar ranking" })
+  // 🔥 GARANTE QUE É ARRAY
+  if(typeof presentes === "string"){
+    try {
+      presentes = JSON.parse(presentes)
+    } catch {
+      presentes = []
+    }
   }
-})
+
+  if(!Array.isArray(presentes)) continue
+
+  for(let nome of presentes){
+
+    if(!ranking[nome]){
+      ranking[nome] = 0
+    }
+
+    ranking[nome]++
+  }
+
+  }
+
+let resultado = []
+
+for(let nome in ranking){
+  resultado.push({
+    nome: nome,
+    presencas: ranking[nome]
+  })
+}
+
+res.json(resultado)
 
 //JOGOS
 
