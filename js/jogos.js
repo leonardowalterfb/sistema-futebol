@@ -16,15 +16,15 @@ if(data === "" || local === ""){
 }
 
 // 🔥 VALIDAR DATA (não permitir passado)
-let dataSelecionada = new Date(data)
+//let dataSelecionada = new Date(data)
 
-let hoje = new Date()
-hoje.setHours(0,0,0,0)
+//let hoje = new Date()
+//hoje.setHours(0,0,0,0)
 
-if(dataSelecionada < hoje){
-  mostrarToast("Não é permitido criar jogo com data anterior a hoje")
-  return
-}
+//if(dataSelecionada < hoje){
+//  mostrarToast("Não é permitido criar jogo com data anterior a hoje")
+//  return
+//}
 
 if(jogoAberto){
   mostrarToast("Já existe um jogo aberto.")
