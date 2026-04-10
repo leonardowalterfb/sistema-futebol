@@ -296,15 +296,15 @@ function mostrarHistorico(){
     let dataFormatada = formatarDataBR(jogo.data)
 
     lista.innerHTML += `
-      <div class="historico-card">
+  <div class="historico-card">
 
-        <div class="historico-header">
-          <strong>📅 ${dataFormatada}</strong>
-          <span>📍 ${jogo.local}</span>
-          <button onclick="removerJogo(${jogo.id})">🗑️</button>
-        </div>
+    <div class="historico-header" onclick="toggleJogo(${i})" style="cursor:pointer;">
+      <strong>📅 ${dataFormatada}</strong>
+      <span>📍 ${jogo.local}</span>
+      <button onclick="event.stopPropagation(); removerJogo(${jogo.id})">🗑️</button>
+    </div>
 
-        <div class="historico-body">
+    <div class="historico-body" id="jogo-${i}" style="display:none;">
 
           <div class="historico-col">
             <h4>✅ Presentes (${jogo.presentes.length})</h4>
@@ -535,4 +535,15 @@ lista[j] = temp
 
 return lista
 
+}
+
+function toggleJogo(index){
+
+  let el = document.getElementById("jogo-" + index)
+
+  if(el.style.display === "none"){
+    el.style.display = "block"
+  } else {
+    el.style.display = "none"
+  }
 }
