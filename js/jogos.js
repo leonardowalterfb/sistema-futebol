@@ -396,24 +396,24 @@ function mostrarRanking(){
     else if(posicao === 2) medalha = "🥈"
     else if(posicao === 3) medalha = "🥉"
 
-    lista.innerHTML += `
+lista.innerHTML += `
   <li class="ranking-item">
 
-    <div class="ranking-header" onclick="toggleRanking(${i})" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
-      
-      <div>
+    <div class="ranking-header" onclick="toggleRanking(${i})">
+
+      <div class="ranking-left">
         <span class="ranking-pos">${medalha} ${posicao}º</span>
         <span class="ranking-nome">${rankingArray[i].nome}</span>
       </div>
 
-      <div>
+      <div class="ranking-right">
         <span class="ranking-pontos">${rankingArray[i].presencas} jogos</span>
         <button onclick='event.stopPropagation(); removerRanking("${rankingArray[i].nome}")'>🗑️</button>
       </div>
 
     </div>
 
-    <div class="ranking-body" id="ranking-${i}" style="display:none; margin-top:10px;">
+    <div class="ranking-body" id="ranking-${i}">
       ${gerarGraficoJogador(rankingArray[i].nome)}
     </div>
 

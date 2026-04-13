@@ -402,43 +402,36 @@ h2 {
 
 .ranking-header {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
   cursor: pointer;
 }
 
-.ranking-linha {
+/* ESQUERDA */
+.ranking-left {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-/* 🔥 LINHA DE AÇÕES */
-.ranking-acoes {
+/* DIREITA */
+.ranking-right {
   display: flex;
   align-items: center;
-  margin-top: 5px;
-  width: 100%;
+  gap: 10px;
 }
 
-/* 75% DA LINHA */
+/* TEXTO JOGOS */
 .ranking-pontos {
-  margin-left: auto;
-  margin-right: 20px;
-  font-weight: 500;
+  white-space: nowrap;
 }
 
-/* LIXEIRA NO FINAL */
-.ranking-acoes button {
-  margin-left: auto;
+/* BOTÃO */
+.ranking-right button {
   background: #ff4d4d;
   border: none;
   border-radius: 8px;
   padding: 6px 10px;
   color: white;
   cursor: pointer;
-}
-
-.ranking-body {
-  display: none;
-  margin-top: 10px;
 }
