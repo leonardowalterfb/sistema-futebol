@@ -432,11 +432,6 @@ app.get("/turmas/:id", async (req, res) => {
   }
 })
 
-//Usuário Admin
-app.get("/turmas", async (req, res) => {
-  const result = await pool.query("SELECT * FROM turmas")
-  res.json(result.rows)
-})
 
 // ================= START =================
 const PORT = process.env.PORT || 3000
