@@ -390,7 +390,10 @@ function mostrarRanking(){
 
   rankingArray.sort((a,b) => b.presencas - a.presencas)
 
-  let limite = mostrarTodosRanking ? rankingArray.length : 3
+ // let limite = mostrarTodosRanking ? rankingArray.length : 3
+ let limite = mostrarTodosRanking 
+  ? rankingArray.length 
+  : Math.min(3, rankingArray.length)
 
   for(let i=0; i < limite; i++){
 
