@@ -1207,9 +1207,45 @@ function logout(){
 
 }
 
+//Usuário Admin seleciona qual turma vai acessar:
+async function carregarTurmasAdmin(){
+
+  let turmas = await apiGet("/turmas")
+
+  let select = document.getElementById("selectTurma")
+
+  select.innerHTML = ""
+
+  for(let turma of turmas){
+    select.innerHTML += `
+      <option value="${turma.id}">
+        ${turma.nome}
+      </option>
+    `
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async function(){
 
   let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
+  //Se for usua´rio Admin
+  if(usuario.tipo === "admin"){
+  await carregarTurmasAdmin()
+
+  document.getElementById("selectTurma").addEventListener("change", async (e) => {
+
+  let turmaId = e.target.value
+
+  await carregarJogadores(turmaId)
+  await carregarRanking(turmaId)
+  await carregarHistorico(turmaId)
+
+})
+
+} else {
+  carregarDados(usuario.turma_id)
+}
 
   // 🔥 NÃO LOGADO
   if(!usuario){
