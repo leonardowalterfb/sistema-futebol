@@ -8,63 +8,46 @@ let mostrarTodosRanking = false
 
 function criarJogo(){
 
-let data = document.getElementById("dataJogo").value
-let local = document.getElementById("localJogo").value
+  let data = document.getElementById("dataJogo").value
+  let local = document.getElementById("localJogo").value
 
-if(data === "" || local === ""){
-  mostrarToast("Informe a data e o local antes de criar o jogo.")
-  return
-}
+  if(data === "" || local === ""){
+    mostrarToast("Informe a data e o local antes de criar o jogo.")
+    return
+  }
 
-// 🔥 CORREÇÃO CRÍTICA
-let jogoSalvo = localStorage.getItem("jogoAtual")
-
-if(!jogoSalvo){
-  jogoAberto = false
-}
-
-// 🔥 VALIDAR DATA (não permitir passado)
-//let dataSelecionada = new Date(data)
-
-//let hoje = new Date()
-//hoje.setHours(0,0,0,0)
-
-//if(dataSelecionada < hoje){
-//  mostrarToast("Não é permitido criar jogo com data anterior a hoje")
-//  return
-//}
-
-if(jogoAberto){
-
+  // 🔥 VERIFICA SE EXISTE JOGO SALVO REAL
   let jogoSalvo = localStorage.getItem("jogoAtual")
 
-  if(jogoSalvo){
-    mostrarToast("Já existe um jogo aberto.")
-    return
-  } else {
-    // 🔥 corrige estado bugado
+  // 🔥 CORRIGE ESTADO BUGADO
+  if(!jogoSalvo){
     jogoAberto = false
   }
-}
 
-// 🔥 RESET CORRETO
-presencas = []
-
-for(let i=0;i<jogadores.length;i++){
-  if(jogadores[i].status === "ativo"){
-    presencas.push({
-      nome: jogadores[i].nome,
-      confirmado: false,
-      respondido: false
-    })
+  // 🔥 BLOQUEIO INTELIGENTE
+  if(jogoAberto && jogoSalvo){
+    mostrarToast("Já existe um jogo aberto.")
+    return
   }
-}
 
-jogoAberto = true
+  // 🔥 RESET TOTAL
+  presencas = []
 
-salvarJogo()
+  for(let i = 0; i < jogadores.length; i++){
+    if(jogadores[i].status === "ativo"){
+      presencas.push({
+        nome: jogadores[i].nome,
+        confirmado: false,
+        respondido: false
+      })
+    }
+  }
 
-mostrarPresenca()
+  jogoAberto = true
+
+  salvarJogo()
+
+  mostrarPresenca()
 }
 
 function mostrarPresenca(){
