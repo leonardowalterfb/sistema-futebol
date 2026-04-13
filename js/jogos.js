@@ -619,10 +619,10 @@ async function mostrarSecao(secao){
 
   // 🔥 CORREÇÃO AQUI
   if(secao === "jogos"){
-    await carregarJogadores()
-    mostrarPresenca()
-    carregarJogoSalvo()
-  }
+  await carregarJogadores()
+  carregarJogoSalvo()
+  mostrarPresenca()
+}
 }
 
 function embaralhar(lista){
