@@ -16,6 +16,13 @@ if(data === "" || local === ""){
   return
 }
 
+// 🔥 CORREÇÃO CRÍTICA
+let jogoSalvo = localStorage.getItem("jogoAtual")
+
+if(!jogoSalvo){
+  jogoAberto = false
+}
+
 // 🔥 VALIDAR DATA (não permitir passado)
 //let dataSelecionada = new Date(data)
 
@@ -28,8 +35,16 @@ if(data === "" || local === ""){
 //}
 
 if(jogoAberto){
-  mostrarToast("Já existe um jogo aberto.")
-  return
+
+  let jogoSalvo = localStorage.getItem("jogoAtual")
+
+  if(jogoSalvo){
+    mostrarToast("Já existe um jogo aberto.")
+    return
+  } else {
+    // 🔥 corrige estado bugado
+    jogoAberto = false
+  }
 }
 
 // 🔥 RESET CORRETO
@@ -183,7 +198,7 @@ if(!jogo) return
 let dados = JSON.parse(jogo)
 
 presencas = dados.presencas || []
-jogoAberto = dados.jogoAberto || false
+jogoAberto = dados.jogoAberto === true
 
 document.getElementById("dataJogo").value = dados.data || ""
 document.getElementById("localJogo").value = dados.local || ""
