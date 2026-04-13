@@ -192,15 +192,24 @@ if(!jogo){
 // 🔥 VERIFICA SE JOGO JÁ FOI SALVO
 let jogoJaSalvo = sessionStorage.getItem("jogoSalvo")
 
-if(jogoJaSalvo === "true"){
+//if(jogoJaSalvo === "true"){
   // 🔥 NÃO CARREGA MAIS
+  //localStorage.removeItem("jogoAtual")
+  //jogoAberto = false
+  //presencas = []
+  //return
+//}
+
+let dados = JSON.parse(jogo)
+
+// 🔥 VALIDAÇÃO INTELIGENTE
+if(!dados || !dados.presencas || dados.presencas.length === 0){
   localStorage.removeItem("jogoAtual")
   jogoAberto = false
   presencas = []
   return
 }
 
-let dados = JSON.parse(jogo)
 
 presencas = dados.presencas || []
 jogoAberto = dados.jogoAberto === true
@@ -275,7 +284,7 @@ await apiPost("/jogos", jogo)
 mostrarToast("Jogo Salvo!")
 
 // MARCA COMO SALVO
-sessionStorage.setItem("jogoSalvo", "true")
+//sessionStorage.setItem("jogoSalvo", "true")
 
 await carregarHistorico()
 await carregarRanking()
@@ -298,6 +307,7 @@ document.getElementById("localJogo").value = ""
 mostrarPresenca()
 
 }
+
 
 async function carregarHistorico(){
 
@@ -643,13 +653,16 @@ async function mostrarSecao(secao){
   }
 
   // 🔥 CORREÇÃO AQUI
-  if(secao === "jogos"){
+ // if(secao === "jogos"){
+  //await carregarJogadores()
+  //carregarJogoSalvo()
+  //mostrarPresenca()
+//}
+if(secao === "jogos"){
   await carregarJogadores()
   carregarJogoSalvo()
-  mostrarPresenca()
 }
 }
-
 function embaralhar(lista){
 
 for(let i = lista.length - 1; i > 0; i--){
