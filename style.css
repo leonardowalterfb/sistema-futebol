@@ -404,6 +404,7 @@ h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%; /* 🔥 ESSENCIAL */
   cursor: pointer;
 }
 
@@ -412,6 +413,7 @@ h2 {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 1; /* 🔥 EMPURRA O RESTO PRA DIREITA */
 }
 
 /* LADO DIREITO */
@@ -424,6 +426,14 @@ h2 {
 /* GARANTE QUE NÃO QUEBRA */
 .ranking-pontos {
   white-space: nowrap;
+}
+
+.ranking-nome {
+  white-space: nowrap;
+}
+
+.ranking-item {
+  width: 100%;
 }
 
 /* BOTÃO */
@@ -440,4 +450,9 @@ h2 {
 .ranking-body {
   display: none;
   margin-top: 10px;
+}
+
+.ranking-right {
+  min-width: 120px;
+  justify-content: flex-end;
 }
