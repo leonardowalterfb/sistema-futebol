@@ -186,6 +186,17 @@ let jogo = localStorage.getItem("jogoAtual")
 if(!jogo){
   jogoAberto = false
   presencas = []
+
+  // 🔥 LIMPA A TELA NA HORA
+  document.getElementById("listaPresenca").innerHTML = ""
+  document.getElementById("confirmados").innerHTML = ""
+  document.getElementById("naoConfirmados").innerHTML = ""
+
+  document.getElementById("dataJogo").value = ""
+  document.getElementById("localJogo").value = ""
+
+  mostrarPresenca()
+
   return
 }
 
