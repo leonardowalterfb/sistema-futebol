@@ -352,9 +352,14 @@ async function carregarRanking(){
   let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
   let turmaId = usuario.turma_id
 
+  // 🔥 GARANTE QUE HISTÓRICO ESTÁ CARREGADO
+  if(historicoJogos.length === 0){
+    await carregarHistorico()
+  }
+
   let dados = await apiGet(`/ranking/${turmaId}`)
 
-  console.log("DADOS RANKING:", dados)  // LOG
+  console.log("DADOS RANKING:", dados)
 
   ranking = {}
 
