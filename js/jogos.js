@@ -413,6 +413,7 @@ lista.innerHTML += `
 
     </div>
 
+    <!-- 🔥 ESCONDIDO POR PADRÃO -->
     <div class="ranking-body" id="ranking-${i}">
       ${gerarGraficoJogador(rankingArray[i].nome)}
     </div>
@@ -450,7 +451,7 @@ function toggleRanking(index){
 
   let el = document.getElementById("ranking-" + index)
 
-  if(el.style.display === "none"){
+  if(el.style.display === "none" || el.style.display === ""){
     el.style.display = "block"
   } else {
     el.style.display = "none"

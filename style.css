@@ -407,21 +407,21 @@ h2 {
   cursor: pointer;
 }
 
-/* ESQUERDA */
+/* LADO ESQUERDO */
 .ranking-left {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-/* DIREITA */
+/* LADO DIREITO */
 .ranking-right {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-/* TEXTO JOGOS */
+/* GARANTE QUE NÃO QUEBRA */
 .ranking-pontos {
   white-space: nowrap;
 }
@@ -434,4 +434,10 @@ h2 {
   padding: 6px 10px;
   color: white;
   cursor: pointer;
+}
+
+/* 🔥 ESCONDE O GRÁFICO */
+.ranking-body {
+  display: none;
+  margin-top: 10px;
 }
