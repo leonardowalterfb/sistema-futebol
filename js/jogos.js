@@ -8,6 +8,8 @@ let mostrarTodosRanking = false
 
 function criarJogo(){
 
+  sessionStorage.removeItem("jogoSalvo")
+
   let data = document.getElementById("dataJogo").value
   let local = document.getElementById("localJogo").value
 
@@ -174,9 +176,29 @@ function salvarJogo(){
 
 function carregarJogoSalvo(){
 
+//let jogo = localStorage.getItem("jogoAtual")
+
+//if(!jogo) return
+
 let jogo = localStorage.getItem("jogoAtual")
 
-if(!jogo) return
+// 🔥 SE NÃO EXISTE → limpa tudo
+if(!jogo){
+  jogoAberto = false
+  presencas = []
+  return
+}
+
+// 🔥 VERIFICA SE JOGO JÁ FOI SALVO
+let jogoJaSalvo = sessionStorage.getItem("jogoSalvo")
+
+if(jogoJaSalvo === "true"){
+  // 🔥 NÃO CARREGA MAIS
+  localStorage.removeItem("jogoAtual")
+  jogoAberto = false
+  presencas = []
+  return
+}
 
 let dados = JSON.parse(jogo)
 
@@ -251,6 +273,9 @@ let jogo = {
 await apiPost("/jogos", jogo)
 
 mostrarToast("Jogo Salvo!")
+
+// MARCA COMO SALVO
+sessionStorage.setItem("jogoSalvo", "true")
 
 await carregarHistorico()
 await carregarRanking()
