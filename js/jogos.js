@@ -261,6 +261,8 @@ await carregarRanking()
 presencas = []
 jogoAberto = false
 
+localStorage.removeItem("jogoAtual")
+
 // limpar interface
 document.getElementById("listaPresenca").innerHTML = ""
 document.getElementById("confirmados").innerHTML = ""
