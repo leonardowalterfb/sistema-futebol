@@ -399,3 +399,46 @@ h2 {
   font-size: 12px;
   font-weight: bold;
 }
+
+.ranking-header {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.ranking-linha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 🔥 LINHA DE AÇÕES */
+.ranking-acoes {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+  width: 100%;
+}
+
+/* 75% DA LINHA */
+.ranking-pontos {
+  margin-left: auto;
+  margin-right: 20px;
+  font-weight: 500;
+}
+
+/* LIXEIRA NO FINAL */
+.ranking-acoes button {
+  margin-left: auto;
+  background: #ff4d4d;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: white;
+  cursor: pointer;
+}
+
+.ranking-body {
+  display: none;
+  margin-top: 10px;
+}
