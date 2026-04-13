@@ -497,16 +497,20 @@ function gerarGraficoJogador(nome){
 
     let percentual = total > 0 ? Math.round((pres / total) * 100) : 0
 
-    html += `
-      <div style="margin-bottom:8px;">
-        <small>${mes}</small>
-        <div class="barra">
-          <div class="progresso" style="width:${percentual}%">
-            <span>${percentual}%</span>
-          </div>
-        </div>
-      </div>
-    `
+html += `
+  <div style="margin-bottom:10px;">
+    
+    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+      <small>${mes}</small>
+      <strong>${percentual}%</strong>
+    </div>
+
+    <div class="barra">
+      <div class="progresso" style="width:${percentual}%"></div>
+    </div>
+
+  </div>
+`
   }
 
   return html
