@@ -300,25 +300,10 @@ mostrarToast("Jogo Salvo!")
 await carregarHistorico()
 await carregarRanking()
 
-// limpar estado corretamente
-presencas = []
-jogoAberto = false
-
-localStorage.removeItem("jogoAtual")
-
-// limpar interface
-document.getElementById("listaPresenca").innerHTML = ""
-document.getElementById("confirmados").innerHTML = ""
-document.getElementById("naoConfirmados").innerHTML = ""
-
-document.getElementById("dataJogo").value = ""
-document.getElementById("localJogo").value = ""
-
 // 🔥 ATUALIZA TELA
 mostrarPresenca()
 
 }
-
 
 async function carregarHistorico(){
 
@@ -704,4 +689,26 @@ function toggleJogo(index){
 function toggleRankingLista(){
   mostrarTodosRanking = !mostrarTodosRanking
   mostrarRanking()
+}
+
+function limparJogo(){
+
+  // limpar estado
+  presencas = []
+  jogoAberto = false
+
+  // limpar storage
+  localStorage.removeItem("jogoAtual")
+
+  // limpar interface
+  document.getElementById("listaPresenca").innerHTML = ""
+  document.getElementById("confirmados").innerHTML = ""
+  document.getElementById("naoConfirmados").innerHTML = ""
+
+  document.getElementById("dataJogo").value = ""
+  document.getElementById("localJogo").value = ""
+
+  mostrarPresenca()
+
+  mostrarToast("Jogo limpo com sucesso!")
 }
