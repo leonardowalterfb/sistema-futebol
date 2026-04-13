@@ -456,3 +456,14 @@ h2 {
   min-width: 120px;
   justify-content: flex-end;
 }
+
+.ranking-body {
+  display: none;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.ranking-item {
+  display: flex;
+  flex-direction: column; /* 🔥 ESSENCIAL */
+}
