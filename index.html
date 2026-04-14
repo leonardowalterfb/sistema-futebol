@@ -1090,6 +1090,10 @@ function abrirAbaConfig(aba){
     document.getElementById("nomeSistema").value =
       localStorage.getItem("nomeSistema") || ""
   }
+  
+  if(aba === "permissoes"){
+  carregarUsuariosPermissoes()
+}
 }
 
 async function selecionarTurmaAdmin(){
