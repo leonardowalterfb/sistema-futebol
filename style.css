@@ -478,3 +478,33 @@ h2 {
   visibility: visible;
   opacity: 1;
 }
+#aba-permissoes {
+  padding: 20px;
+}
+
+#aba-permissoes h3 {
+  margin-bottom: 15px;
+}
+
+#aba-permissoes h4 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+#aba-permissoes label {
+  display: block;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+#aba-permissoes select {
+  padding: 8px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+#aba-permissoes button {
+  margin-top: 15px;
+}

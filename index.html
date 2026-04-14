@@ -156,9 +156,27 @@
 
   </div>
 
-  
   <div id="aba-permissoes" class="aba-config" style="display:none">
-    <h3>Permissões (em breve)</h3>
+    <h3>🔐 Permissões</h3>
+
+<select id="selectUsuario" onchange="carregarPermissoes()"></select>
+
+<h4>Jogadores</h4>
+<label><input type="checkbox" id="perm_jogadores_cadastrar"> Cadastrar</label>
+<label><input type="checkbox" id="perm_jogadores_editar"> Editar</label>
+<label><input type="checkbox" id="perm_jogadores_excluir"> Excluir</label>
+
+<h4>Jogos</h4>
+<label><input type="checkbox" id="perm_jogos_salvar"> Salvar Jogo</label>
+
+<h4>Financeiro</h4>
+<label><input type="checkbox" id="perm_financeiro_registrar"> Registrar</label>
+<label><input type="checkbox" id="perm_financeiro_excluir"> Excluir</label>
+
+<br><br>
+
+<button onclick="salvarPermissoes()">💾 Salvar Permissões</button>
+
   </div>
 
   <div id="aba-sistema" class="aba-config" style="display:none">
@@ -438,6 +456,7 @@ Salvar
 
 <script src="js/utils.js"></script>
 <script src="js/api.js"></script>
+<script src="usuarios.js"></script>
 <script src="js/jogadores.js"></script>
 <script src="js/financeiro.js"></script>
 <script src="js/jogos.js"></script>

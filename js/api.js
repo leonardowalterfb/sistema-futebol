@@ -26,12 +26,17 @@ async function apiGet(url){
 // POST
 async function apiPost(url, body){
 
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
   let res = await fetch(API + url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify({
+      ...body,
+      usuario_id: usuario?.id 
+    })
   })
 
   let data
@@ -43,7 +48,7 @@ async function apiPost(url, body){
   }
 
   if(!res.ok){
-    throw data // 🔥 AQUI A MÁGICA
+    throw data
   }
 
   return data
@@ -52,12 +57,17 @@ async function apiPost(url, body){
 // PUT
 async function apiPut(url, body){
 
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
   let res = await fetch(API + url, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify({
+      ...body,
+      usuario_id: usuario?.id // 🔥 AQUI ESTÁ A MUDANÇA
+    })
   })
 
   let data
@@ -78,8 +88,16 @@ async function apiPut(url, body){
 // DELETE
 async function apiDelete(url){
 
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
   let res = await fetch(API + url, {
-    method: "DELETE"
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      usuario_id: usuario?.id
+    })
   })
 
   let data

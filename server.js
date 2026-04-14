@@ -25,6 +25,17 @@ pool.query("SELECT NOW()")
 app.use(cors())
 app.use(express.json())
 
+async function temPermissao(usuarioId, modulo, acao){
+
+  const result = await pool.query(
+    `SELECT permitido FROM permissoes 
+     WHERE usuario_id = $1 AND modulo = $2 AND acao = $3`,
+    [usuarioId, modulo, acao]
+  )
+
+  return result.rows.length > 0 && result.rows[0].permitido === true
+}
+
 //const db = require("./config/db")
 
 // ================= TESTE =================
@@ -67,7 +78,15 @@ app.get("/jogadores/:turmaId", async (req, res) => {
 
 app.post("/jogadores", async (req, res) => {
   try {
+
     const j = req.body
+
+    // 🔥 VALIDA PERMISSÃO
+    const pode = await temPermissao(j.usuario_id, "jogadores", "cadastrar")
+
+    if(!pode){
+      return res.status(403).json({ erro: "Sem permissão" })
+    }
 
     const cpfLimpo = j.cpf.replace(/\D/g, "")
 
@@ -109,6 +128,12 @@ app.put("/jogadores/:id", async (req, res) => {
     const { id } = req.params
     const d = req.body
 
+    const pode = await temPermissao(d.usuario_id, "jogadores", "editar")
+
+if(!pode){
+  return res.status(403).json({ erro: "Sem permissão" })
+}
+
     if (d.status && Object.keys(d).length === 1) {
       await pool.query(
         "UPDATE jogadores SET status = $1 WHERE id = $2",
@@ -135,6 +160,11 @@ app.put("/jogadores/:id", async (req, res) => {
 
 app.delete("/jogadores/:id", async (req, res) => {
   try {
+    const { usuario_id } = req.body
+    const pode = await temPermissao(usuario_id, "jogadores", "excluir")
+    if(!pode){
+    return res.status(403).json({ erro: "Sem permissão" })
+}
     await pool.query("DELETE FROM jogadores WHERE id=$1", [req.params.id])
     res.json({ ok: true })
   } catch (err) {
@@ -157,7 +187,11 @@ app.get("/pagamentos/:turmaId", async (req, res) => {
 
 app.post("/pagamentos", async (req, res) => {
   try {
-    const { jogador, jogador_id, mes, valor, data, turma_id } = req.body
+    const { jogador, jogador_id, mes, valor, data, turma_id, usuario_id } = req.body
+    const pode = await temPermissao(usuario_id, "financeiro", "registrar")
+    if(!pode){
+    return res.status(403).json({ erro: "Sem permissão" })
+}
 
     const existe = await pool.query(
       "SELECT id FROM pagamentos WHERE jogador_nome=$1 AND mes=$2 AND turma_id=$3",
@@ -183,6 +217,11 @@ app.post("/pagamentos", async (req, res) => {
 
 app.delete("/pagamentos/:id", async (req, res) => {
   try {
+    const { usuario_id } = req.body
+    const pode = await temPermissao(usuario_id, "financeiro", "excluir")
+    if(!pode){
+  return res.status(403).json({ erro: "Sem permissão" })
+}
     await pool.query("DELETE FROM pagamentos WHERE id=$1", [req.params.id])
     res.json({ ok: true })
   } catch (err) {
@@ -205,7 +244,11 @@ app.get("/despesas/:turmaId", async (req, res) => {
 
 app.post("/despesas", async (req, res) => {
   try {
-    const { descricao, valor, data, turma_id } = req.body
+    const { descricao, valor, data, turma_id, usuario_id } = req.body
+    const pode = await temPermissao(usuario_id, "financeiro", "registrar")
+    if(!pode){
+  return res.status(403).json({ erro: "Sem permissão" })
+}
 
     await pool.query(
       `INSERT INTO despesas (descricao, valor, data, turma_id)
@@ -221,6 +264,11 @@ app.post("/despesas", async (req, res) => {
 
 app.delete("/despesas/:id", async (req, res) => {
   try {
+    const { usuario_id } = req.body
+    const pode = await temPermissao(usuario_id, "financeiro", "excluir")
+    if(!pode){
+  return res.status(403).json({ erro: "Sem permissão" })
+}
     await pool.query("DELETE FROM despesas WHERE id=$1", [req.params.id])
     res.json({ ok: true })
   } catch (err) {
@@ -263,6 +311,52 @@ app.delete("/usuarios/:id", async (req, res) => {
   try {
     await pool.query("DELETE FROM usuarios WHERE id=$1", [req.params.id])
     res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ erro: err.message })
+  }
+})
+
+// ===============PERMISSÕES================
+
+app.get("/permissoes/:usuarioId", async (req, res) => {
+  try {
+
+    const { usuarioId } = req.params
+
+    const result = await pool.query(
+      "SELECT * FROM permissoes WHERE usuario_id = $1",
+      [usuarioId]
+    )
+
+    res.json(result.rows)
+
+  } catch (err) {
+    res.status(500).json({ erro: err.message })
+  }
+})
+
+app.post("/permissoes", async (req, res) => {
+  try {
+
+    const { usuario_id, permissoes } = req.body
+
+    // 🔥 apaga antigas
+    await pool.query(
+      "DELETE FROM permissoes WHERE usuario_id = $1",
+      [usuario_id]
+    )
+
+    // 🔥 insere novas
+    for(let p of permissoes){
+      await pool.query(
+        `INSERT INTO permissoes (usuario_id, modulo, acao, permitido)
+         VALUES ($1,$2,$3,$4)`,
+        [usuario_id, p.modulo, p.acao, p.permitido]
+      )
+    }
+
+    res.json({ ok: true })
+
   } catch (err) {
     res.status(500).json({ erro: err.message })
   }
@@ -377,7 +471,11 @@ app.get("/jogos/:turmaId", async (req, res) => {
 
 app.post("/jogos", async (req, res) => {
   try {
-    const { data, local, presentes, faltaram, turma_id } = req.body
+    const { data, local, presentes, faltaram, turma_id, usuario_id } = req.body
+    const pode = await temPermissao(usuario_id, "jogos", "salvar")
+    if(!pode){
+    return res.status(403).json({ erro: "Sem permissão" })
+}
 
     const result = await pool.query(
       `INSERT INTO jogos (data, local, presentes, faltaram, turma_id)
@@ -431,7 +529,6 @@ app.get("/turmas/:id", async (req, res) => {
     res.status(500).json({ erro: "Erro ao buscar turma" })
   }
 })
-
 
 // ================= START =================
 const PORT = process.env.PORT || 3000
