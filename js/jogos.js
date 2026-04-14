@@ -479,9 +479,17 @@ if(rankingArray.length > 3){
 }
 }
 
-
 async function removerRanking(nome){
 
+  // 🔥 VALIDA PERMISSÃO PRIMEIRO
+  let pode = await usuarioTemPermissao("ranking", "excluir")
+
+  if(!pode){
+    mostrarToast("Você não tem autorização para excluir ranking", "error")
+    return
+  }
+
+  // 🔥 CONFIRMAÇÃO
   if(!confirm("Deseja remover esse jogador do ranking?")) return
 
   console.log("🗑️ REMOVENDO:", nome)
@@ -490,7 +498,27 @@ async function removerRanking(nome){
 
   // 🔥 ATUALIZA DO BANCO
   await carregarRanking()
+}
 
+async function excluirHistorico(id){
+
+  // 🔥 VALIDA PERMISSÃO
+  let pode = await usuarioTemPermissao("historico", "excluir")
+
+  if(!pode){
+    mostrarToast("Você não tem autorização para excluir histórico", "error")
+    return
+  }
+
+  // 🔥 CONFIRMAÇÃO
+  if(!confirm("Deseja excluir este histórico?")) return
+
+  await apiDelete(`/jogos/${id}`)
+
+  mostrarToast("Histórico removido com sucesso!")
+
+  // 🔥 ATUALIZA TELA
+  await carregarHistorico()
 }
 
 function toggleRanking(index){

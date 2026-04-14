@@ -81,3 +81,15 @@ async function usuarioTemPermissao(modulo, acao){
     return false
   }
 }
+
+async function validarPermissao(modulo, acao){
+
+  let pode = await usuarioTemPermissao(modulo, acao)
+
+  if(!pode){
+    mostrarToast("Você não tem autorização para essa ação", "error")
+    return false
+  }
+
+  return true
+}
