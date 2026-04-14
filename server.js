@@ -27,6 +27,17 @@ app.use(express.json())
 
 async function temPermissao(usuarioId, modulo, acao){
 
+  // 🔥 verifica se é master
+  const user = await pool.query(
+    "SELECT is_master FROM usuarios WHERE id = $1",
+    [usuarioId]
+  )
+
+  if(user.rows[0]?.is_master){
+    return true
+  }
+
+  // 🔥 verifica permissões normais
   const result = await pool.query(
     `SELECT permitido FROM permissoes 
      WHERE usuario_id = $1 AND modulo = $2 AND acao = $3`,
