@@ -541,6 +541,28 @@ app.get("/turmas/:id", async (req, res) => {
   }
 })
 
+// ===============MODALIDADE================
+
+app.put("/turmas/:id", async (req, res) => {
+
+  const { id } = req.params
+  const { modalidade } = req.body
+
+  try{
+
+    await pool.query(
+      "UPDATE turmas SET modalidade = $1 WHERE id = $2",
+      [modalidade, id]
+    )
+
+    res.json({ ok: true })
+
+  }catch(err){
+    console.log(err)
+    res.status(500).json({ erro: "Erro ao atualizar turma" })
+  }
+})
+
 // ================= START =================
 const PORT = process.env.PORT || 3000
 
