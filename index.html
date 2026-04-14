@@ -205,6 +205,18 @@
 
    <button onclick="salvarMensalidade()">Salvar</button>
 
+ <h3>Modalidade</h3>
+
+<select id="modalidadeTurma">
+  <option value="futebol">Futebol</option>
+  <option value="futsal">Futsal</option>
+  <option value="volei">Vôlei</option>
+  <option value="basquete">Basquete</option>
+  <option value="handebol">Handebol</option>
+</select>
+
+<button onclick="salvarModalidade()">Salvar Modalidade</button>  
+
 </div>
 
   </div>
@@ -536,6 +548,7 @@ async function iniciarSistema(){
   await carregarPagamentos(),
   await carregarDespesas(),
   await carregarRanking(),
+  await carregarModalidade(),
 ])
   atualizarSelectJogadores()
   mostrarPagamentos()
@@ -1220,6 +1233,65 @@ async function atualizarTituloSistema(){
   } else {
     titulo.innerText = "⚽ Sistema Para controle de Turmas Esportivas"
   }
+}
+
+async function salvarModalidade(){
+
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
+  let modalidade = document.getElementById("modalidadeTurma").value
+
+  await apiPut(`/turmas/${usuario.turma_id}`, {
+    modalidade: modalidade
+  })
+
+  mostrarToast("Modalidade atualizada!")
+
+  carregarModalidade()
+}
+
+async function carregarModalidade(){
+
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
+  let turma = await apiGet(`/turmas/${usuario.turma_id}`)
+
+  document.getElementById("modalidadeTurma").value = turma.modalidade
+
+  montarPosicoes(turma.modalidade)
+}
+
+function montarPosicoes(modalidade){
+
+  let select = document.getElementById("posicao")
+
+  let opcoes = []
+
+  if(modalidade === "futebol"){
+    opcoes = ["Goleiro","Zagueiro","Lateral","Meia","Atacante"]
+  }
+
+  if(modalidade === "futsal"){
+    opcoes = ["Goleiro","Fixo","Ala","Pivô"]
+  }
+
+  if(modalidade === "volei"){
+    opcoes = ["Levantador","Ponteiro","Central","Oposto","Líbero"]
+  }
+
+  if(modalidade === "basquete"){
+    opcoes = ["Armador","Ala","Ala-Pivô","Pivô"]
+  }
+
+  if(modalidade === "handebol"){
+    opcoes = ["Goleiro","Ponta","Armador","Central","Pivot"]
+  }
+
+  select.innerHTML = "<option value=''>Posição</option>"
+
+  opcoes.forEach(p => {
+    select.innerHTML += `<option>${p}</option>`
+  })
 }
 
 function mostrarPagina(pagina){
