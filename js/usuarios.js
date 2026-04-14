@@ -58,3 +58,26 @@ async function salvarPermissoes(){
 
   mostrarToast("Permissões salvas!")
 }
+
+async function usuarioTemPermissao(modulo, acao){
+
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
+  if(!usuario) return false
+
+  // 🔥 MASTER LIBERADO
+  if(usuario.is_master) return true
+
+  try {
+    let permissoes = await apiGet(`/permissoes/${usuario.id}`)
+
+    let perm = permissoes.find(p =>
+      p.modulo === modulo && p.acao === acao
+    )
+
+    return perm && perm.permitido === true
+
+  } catch {
+    return false
+  }
+}

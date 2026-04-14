@@ -636,6 +636,17 @@ document.getElementById("timeB").innerHTML=""
 
 async function mostrarSecao(secao){
 
+  // 🔥 BLOQUEIO DE CONFIGURAÇÕES
+  if(secao === "configuracoes"){
+
+    let pode = await usuarioTemPermissao("configuracoes", "acessar")
+
+    if(!pode){
+      mostrarToast("Sem acesso a configurações", "error")
+      return
+    }
+  }
+
   // esconde todas
   document.querySelectorAll(".secao").forEach(s => {
     s.style.display = "none"
@@ -648,31 +659,11 @@ async function mostrarSecao(secao){
     ativa.style.display = "block"
   }
 
-  // 🔥 CORREÇÃO AQUI
- // if(secao === "jogos"){
-  //await carregarJogadores()
-  //carregarJogoSalvo()
-  //mostrarPresenca()
-//}
-if(secao === "jogos"){
-  await carregarJogadores()
-  carregarJogoSalvo()
-}
-}
-function embaralhar(lista){
-
-for(let i = lista.length - 1; i > 0; i--){
-
-let j = Math.floor(Math.random() * (i + 1))
-
-let temp = lista[i]
-lista[i] = lista[j]
-lista[j] = temp
-
-}
-
-return lista
-
+  // 🔥 lógica específica
+  if(secao === "jogos"){
+    await carregarJogadores()
+    carregarJogoSalvo()
+  }
 }
 
 function toggleJogo(index){

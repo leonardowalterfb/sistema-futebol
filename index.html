@@ -37,7 +37,7 @@
 <p id="nomeUsuarioLogado" style="margin-bottom:10px;font-weight:bold;"></p>
 
 <button onclick="mostrarSecao('painel')">📊 Painel</button>
-<button onclick="mostrarSecao('configuracoes'); abrirAbaConfig('usuarios')">⚙️ Configurações</button>
+<button id="btnConfiguracoes" onclick="mostrarSecao('configuracoes'); abrirAbaConfig('usuarios')"> ⚙️ Configurações</button>
 <button onclick="mostrarSecao('jogadores')">👥 Jogadores</button>
 <button onclick="mostrarSecao('financeiro')">💰 Financeiro</button>
 <button onclick="mostrarSecao('jogos')">⚽ Jogos</button>
@@ -1090,7 +1090,7 @@ function abrirAbaConfig(aba){
     document.getElementById("nomeSistema").value =
       localStorage.getItem("nomeSistema") || ""
   }
-  
+
   if(aba === "permissoes"){
   carregarUsuariosPermissoes()
 }
@@ -1241,6 +1241,14 @@ document.addEventListener("DOMContentLoaded", async function(){
     document.getElementById("sistema").style.display = "none"
     return
   }
+
+let podeConfig = await usuarioTemPermissao("configuracoes", "acessar")
+
+console.log("Permissão config:", podeConfig)
+
+if(!podeConfig){
+  document.getElementById("btnConfiguracoes").style.display = "none"
+}
 
   // 🔥 CHAMA O SISTEMA CENTRAL
   await iniciarSistema()
