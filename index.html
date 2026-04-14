@@ -365,11 +365,10 @@ Salvar
 <input type="date" id="dataJogo">
 <input type="text" id="localJogo" placeholder="Local do jogo">
 
-<button onclick="criarJogo()">⚽Criar Jogo</button>
-<button onclick="salvarHistorico()">Salvar Jogo</button>
-<button onclick="limparJogo()">🧹 Limpar Jogo</button>
-
-<button onclick="gerarLinksConfirmacao()">📲 Gerar links para WhatsApp</button>
+<button id="btnCriarJogo" onclick="criarJogo()">⚽Criar Jogo</button>
+<button id="btnSalvarJogo" onclick="salvarHistorico()">⚽Salvar Jogo</button>
+<button id="btnLimparJogo" onclick="limparJogo()">🧹Limpar Jogo</button>
+<button id="btnGerarLink" onclick="gerarLinksConfirmacao()">📲 Gerar links para WhatsApp</button>
 
 <h3 id="tituloJogadores">Jogadores (0)</h3>
 
@@ -604,7 +603,14 @@ mostrarToast("Presença registrada!")
 
 }
 
-function gerarLinksConfirmacao(){
+async function gerarLinks(){
+
+  let pode = await usuarioTemPermissao("jogos", "gerar_link")
+
+  if(!pode){
+    mostrarToast("Sem permissão", "error")
+    return
+  }
 
 let base = window.location.href.split("?")[0]
 
@@ -1235,7 +1241,6 @@ document.addEventListener("DOMContentLoaded", async function(){
 
   let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
 
-  // 🔥 NÃO LOGADO
   if(!usuario){
     document.getElementById("telaLogin").style.display = "flex"
     document.getElementById("sistema").style.display = "none"
@@ -1250,7 +1255,27 @@ if(!podeConfig){
   document.getElementById("btnConfiguracoes").style.display = "none"
 }
 
-  // 🔥 CHAMA O SISTEMA CENTRAL
+try{  
+  let podeCriar = await usuarioTemPermissao("jogos", "criar")  
+  let podeLimpar = await usuarioTemPermissao("jogos", "limpar")  
+  let podeLink = await usuarioTemPermissao("jogos", "gerar_link")  
+
+  if(!podeCriar){
+    document.getElementById("btnCriarJogo")?.remove()
+  }
+
+  if(!podeLimpar){
+    document.getElementById("btnLimparJogo")?.remove()
+  }
+
+  if(!podeLink){
+    document.getElementById("btnGerarLink")?.remove()
+  }
+
+}catch(err){
+  console.log("Erro permissões jogos:", err)
+}
+
   await iniciarSistema()
 
   atualizarBotaoPagamento()

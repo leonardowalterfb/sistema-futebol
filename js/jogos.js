@@ -6,7 +6,14 @@ let mostrarTodosRanking = false
 
 //CRIAR JOGO//
 
-function criarJogo(){
+async function criarJogo(){
+
+  let pode = await usuarioTemPermissao("jogos", "criar")
+
+  if(!pode){
+    mostrarToast("Sem permissão", "error")
+    return
+  }
 
   sessionStorage.removeItem("jogoSalvo")
 
@@ -682,7 +689,14 @@ function toggleRankingLista(){
   mostrarRanking()
 }
 
-function limparJogo(){
+async function limparJogo(){
+
+  let pode = await usuarioTemPermissao("jogos", "limpar")
+
+  if(!pode){
+    mostrarToast("Sem permissão", "error")
+    return
+  }
 
   // limpar estado
   presencas = []
