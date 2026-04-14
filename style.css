@@ -467,3 +467,14 @@ h2 {
   display: flex;
   flex-direction: column; /* 🔥 ESSENCIAL */
 }
+
+#toast {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#toast.show {
+  visibility: visible;
+  opacity: 1;
+}
