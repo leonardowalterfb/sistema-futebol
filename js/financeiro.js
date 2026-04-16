@@ -339,30 +339,39 @@ async function removerDespesa(id){
 
 function mostrarReceitaPorMes(){
 
-  console.log("🔥 FUNÇÃO RECEITA POR MÊS RODOU")
-  console.log("💰 PAGAMENTOS:", pagamentos)
-
   let totais = {}
 
+  // 🔵 PAGAMENTOS
   for(let i=0;i<pagamentos.length;i++){
 
     let mes = pagamentos[i].mes
 
-    if(!totais[mes]){
-      totais[mes] = 0
-    }
+    if(!totais[mes]) totais[mes] = 0
 
     totais[mes] += Number(pagamentos[i].valor || 0)
   }
 
-  let div = document.getElementById("receitaPorMes")
+  // 🟢 RECEITAS (AGORA ENTRA)
+  if(receitas && receitas.length){
+    for(let i=0;i<receitas.length;i++){
 
+      let data = new Date(receitas[i].data)
+
+      let mes = data.toLocaleString("pt-BR",{month:"long"})
+      mes = mes.charAt(0).toUpperCase()+mes.slice(1)
+
+      if(!totais[mes]) totais[mes] = 0
+
+      totais[mes] += Number(receitas[i].valor || 0)
+    }
+  }
+
+  let div = document.getElementById("receitaPorMes")
   if(!div) return
 
   div.innerHTML = ""
 
-  // 🔥 ORDEM CORRETA DOS MESES
-  let ordemMeses = [
+  const ordemMeses = [
     "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
     "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
   ]
@@ -370,12 +379,7 @@ function mostrarReceitaPorMes(){
   ordemMeses.forEach(mes => {
     if(totais[mes]){
       div.innerHTML += `
-        <div style="
-          display:flex;
-          justify-content:space-between;
-          padding:6px 0;
-          border-bottom:1px solid #eee;
-        ">
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;">
           <span>${mes}</span>
           <strong>${formatarMoeda(totais[mes])}</strong>
         </div>
@@ -383,7 +387,6 @@ function mostrarReceitaPorMes(){
     }
   })
 }
-
   function atualizarBotaoPagamento(){
   const botao = document.getElementById("btnPagamento");
 
