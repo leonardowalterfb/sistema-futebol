@@ -475,15 +475,6 @@ async function carregarReceitas(){
 
     if(!mapaMes[mes]) return
 
-    lista.innerHTML += `
-  <div style="display:flex;font-weight:bold;padding:5px 0">
-    <span style="flex:2">Data</span>
-    <span style="flex:5">Descrição</span>
-    <span style="flex:2">Valor</span>
-    <span style="flex:1"></span>
-  </div>
-`
-
     // 🔥 TÍTULO (CLICÁVEL)
     lista.innerHTML += `
       <div style="font-weight:bold;cursor:pointer;margin-top:10px"
