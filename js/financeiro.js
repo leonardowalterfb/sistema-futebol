@@ -446,10 +446,10 @@ async function carregarReceitas(){
 
   let html = ""
 
-  lista.forEach(r => {
+  receitas.forEach(r => {
     html += `
       <div>
-        📅 ${formatarData(r.data)} - ${r.descricao} 
+        📅 ${formatarDataBR(r.data)} - ${r.descricao} 
         💰 ${formatarMoeda(r.valor)}
       </div>
     `
