@@ -709,23 +709,44 @@ Pagamentos em ${mesAtual}: <br>
 <strong>${totalMesPagamentos}</strong>
 `
 
-let totalAno=0
+let totalAno = 0
 
+// PAGAMENTOS
 for(let i=0;i<pagamentos.length;i++){
-totalAno += Number(pagamentos[i].valor || 0)
+  totalAno += Number(pagamentos[i].valor || 0)
+}
+
+// RECEITAS
+if(receitas && receitas.length){
+  for(let i=0;i<receitas.length;i++){
+    totalAno += Number(receitas[i].valor || 0)
+  }
 }
 
 document.getElementById("totalAno").innerText=
 "Total Recebido no Ano: "+formatarMoeda(Number(totalAno || 0))
 
-let totalMes=0
+let totalMes = 0
 
+// PAGAMENTOS
 for(let i=0;i<pagamentos.length;i++){
-
-if(pagamentos[i].mes===mesAtual){
-totalMes += Number(pagamentos[i].valor || 0)
+  if(pagamentos[i].mes === mesAtual){
+    totalMes += Number(pagamentos[i].valor || 0)
+  }
 }
 
+if(receitas && receitas.length){
+  for(let i=0;i<receitas.length;i++){
+
+    let data = new Date(receitas[i].data)
+
+    let mes = data.toLocaleString('pt-BR',{month:'long'})
+    mes = mes.charAt(0).toUpperCase()+mes.slice(1)
+
+    if(mes === mesAtual){
+      totalMes += Number(receitas[i].valor || 0)
+    }
+  }
 }
 
 document.getElementById("totalMesAtual").innerText=
@@ -745,7 +766,7 @@ if(typeof receitas !== "undefined"){
   }
 }
 
-totalAno += totalReceitas
+//totalAno += totalReceitas
 
 document.getElementById("totalDespesas").innerText =
 "Total de Despesas: "+formatarMoeda(totalDespesas)
