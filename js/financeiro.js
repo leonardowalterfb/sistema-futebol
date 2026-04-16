@@ -459,4 +459,5 @@ async function carregarReceitas(){
   })
 
   document.getElementById("listaReceitas").innerHTML = html
+  mostrarReceitaPorMes()
 }
