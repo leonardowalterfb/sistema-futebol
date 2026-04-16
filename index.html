@@ -926,6 +926,19 @@ function toggleMesDespesa(classe){
   }
 }
 
+function toggleMesReceita(mes){
+
+  let div = document.getElementById("receita_" + mes)
+
+  if(!div) return
+
+  if(div.style.display === "none"){
+    div.style.display = "block"
+  }else{
+    div.style.display = "none"
+  }
+}
+
 //Jogadores Inadimplentes //
 
 function mostrarInadimplentes(){

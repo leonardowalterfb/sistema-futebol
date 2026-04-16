@@ -447,17 +447,81 @@ async function carregarReceitas(){
 
   receitas = await apiGet(`/receitas/${usuario.turma_id}`)
 
-  let html = ""
+  let lista = document.getElementById("listaReceitas")
+  lista.innerHTML = ""
 
+  const meses = [
+    "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+    "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+  ]
+
+  const mapaMes = {}
+
+  // 🔥 ORGANIZA POR MÊS
   receitas.forEach(r => {
-    html += `
-      <div>
-        📅 ${formatarDataBR(r.data)} - ${r.descricao} 
-        💰 ${formatarMoeda(r.valor)}
-      </div>
-    `
+
+    let data = new Date(r.data)
+
+    let mes = data.toLocaleString("pt-BR",{month:"long"})
+    mes = mes.charAt(0).toUpperCase()+mes.slice(1)
+
+    if(!mapaMes[mes]) mapaMes[mes] = []
+
+    mapaMes[mes].push(r)
   })
 
-  document.getElementById("listaReceitas").innerHTML = html
+  // 🔥 MONTA NA TELA
+  meses.forEach(mes => {
+
+    if(!mapaMes[mes]) return
+
+    // 🔥 TÍTULO (CLICÁVEL)
+    lista.innerHTML += `
+      <div style="font-weight:bold;cursor:pointer;margin-top:10px"
+           onclick="toggleMesReceita('${mes}')">
+        ▶ ${mes}
+      </div>
+      <div id="receita_${mes}" style="display:none;padding-left:10px"></div>
+    `
+
+    let container = document.getElementById(`receita_${mes}`)
+
+    mapaMes[mes].forEach(r => {
+
+      container.innerHTML += `
+        <div style="display:flex;justify-content:space-between;margin:5px 0">
+          <span>
+            📅 ${formatarDataBR(r.data)} - ${r.descricao}
+          </span>
+
+          <span>
+            💰 ${formatarMoeda(r.valor)}
+            <button onclick="excluirReceita(${r.id})">🗑️</button>
+          </span>
+        </div>
+      `
+    })
+  })
+
+  // 🔥 atualiza painel também
   mostrarReceitaPorMes()
+}
+
+async function excluirReceita(id){
+
+  let pode = await usuarioTemPermissao("financeiro", "excluir")
+
+  if(!pode){
+    mostrarToast("Sem permissão", "error")
+    return
+  }
+
+  if(!confirm("Deseja excluir essa entrada?")) return
+
+  await apiDelete(`/receitas/${id}`)
+
+  mostrarToast("Entrada removida!")
+
+  carregarReceitas()
+  atualizarPainel()
 }

@@ -601,6 +601,18 @@ app.get("/receitas/:turmaId", async (req, res) => {
   }
 })
 
+app.delete("/receitas/:id", async (req, res) => {
+
+  const { id } = req.params
+
+  try{
+    await pool.query("DELETE FROM receitas WHERE id = $1", [id])
+    res.json({ ok: true })
+  }catch(err){
+    res.status(500).json({ erro: "Erro ao excluir receita" })
+  }
+})
+
 // ================= START =================
 const PORT = process.env.PORT || 3000
 
