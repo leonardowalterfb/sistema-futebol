@@ -346,6 +346,16 @@ Salvar
   </table>
 </div>
 
+<h2>Outras Entradas</h2>
+
+<input type="text" id="descricaoReceita" placeholder="Descrição">
+
+<input type="number" id="valorReceita" placeholder="Valor">
+
+<button onclick="registrarReceita()">Adicionar Entrada</button>
+
+<div id="listaReceitas"></div>
+
 <h2>💸 Controle de Despesas</h2>
 
 <input type="text" id="descricaoDespesa" placeholder="Descrição da despesa">
@@ -726,6 +736,16 @@ let totalDespesas = 0
 for(let i=0;i<despesas.length;i++){
 totalDespesas += Number(despesas[i].valor || 0)
 }
+
+let totalReceitas = 0
+
+if(typeof receitas !== "undefined"){
+  for(let i=0;i<receitas.length;i++){
+    totalReceitas += Number(receitas[i].valor || 0)
+  }
+}
+
+totalAno += totalReceitas
 
 document.getElementById("totalDespesas").innerText =
 "Total de Despesas: "+formatarMoeda(totalDespesas)
@@ -1372,6 +1392,7 @@ try{
   await carregarPagamentos()
   await carregarDespesas()
   await carregarRanking()
+  await carregarReceitas()
 
   atualizarSelectJogadores()
   mostrarPagamentos()

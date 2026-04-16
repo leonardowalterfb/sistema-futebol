@@ -563,6 +563,44 @@ app.put("/turmas/:id", async (req, res) => {
   }
 })
 
+//============== OUTRAS RECEITAS ================
+
+app.post("/receitas", async (req, res) => {
+
+  const { descricao, valor, turma_id } = req.body
+
+  try{
+
+    await pool.query(
+      "INSERT INTO receitas (descricao, valor, turma_id) VALUES ($1,$2,$3)",
+      [descricao, valor, turma_id]
+    )
+
+    res.json({ ok: true })
+
+  }catch(err){
+    res.status(500).json({ erro: "Erro ao salvar receita" })
+  }
+})
+
+app.get("/receitas/:turmaId", async (req, res) => {
+
+  const { turmaId } = req.params
+
+  try{
+
+    const result = await pool.query(
+      "SELECT * FROM receitas WHERE turma_id = $1 ORDER BY data DESC",
+      [turmaId]
+    )
+
+    res.json(result.rows)
+
+  }catch(err){
+    res.status(500).json({ erro: "Erro ao buscar receitas" })
+  }
+})
+
 // ================= START =================
 const PORT = process.env.PORT || 3000
 

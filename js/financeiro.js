@@ -1,5 +1,6 @@
 let pagamentos = []
 let despesas = []
+let receitas = []
 
 //PAGAMENTOS//
 
@@ -409,4 +410,50 @@ function formatarDataBR(dataISO){
   let partes = dataISO.split("T")[0].split("-")
 
   return `${partes[2]}/${partes[1]}/${partes[0]}`
+}
+
+async function registrarReceita(){
+
+  let descricao = document.getElementById("descricaoReceita").value
+  let valor = Number(document.getElementById("valorReceita").value)
+
+  if(!descricao || !valor){
+    mostrarToast("Preencha descrição e valor", "error")
+    return
+  }
+
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
+  await apiPost("/receitas", {
+    descricao,
+    valor,
+    turma_id: usuario.turma_id
+  })
+
+  mostrarToast("Entrada registrada!")
+
+  document.getElementById("descricaoReceita").value = ""
+  document.getElementById("valorReceita").value = ""
+
+  carregarReceitas()
+}
+
+async function carregarReceitas(){
+
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
+  receitas = await apiGet(`/receitas/${usuario.turma_id}`)
+
+  let html = ""
+
+  lista.forEach(r => {
+    html += `
+      <div>
+        📅 ${formatarData(r.data)} - ${r.descricao} 
+        💰 ${formatarMoeda(r.valor)}
+      </div>
+    `
+  })
+
+  document.getElementById("listaReceitas").innerHTML = html
 }
