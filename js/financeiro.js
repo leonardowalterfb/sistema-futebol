@@ -475,6 +475,15 @@ async function carregarReceitas(){
 
     if(!mapaMes[mes]) return
 
+    lista.innerHTML += `
+  <div style="display:flex;font-weight:bold;padding:5px 0">
+    <span style="flex:2">Data</span>
+    <span style="flex:5">Descrição</span>
+    <span style="flex:2">Valor</span>
+    <span style="flex:1"></span>
+  </div>
+`
+
     // 🔥 TÍTULO (CLICÁVEL)
     lista.innerHTML += `
       <div style="font-weight:bold;cursor:pointer;margin-top:10px"
@@ -488,18 +497,44 @@ async function carregarReceitas(){
 
     mapaMes[mes].forEach(r => {
 
-      container.innerHTML += `
-        <div style="display:flex;justify-content:space-between;margin:5px 0">
-          <span>
-            📅 ${formatarDataBR(r.data)} - ${r.descricao}
-          </span>
+  container.innerHTML += `
+  <div style="
+    display:flex;
+    align-items:center;
+    padding:8px 0;
+    border-bottom:1px solid #eee;
+  ">
 
-          <span>
-            💰 ${formatarMoeda(r.valor)}
-            <button onclick="excluirReceita(${r.id})">🗑️</button>
-          </span>
-        </div>
-      `
+    <span style="flex:2">
+      ${formatarDataBR(r.data)}
+    </span>
+
+    <span style="flex:5">
+      ${r.descricao}
+    </span>
+
+    <span style="flex:2">
+      ${formatarMoeda(r.valor)}
+    </span>
+
+    <span style="flex:1; text-align:right">
+      <button 
+        onclick="excluirReceita(${r.id})"
+        style="
+          background:#ef4444;
+          border:none;
+          color:white;
+          padding:6px 10px;
+          border-radius:6px;
+          cursor:pointer;
+        "
+      >
+        🗑️
+      </button>
+    </span>
+
+  </div>
+`
     })
   })
 
