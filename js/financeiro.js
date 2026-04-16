@@ -457,7 +457,6 @@ async function carregarReceitas(){
 
   const mapaMes = {}
 
-  // 🔥 ORGANIZA POR MÊS
   receitas.forEach(r => {
 
     let data = new Date(r.data)
@@ -470,66 +469,52 @@ async function carregarReceitas(){
     mapaMes[mes].push(r)
   })
 
-  // 🔥 MONTA NA TELA
   meses.forEach(mes => {
 
     if(!mapaMes[mes]) return
 
-    // 🔥 TÍTULO (CLICÁVEL)
     lista.innerHTML += `
-      <div style="font-weight:bold;cursor:pointer;margin-top:10px"
-           onclick="toggleMesReceita('${mes}')">
-        ▶ ${mes}
+      <div style="margin-top:15px">
+
+        <div style="font-weight:bold;cursor:pointer"
+             onclick="toggleMesReceita('${mes}')">
+          ▶ ${mes}
+        </div>
+
+        <table style="width:100%;border-collapse:collapse;display:none"
+               id="receita_${mes}">
+
+          <thead>
+            <tr style="background:#1e293b;color:white">
+              <th style="padding:8px;text-align:left">Descrição</th>
+              <th style="padding:8px">Valor</th>
+              <th style="padding:8px">Data</th>
+              <th style="padding:8px">Ações</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${mapaMes[mes].map(r => `
+              <tr>
+                <td style="padding:8px">${r.descricao}</td>
+                <td style="padding:8px">${formatarMoeda(r.valor)}</td>
+                <td style="padding:8px">${formatarDataBR(r.data)}</td>
+                <td style="padding:8px">
+                  <button onclick="excluirReceita(${r.id})"
+                    style="background:#ef4444;border:none;color:white;padding:6px 10px;border-radius:6px">
+                    🗑️
+                  </button>
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+
+        </table>
+
       </div>
-      <div id="receita_${mes}" style="display:none;padding-left:10px"></div>
     `
-
-    let container = document.getElementById(`receita_${mes}`)
-
-    mapaMes[mes].forEach(r => {
-
-  container.innerHTML += `
-  <div style="
-    display:flex;
-    align-items:center;
-    padding:8px 0;
-    border-bottom:1px solid #eee;
-  ">
-
-    <span style="flex:2">
-      ${formatarDataBR(r.data)}
-    </span>
-
-    <span style="flex:5">
-      ${r.descricao}
-    </span>
-
-    <span style="flex:2">
-      ${formatarMoeda(r.valor)}
-    </span>
-
-    <span style="flex:1; text-align:right">
-      <button 
-        onclick="excluirReceita(${r.id})"
-        style="
-          background:#ef4444;
-          border:none;
-          color:white;
-          padding:6px 10px;
-          border-radius:6px;
-          cursor:pointer;
-        "
-      >
-        🗑️
-      </button>
-    </span>
-
-  </div>
-`
-    })
   })
 
-  // 🔥 atualiza painel também
   mostrarReceitaPorMes()
 }
 

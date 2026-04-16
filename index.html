@@ -928,14 +928,12 @@ function toggleMesDespesa(classe){
 
 function toggleMesReceita(mes){
 
-  let div = document.getElementById("receita_" + mes)
+  let tabela = document.getElementById("receita_" + mes)
 
-  if(!div) return
-
-  if(div.style.display === "none"){
-    div.style.display = "block"
-  }else{
-    div.style.display = "none"
+  if(tabela.style.display === "none"){
+    tabela.style.display = "table"
+  } else {
+    tabela.style.display = "none"
   }
 }
 
