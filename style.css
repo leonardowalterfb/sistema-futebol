@@ -674,3 +674,6 @@ input, select {
 .toggle-title:hover {
   color: #3b82f6;
 }
+#secao_ativos, #secao_inativos {
+  transition: all 0.3s ease;
+}
