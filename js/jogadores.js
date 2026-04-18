@@ -332,3 +332,18 @@ function editarJogador(id){
   document.getElementById("nascimento").value = jogador.nascimento || ""
   document.getElementById("posicao").value = jogador.posicao || ""
 }
+
+function toggleSecao(nome){
+
+  let secao = document.getElementById("secao_" + nome)
+  let titulo = document.querySelector(`[onclick="toggleSecao('${nome}')"]`)
+
+  if(secao.style.display === "none"){
+    secao.style.display = "block"
+    titulo.innerText = "▼ " + titulo.innerText.replace("▶ ", "").replace("▼ ", "")
+  } else {
+    secao.style.display = "none"
+    titulo.innerText = "▶ " + titulo.innerText.replace("▶ ", "").replace("▼ ", "")
+  }
+
+}

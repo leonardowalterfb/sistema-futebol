@@ -557,6 +557,7 @@ input, select {
 }
 
 
+
 @media (max-width: 768px){
 
   .sidebar {
@@ -662,4 +663,14 @@ input, select {
 
 .mobile-actions button {
   width: 100%;
+}
+
+.toggle-title {
+  cursor: pointer;
+  user-select: none;
+  margin-top: 15px;
+}
+
+.toggle-title:hover {
+  color: #3b82f6;
 }
