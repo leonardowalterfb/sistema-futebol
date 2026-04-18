@@ -338,12 +338,14 @@ function toggleSecao(nome){
   let secao = document.getElementById("secao_" + nome)
   let titulo = document.querySelector(`[onclick="toggleSecao('${nome}')"]`)
 
-  if(secao.style.display === "none"){
-    secao.style.display = "block"
-    titulo.innerText = "▼ " + titulo.innerText.replace("▶ ", "").replace("▼ ", "")
-  } else {
+  let visivel = window.getComputedStyle(secao).display !== "none"
+
+  if(visivel){
     secao.style.display = "none"
     titulo.innerText = "▶ " + titulo.innerText.replace("▶ ", "").replace("▼ ", "")
+  } else {
+    secao.style.display = "block"
+    titulo.innerText = "▼ " + titulo.innerText.replace("▶ ", "").replace("▼ ", "")
   }
 
 }
