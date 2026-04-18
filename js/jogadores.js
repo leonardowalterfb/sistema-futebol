@@ -118,46 +118,51 @@ jogador.turma_id = turmaId
 
 async function carregarJogadores(){
 
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaId = usuario.turma_id
+
+  jogadores = await apiGet(`/jogadores/${turmaId}`)
+
   let listaAtivos = document.getElementById("listaJogadores")
-let listaInativos = document.getElementById("listaInativos")
+  let listaInativos = document.getElementById("listaInativos")
 
-listaAtivos.innerHTML = ""
-listaInativos.innerHTML = ""
+  listaAtivos.innerHTML = ""
+  listaInativos.innerHTML = ""
 
-jogadores.forEach(jogador => {
+  jogadores.forEach(jogador => {
 
-  let html = ""
+    let html = ""
 
-  if(document.body.classList.contains("modo-mobile")){
-    html = criarCardJogador(jogador)
-  } else {
-    html = `
-      <tr>
-        <td>${jogador.id}</td>
-        <td>${jogador.nome}</td>
-        <td>${jogador.cpf}</td>
-        <td>${jogador.telefone}</td>
-        <td>${jogador.posicao}</td>
-        <td>${formatarDataBR(jogador.nascimento)}</td>
-        <td>${jogador.idade}</td>
-        <td>${formatarDataBR(jogador.dataCadastro)}</td>
-        <td>
-          <button onclick="editar(${jogador.id})">✏️</button>
-          <button onclick="inativar(${jogador.id})">🚫</button>
-          <button onclick="excluir(${jogador.id})">🗑️</button>
-        </td>
-      </tr>
-    `
-  }
+    if(document.body.classList.contains("modo-mobile")){
+      html = criarCardJogador(jogador)
+    } else {
+      html = `
+        <tr>
+          <td>${jogador.id}</td>
+          <td>${jogador.nome}</td>
+          <td>${jogador.cpf}</td>
+          <td>${jogador.telefone}</td>
+          <td>${jogador.posicao}</td>
+          <td>${formatarDataBR(jogador.nascimento)}</td>
+          <td>${jogador.idade}</td>
+          <td>${formatarDataBR(jogador.dataCadastro)}</td>
+          <td>
+            <button onclick="editar(${jogador.id})">✏️</button>
+            <button onclick="inativar(${jogador.id})">🚫</button>
+            <button onclick="excluir(${jogador.id})">🗑️</button>
+          </td>
+        </tr>
+      `
+    }
 
-  // 🔥 SEPARAÇÃO CORRETA
-  if(jogador.status === "ativo"){
-    listaAtivos.innerHTML += html
-  } else {
-    listaInativos.innerHTML += html
-  }
+    // 🔥 separação correta
+    if(jogador.status === "ativo"){
+      listaAtivos.innerHTML += html
+    } else {
+      listaInativos.innerHTML += html
+    }
 
-})
+  })
 
 }
 
