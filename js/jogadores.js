@@ -123,12 +123,40 @@ async function carregarJogadores(){
 
   jogadores = await apiGet(`/jogadores/${turmaId}`)
 
-  console.log("Jogadores carregados:", jogadores)
+  let lista = document.getElementById("listaJogadores")
+  lista.innerHTML = ""
 
-  mostrarJogadores()
-  atualizarSelectJogadores()
-  atualizarPainel()
-  mostrarAniversarios()
+  // 🔥 LOOP CORRETO
+  jogadores.forEach(jogador => {
+
+    if(document.body.classList.contains("modo-mobile")){
+
+      lista.innerHTML += criarCardJogador(jogador)
+
+    } else {
+
+      lista.innerHTML += `
+        <tr>
+          <td>${jogador.id}</td>
+          <td>${jogador.nome}</td>
+          <td>${jogador.cpf}</td>
+          <td>${jogador.telefone}</td>
+          <td>${jogador.posicao}</td>
+          <td>${formatarDataBR(jogador.nascimento)}</td>
+          <td>${jogador.idade}</td>
+          <td>${formatarDataBR(jogador.dataCadastro)}</td>
+          <td>
+            <button onclick="editar(${jogador.id})">✏️</button>
+            <button onclick="inativar(${jogador.id})">🚫</button>
+            <button onclick="excluir(${jogador.id})">🗑️</button>
+          </td>
+        </tr>
+      `
+
+    }
+
+  })
+
 }
 
 async function salvarJogadorBackend(jogador){
@@ -333,19 +361,32 @@ function editarJogador(id){
   document.getElementById("posicao").value = jogador.posicao || ""
 }
 
-function toggleSecao(nome){
+//APP
+function criarCardJogador(j){
 
-  let secao = document.getElementById("secao_" + nome)
-  let titulo = document.querySelector(`[onclick="toggleSecao('${nome}')"]`)
+  return `
+  <div class="card-jogador">
 
-  let visivel = window.getComputedStyle(secao).display !== "none"
+    <div class="card-header" onclick="toggleDetalhe(${j.id})">
+      👤 ${j.nome}
+    </div>
 
-  if(visivel){
-    secao.style.display = "none"
-    titulo.innerText = "▶ " + titulo.innerText.replace("▶ ", "").replace("▼ ", "")
-  } else {
-    secao.style.display = "block"
-    titulo.innerText = "▼ " + titulo.innerText.replace("▶ ", "").replace("▼ ", "")
-  }
+    <div id="detalhe_${j.id}" class="card-detalhe" style="display:none">
 
+      <p>📄 CPF: ${j.cpf}</p>
+      <p>📞 Tel: ${j.telefone}</p>
+      <p>⚽ ${j.posicao}</p>
+      <p>🎂 ${formatarDataBR(j.nascimento)}</p>
+      <p>📅 Cadastro: ${formatarDataBR(j.dataCadastro)}</p>
+
+      <div class="acoes">
+        <button onclick="editar(${j.id})">✏️</button>
+        <button onclick="inativar(${j.id})">🚫</button>
+        <button onclick="excluir(${j.id})">🗑️</button>
+      </div>
+
+    </div>
+
+  </div>
+  `
 }

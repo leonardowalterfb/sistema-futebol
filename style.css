@@ -677,3 +677,36 @@ input, select {
 #secao_ativos, #secao_inativos {
   transition: all 0.3s ease;
 }
+@media (max-width: 768px){
+
+  .modo-mobile .tabela-desktop {
+    display: none;
+  }
+
+  .modo-mobile .card-jogador {
+    display: block;
+  }
+
+}
+.card-jogador{
+  background: white;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.card-header{
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.card-detalhe{
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.acoes button{
+  margin-right: 5px;
+}

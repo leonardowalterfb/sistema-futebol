@@ -970,6 +970,18 @@ function toggleSecao(nome){
 
 }
 
+function toggleDetalhe(id){
+
+  let el = document.getElementById("detalhe_" + id)
+
+  if(el.style.display === "none"){
+    el.style.display = "block"
+  } else {
+    el.style.display = "none"
+  }
+
+}
+
 //Jogadores Inadimplentes //
 
 function mostrarInadimplentes(){
@@ -1405,6 +1417,10 @@ function logout(){
 }
 
 document.addEventListener("DOMContentLoaded", async function(){
+
+  if(window.innerWidth <= 768){  
+    document.body.classList.add("modo-mobile")  
+  }
 
   let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
 
