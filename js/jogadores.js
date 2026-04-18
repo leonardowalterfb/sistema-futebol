@@ -118,44 +118,46 @@ jogador.turma_id = turmaId
 
 async function carregarJogadores(){
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-  let turmaId = usuario.turma_id
+  let listaAtivos = document.getElementById("listaJogadores")
+let listaInativos = document.getElementById("listaInativos")
 
-  jogadores = await apiGet(`/jogadores/${turmaId}`)
+listaAtivos.innerHTML = ""
+listaInativos.innerHTML = ""
 
-  let lista = document.getElementById("listaJogadores")
-  lista.innerHTML = ""
+jogadores.forEach(jogador => {
 
-  // 🔥 LOOP CORRETO
-  jogadores.forEach(jogador => {
+  let html = ""
 
-    if(document.body.classList.contains("modo-mobile")){
+  if(document.body.classList.contains("modo-mobile")){
+    html = criarCardJogador(jogador)
+  } else {
+    html = `
+      <tr>
+        <td>${jogador.id}</td>
+        <td>${jogador.nome}</td>
+        <td>${jogador.cpf}</td>
+        <td>${jogador.telefone}</td>
+        <td>${jogador.posicao}</td>
+        <td>${formatarDataBR(jogador.nascimento)}</td>
+        <td>${jogador.idade}</td>
+        <td>${formatarDataBR(jogador.dataCadastro)}</td>
+        <td>
+          <button onclick="editar(${jogador.id})">✏️</button>
+          <button onclick="inativar(${jogador.id})">🚫</button>
+          <button onclick="excluir(${jogador.id})">🗑️</button>
+        </td>
+      </tr>
+    `
+  }
 
-      lista.innerHTML += criarCardJogador(jogador)
+  // 🔥 SEPARAÇÃO CORRETA
+  if(jogador.status === "ativo"){
+    listaAtivos.innerHTML += html
+  } else {
+    listaInativos.innerHTML += html
+  }
 
-    } else {
-
-      lista.innerHTML += `
-        <tr>
-          <td>${jogador.id}</td>
-          <td>${jogador.nome}</td>
-          <td>${jogador.cpf}</td>
-          <td>${jogador.telefone}</td>
-          <td>${jogador.posicao}</td>
-          <td>${formatarDataBR(jogador.nascimento)}</td>
-          <td>${jogador.idade}</td>
-          <td>${formatarDataBR(jogador.dataCadastro)}</td>
-          <td>
-            <button onclick="editar(${jogador.id})">✏️</button>
-            <button onclick="inativar(${jogador.id})">🚫</button>
-            <button onclick="excluir(${jogador.id})">🗑️</button>
-          </td>
-        </tr>
-      `
-
-    }
-
-  })
+})
 
 }
 
