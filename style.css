@@ -555,3 +555,59 @@ input, select {
   transform: translateY(-2px);
   transition: 0.2s;
 }
+
+@media (max-width: 768px){
+
+  body {
+    font-size: 16px;
+  }
+
+  h1, h2, h3 {
+    font-size: 18px;
+  }
+
+}
+
+@media (max-width: 768px){
+
+  .menu {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+  }
+
+  .menu button {
+    flex: 1;
+    font-size: 14px;
+  }
+
+}
+
+@media (max-width: 768px){
+
+  table {
+    font-size: 14px;
+  }
+
+  th, td {
+    padding: 6px;
+  }
+
+}
+
+@media (max-width: 768px){
+
+  input, select, button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+}
+
+@media (max-width: 768px){
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+}
