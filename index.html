@@ -801,8 +801,9 @@ function mostrarAniversarios(){
   let hoje = new Date()
   hoje.setHours(0,0,0,0)
 
-  let limite = new Date()
-  limite.setDate(hoje.getDate() + 30)
+  let limite = new Date(hoje)
+limite.setDate(limite.getDate() + 30)
+limite.setHours(23,59,59,999)
 
   let lista = document.getElementById("listaAniversarios")
   lista.innerHTML = ""
@@ -811,7 +812,7 @@ function mostrarAniversarios(){
     .filter(j => j.nascimento)
     .map(j => {
 
-      let partes = j.nascimento.split("-") // yyyy-mm-dd
+      let partes = j.nascimento.split("T")[0].split("-")
 
 let nascimento = new Date(
   Number(partes[0]),
