@@ -569,3 +569,57 @@ async function excluirReceita(id){
   carregarReceitas()
   atualizarPainel()
 }
+
+function mostrarPagamentosMobile(){
+
+  let container = document.getElementById("listaPagamentosMobile")
+  if(!container) return
+
+  container.innerHTML = pagamentos.map(p => `
+
+    <!-- 🔹 CABEÇALHO -->
+    <div class="card-pagamento" onclick="togglePagamento(${p.id})">
+      👤 ${p.jogador_nome || "Jogador"}
+    </div>
+
+    <!-- 🔹 DETALHES -->
+    <div id="detalhe_pag_${p.id}" class="detalhe-pagamento" style="display:none">
+
+      📅 ${p.mes} <br>
+      💰 ${formatarMoeda(p.valor)} <br>
+      📆 ${formatarDataBR(p.data)} <br><br>
+
+      <button onclick="removerPagamento(${p.id})">🗑️ Excluir</button>
+
+    </div>
+
+  `).join("")
+}
+
+function renderPagamentos(){
+
+  let mobile = window.matchMedia("(max-width: 768px)").matches
+
+  if(mobile){
+    document.getElementById("tabelaPagamentos").style.display = "none"
+    document.getElementById("listaPagamentosMobile").style.display = "block"
+
+    mostrarPagamentosMobile()
+
+  } else {
+    document.getElementById("tabelaPagamentos").style.display = "table"
+    document.getElementById("listaPagamentosMobile").style.display = "none"
+
+    mostrarPagamentos()
+  }
+}
+
+function togglePagamento(id){
+
+  let el = document.getElementById("detalhe_pag_" + id)
+  if(!el) return
+
+  let aberto = el.style.display === "block"
+
+  el.style.display = aberto ? "none" : "block"
+}
