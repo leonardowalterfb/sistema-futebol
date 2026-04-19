@@ -435,3 +435,14 @@ function renderJogadores(){
     mostrarJogadores()
   }
 }
+
+function toggleJogador(id){
+
+  let el = document.getElementById("detalhe_" + id)
+
+  if(!el) return
+
+  let aberto = el.style.display === "block"
+
+  el.style.display = aberto ? "none" : "block"
+}
