@@ -741,3 +741,27 @@ input, select {
   border-radius: 8px;
   margin-bottom: 12px;
 }
+
+.mes-card {
+  background: #e5e7eb;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.card-pagamento {
+  background: white;
+  padding: 12px;
+  margin: 6px 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.detalhe-pagamento {
+  background: #f8fafc;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}

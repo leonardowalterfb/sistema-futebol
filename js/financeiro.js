@@ -575,27 +575,45 @@ function mostrarPagamentosMobile(){
   let container = document.getElementById("listaPagamentosMobile")
   if(!container) return
 
-  container.innerHTML = pagamentos.map(p => `
+  let grupos = {}
 
-    <!-- 🔹 CABEÇALHO -->
-    <div class="card-pagamento" onclick="togglePagamento(${p.id})">
-      👤 ${p.jogador_nome || "Jogador"}
+  pagamentos.forEach(p => {
+    if(!grupos[p.mes]){
+      grupos[p.mes] = []
+    }
+    grupos[p.mes].push(p)
+  })
+
+  container.innerHTML = Object.keys(grupos).map(mes => `
+
+    <!-- 🔹 MÊS -->
+    <div class="mes-card" onclick="toggleMes('${mes}')">
+      ▶ ${mes}
     </div>
 
-    <!-- 🔹 DETALHES -->
-    <div id="detalhe_pag_${p.id}" class="detalhe-pagamento" style="display:none">
+    <div id="grupo_${mes}" style="display:none">
 
-      📅 ${p.mes} <br>
-      💰 ${formatarMoeda(p.valor)} <br>
-      📆 ${formatarDataBR(p.data)} <br><br>
+      ${grupos[mes].map(p => `
 
-      <button onclick="removerPagamento(${p.id})">🗑️ Excluir</button>
+        <!-- 🔸 JOGADOR -->
+        <div class="card-pagamento" onclick="togglePagamento(${p.id})">
+          👤 ${p.jogador_nome}
+        </div>
+
+        <!-- 🔸 DETALHE -->
+        <div id="detalhe_pag_${p.id}" class="detalhe-pagamento" style="display:none">
+          💰 ${formatarMoeda(p.valor)} <br>
+          📆 ${formatarDataBR(p.data)} <br><br>
+
+          <button onclick="removerPagamento(${p.id})">🗑️</button>
+        </div>
+
+      `).join("")}
 
     </div>
 
   `).join("")
 }
-
 function renderPagamentos(){
 
   let mobile = window.matchMedia("(max-width: 768px)").matches
@@ -612,6 +630,16 @@ function renderPagamentos(){
 
     mostrarPagamentos()
   }
+}
+
+function toggleMes(mes){
+
+  let el = document.getElementById("grupo_" + mes)
+  if(!el) return
+
+  let aberto = el.style.display === "block"
+
+  el.style.display = aberto ? "none" : "block"
 }
 
 function togglePagamento(id){
