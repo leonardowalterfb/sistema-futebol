@@ -115,3 +115,27 @@ async function apiDelete(url){
   return data
 }
 
+async function apiGet(url){
+
+  try {
+
+    let res = await fetch(BASE_URL + url)
+
+    if(!res.ok){
+      throw new Error("Erro no servidor")
+    }
+
+    return await res.json()
+
+  } catch (e){
+
+    console.error("Erro API:", e)
+
+    mostrarToast("⚠️ Servidor offline ou indisponível")
+
+    return []
+
+  }
+
+}
+
