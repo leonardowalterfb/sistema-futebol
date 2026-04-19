@@ -2,6 +2,13 @@ let pagamentos = []
 let despesas = []
 let receitas = []
 
+function normalizarMes(mes){
+  return mes
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+}
+
 //PAGAMENTOS//
 
 async function registrarPagamento(){
@@ -584,14 +591,18 @@ function mostrarPagamentosMobile(){
     grupos[p.mes].push(p)
   })
 
-  container.innerHTML = Object.keys(grupos).map(mes => `
+container.innerHTML = Object.keys(grupos).map(mes => {
+
+  let chave = normalizarMes(mes)
+
+  return `
 
     <!-- 🔹 MÊS -->
-    <div class="mes-card" onclick="toggleMes('${mes}')">
+    <div class="mes-card" onclick="toggleMes('${chave}')">
       ▶ ${mes}
     </div>
 
-    <div id="grupo_${mes}" style="display:none">
+    <div id="grupo_${chave}" style="display:none">
 
       ${grupos[mes].map(p => `
 
@@ -612,7 +623,8 @@ function mostrarPagamentosMobile(){
 
     </div>
 
-  `).join("")
+  `
+}).join("")
 }
 function renderPagamentos(){
 
@@ -651,3 +663,4 @@ function togglePagamento(id){
 
   el.style.display = aberto ? "none" : "block"
 }
+
