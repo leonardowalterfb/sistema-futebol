@@ -275,13 +275,16 @@ function mostrarJogadoresMobile(){
     </div>
 
     <div id="detalhe_${j.id}" class="detalhe-jogador" style="display:none">
-      📞 ${j.telefone || "-"} <br>
-      📄 ${j.cpf || "-"} <br>
-      ⚽ ${j.posicao || "-"} <br><br>
+  📞 ${j.telefone || "-"} <br>
+  📄 ${j.cpf || "-"} <br>
+  ⚽ ${j.posicao || "-"} <br>
+  🎂 ${j.nascimento ? formatarDataBR(j.nascimento) : "-"} <br>
+  👤 ${j.nascimento ? calcularIdade(j.nascimento) + " anos" : "-"} <br><br>
 
-      <button onclick="editarJogador(${j.id})">✏️</button>
-      <button onclick="inativarJogador(${j.id})">🚫</button>
-    </div>
+  <button onclick="editarJogador(${j.id})">✏️</button>
+  <button onclick="inativarJogador(${j.id})">🚫</button>
+  <button onclick="excluirJogador(${j.id})">🗑️</button>
+</div>
   `).join("")
 }
   
@@ -298,13 +301,15 @@ function mostrarJogadoresInativosMobile(){
     </div>
 
     <div id="detalhe_${j.id}" class="detalhe-jogador" style="display:none">
-      📞 ${j.telefone || "-"} <br>
-      📄 ${j.cpf || "-"} <br>
-      ⚽ ${j.posicao || "-"} <br><br>
+  📞 ${j.telefone || "-"} <br>
+  📄 ${j.cpf || "-"} <br>
+  ⚽ ${j.posicao || "-"} <br>
+  🎂 ${j.nascimento ? formatarDataBR(j.nascimento) : "-"} <br>
+  👤 ${j.nascimento ? calcularIdade(j.nascimento) + " anos" : "-"} <br><br>
 
-      <button onclick="ativarJogador(${j.id})">✅</button>
-      <button onclick="excluirJogador(${j.id})">🗑️</button>
-    </div>
+  <button onclick="ativarJogador(${j.id})">✅</button>
+  <button onclick="excluirJogador(${j.id})">🗑️</button>
+</div>
   `).join("")
 }
 
