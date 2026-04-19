@@ -310,6 +310,7 @@ Salvar
 
 </div>
 
+</div>
 
 <!-- ======================= -->
 <!-- FINANCEIRO -->
@@ -341,14 +342,24 @@ Salvar
 </button>
 
 <!-- PAGAMENTOS -->
-<h3 onclick="toggleGrupo('grupoPagamentos')" style="cursor:pointer">
-  ▶ Pagamentos
-</h3>
+<h3 onclick="toggleGrupo('grupoPagamentos')">▶ Pagamentos</h3>
 
-<div id="grupoPagamentos" style="display:none">
+<div id="grupoPagamentos">
+
   <table>
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Mês</th>
+        <th>Valor</th>
+        <th>Data</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+
     <tbody id="listaPagamentos"></tbody>
   </table>
+
 </div>
 
 <!-- INADIMPLENTES -->
@@ -569,24 +580,18 @@ async function iniciarSistema(){
   }
 
   // 🔥 CARREGA SISTEMA NORMAL
-//await Promise.all([
-await carregarJogadores().catch(e => console.error("Erro jogadores", e))
-//await carregarPagamentos().catch(e => console.error("Erro pagamentos", e))
-await carregarPagamentos()
-await carregarDespesas().catch(e => console.error("Erro despesas", e))
-await carregarRanking().catch(e => console.error("Erro ranking", e))
-await carregarModalidade().catch(e => console.error("Erro modalidade", e))
-//])
-
-//await carregarReceitas()
-
-atualizarSelectJogadores()
-mostrarPagamentos()
-mostrarDespesas()
-atualizarPainel()
-
-mostrarReceitaPorMes()
-mostrarAniversarios()
+  await Promise.all([
+  await carregarJogadores(),
+  await carregarPagamentos(),
+  await carregarDespesas(),
+  await carregarRanking(),
+  await carregarModalidade(),
+])
+  atualizarSelectJogadores()
+  mostrarPagamentos()
+  mostrarDespesas()
+  atualizarPainel()
+  mostrarSecao("painel")
 }
 
 let dataSalva = localStorage.getItem("dataJogo")
@@ -808,58 +813,34 @@ function mostrarAniversarios(){
   let hoje = new Date()
   hoje.setHours(0,0,0,0)
 
-  let limite = new Date(hoje)
-limite.setDate(limite.getDate() + 30)
-limite.setHours(23,59,59,999)
+  let limite = new Date()
+  limite.setDate(hoje.getDate() + 30)
 
   let lista = document.getElementById("listaAniversarios")
   lista.innerHTML = ""
 
   let aniversarios = jogadores
     .filter(j => j.nascimento)
-   .map(j => {
+    .map(j => {
 
-  if(!j.nascimento) return null
+      let nascimento = new Date(j.nascimento)
 
-  let data = j.nascimento
+      let aniversario = new Date(
+        hoje.getFullYear(),
+        nascimento.getMonth(),
+        nascimento.getDate()
+      )
 
-  // 🔥 remove timezone se existir
-  if(data.includes("T")){
-    data = data.split("T")[0]
-  }
+      // se já passou esse ano → joga pro próximo
+      if(aniversario < hoje){
+        aniversario.setFullYear(hoje.getFullYear() + 1)
+      }
 
-  // 🔥 valida formato yyyy-mm-dd
-  if(!data.includes("-")) return null
-
-  let partes = data.split("-")
-
-  if(partes.length !== 3) return null
-
-  let ano = Number(partes[0])
-  let mes = Number(partes[1])
-  let dia = Number(partes[2])
-
-  if(!ano || !mes || !dia) return null
-
-  let nascimento = new Date(ano, mes - 1, dia)
-
-  let aniversario = new Date(
-    hoje.getFullYear(),
-    nascimento.getMonth(),
-    nascimento.getDate()
-  )
-
-  if(aniversario < hoje){
-    aniversario.setFullYear(hoje.getFullYear() + 1)
-  }
-
-  return {
-    ...j,
-    proximaData: aniversario
-  }
-
-})
-.filter(j => j !== null)
+      return {
+        ...j,
+        proximaData: aniversario
+      }
+    })
     // 🔥 FILTRA APENAS PRÓXIMOS 30 DIAS
     .filter(j => j.proximaData <= limite)
     // 🔥 ORDENA
@@ -883,6 +864,7 @@ limite.setHours(23,59,59,999)
   </div>
 `
   }
+
 }
 
 function toggleGrupo(id, el){
@@ -944,16 +926,23 @@ linhas[i].style.display = "none"
 
 // Expandir/Recolher Mes //
 
-function toggleMes(id){
+function toggleMes(mes, el){
 
-  let tabela = document.getElementById(id)
+  let linhas = document.querySelectorAll(".mes-" + mes)
 
-  if(!tabela) return
+  if(!linhas.length){
+    console.warn("Nenhuma linha encontrada:", mes)
+    return
+  }
 
-  if(tabela.style.display === "none"){
-    tabela.style.display = "table-row-group"
-  }else{
-    tabela.style.display = "none"
+  let aberto = linhas[0].style.display !== "none"
+
+  linhas.forEach(l => {
+    l.style.display = aberto ? "none" : ""
+  })
+
+  if(el){
+    el.innerHTML = `<td colspan="5">${aberto ? "▶" : "▼"} ${mes}`
   }
 }
 
@@ -1432,6 +1421,32 @@ function mostrarPagina(pagina){
   document.getElementById(pagina).style.display = "block"
 }
 
+async function mostrarSecao(id){
+
+  document.querySelectorAll(".secao").forEach(sec => {
+    sec.classList.remove("ativa")
+    sec.style.display = "none" // 🔥 GARANTE
+  })
+
+  const el = document.getElementById(id)
+
+  if(el){
+    el.classList.add("ativa")
+    el.style.display = "block" // 🔥 GARANTE VISUAL
+  }
+
+  if(id === "financeiro"){
+    await carregarPagamentos()
+    await carregarReceitas()
+    await carregarDespesas()
+
+    mostrarPagamentos()
+    mostrarDespesas()
+    mostrarReceitaPorMes()
+    mostrarInadimplentes()
+    atualizarPainel()
+  }
+}
 function logout(){
 
   // 🔥 LIMPA SESSÃO
@@ -1499,25 +1514,25 @@ try{
   document.getElementById("telaLogin").style.display = "none"
   document.getElementById("sistema").style.display = "flex"
 
-  //await carregarJogadores()
-  //await carregarPagamentos()
- //await carregarDespesas()
-  //await carregarRanking()
-  //await carregarReceitas()
-  //mostrarReceitaPorMes()
-   
-  //atualizarSelectJogadores()
-  //mostrarPagamentos()
-  //mostrarInadimplentes()
-  //atualizarPainel()
-  //mostrarAniversarios()
-  //mostrarPresenca()
-  //await carregarHistorico()
-  //mostrarRanking()
- // mostrarDespesas()
-  //mostrarSecao("painel")
- // verificarConfirmacaoLink()
-  //atualizarTituloSistema()
+  await carregarJogadores()
+  await carregarPagamentos()
+  await carregarDespesas()
+  await carregarRanking()
+  await carregarReceitas()
+  mostrarReceitaPorMes()
+
+  atualizarSelectJogadores()
+  mostrarPagamentos()
+  mostrarInadimplentes()
+  atualizarPainel()
+  mostrarAniversarios()
+  mostrarPresenca()
+  await carregarHistorico()
+  mostrarRanking()
+  mostrarDespesas()
+  mostrarSecao("painel")
+  verificarConfirmacaoLink()
+  atualizarTituloSistema()
 })
 
 </script>
@@ -1550,7 +1565,7 @@ if ("serviceWorker" in navigator) {
   <button onclick="mostrarSecao('jogadores')">👥</button>
   <button onclick="mostrarSecao('financeiro')">💰</button>
   <button onclick="mostrarSecao('jogos')">⚽</button>
-  <button onclick="mostrarSecao('configuracoes')">⚙️</button>
+  <button onclick="mostrarSecao('config')">⚙️</button>
 
 </div>
 

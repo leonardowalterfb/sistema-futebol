@@ -72,75 +72,107 @@ async function carregarPagamentos(){
 
 function mostrarPagamentos(){
 
-let lista = document.getElementById("listaPagamentos")
-lista.innerHTML = ""
+  let lista = document.getElementById("listaPagamentos")
+  if(!lista) return
 
-let pagamentosPorMes = {}
+  lista.innerHTML = ""
 
-for(let i=0;i<pagamentos.length;i++){
+  let pagamentosPorMes = {}
 
-let mes = pagamentos[i].mes
+  // 🔹 Agrupar por mês
+  for(let i=0;i<pagamentos.length;i++){
+    let mes = pagamentos[i].mes
 
-if(!pagamentosPorMes[mes]){
-pagamentosPorMes[mes] = []
+    if(!pagamentosPorMes[mes]){
+      pagamentosPorMes[mes] = []
+    }
+
+    pagamentosPorMes[mes].push(pagamentos[i])
+  }
+
+  const ordemMeses = [
+    "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+    "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+  ]
+
+  ordemMeses.forEach(mes => {
+
+    //if(!pagamentosPorMes[mes]) return
+    let chave = Object.keys(pagamentosPorMes).find(m => 
+  m.toLowerCase() === mes.toLowerCase()
+)
+
+if(!chave) return
+
+    // 🔥 LINHA DE TÍTULO (CLICÁVEL)
+    let titulo = document.createElement("tr")
+
+    titulo.innerHTML = `
+      <td colspan="5" style="cursor:pointer;font-weight:bold;background:#eee;text-align:left;padding-left:20px"
+      onclick="toggleMes('${mes}', this)">
+        ▶ ${mes}
+      </td>
+    `
+
+    lista.appendChild(titulo)
+
+    // 🔹 Ordena jogadores
+    pagamentosPorMes[chave].sort((a,b) =>
+      (a.jogador_nome || a.jogador || "").localeCompare(b.jogador_nome || b.jogador || "")
+    )
+
+    // 🔹 Linhas dos pagamentos
+    //pagamentosPorMes[mes].forEach(p => {
+      pagamentosPorMes[chave].forEach(p => {
+
+      let tr = document.createElement("tr")
+
+      tr.classList.add("mes-" + mes)
+      //tr.style.display = "none"
+      tr.style.display = "none"
+
+      tr.innerHTML = `
+        <td>${p.jogador_nome || p.jogador}</td>
+        <td>${p.mes}</td>
+        <td>${formatarMoeda(Number(p.valor))}</td>
+        <td>${formatarDataBR(p.data)}</td>
+        <td>
+          <button onclick="removerPagamento(${p.id})">🗑️</button>
+        </td>
+      `
+
+      lista.appendChild(tr)
+     
+    })
+    
+  })
+  //mostrarPagamentos()
+  calcularTotalMes()
 }
 
-pagamentosPorMes[mes].push({
-dados:pagamentos[i],
-index:i
-})
+/*function mostrarPagamentos(){
 
-}
-const ordemMeses = [
-  "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
-  "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
-]
-ordemMeses.forEach(mes => {
+  let lista = document.getElementById("listaPagamentos")
 
-  if(!pagamentosPorMes[mes]) return
+  if(!lista){
+    console.error("listaPagamentos não encontrado")
+    return
+  }
 
-  pagamentosPorMes[mes].sort((a,b) =>
-    (a.dados.jogador || "").localeCompare(b.dados.jogador || "")
-  )
+  console.log("Renderizando pagamentos:", pagamentos)
 
-  let titulo = document.createElement("tr")
-
-  titulo.innerHTML =
-  `<td colspan='5' style='cursor:pointer;font-weight:bold;background:#eee;text-align:left;padding-left:20px' onclick='toggleMes("mes_${mes}")'>▶ ${mes}</td>`
-
-  lista.appendChild(titulo)
-
-  let grupo = document.createElement("tbody")
-  grupo.id = "mes_" + mes
-  grupo.style.display = "none"
-
-  for(let i=0;i<pagamentosPorMes[mes].length;i++){
-
-    let item = pagamentosPorMes[mes][i]
-    let p = item.dados
-
-    let tr = document.createElement("tr")
-
-    tr.innerHTML = `
-      <td>${p.jogador_nome || p.jogador}</td>
-      <td>${p.mes}</td>
-      <td>${formatarMoeda(Number(p.valor))}</td>
+  lista.innerHTML = pagamentos.map(p => `
+    <tr>
+      <td>${p.jogador_nome || p.jogador || "-"}</td>
+      <td>${p.mes || "-"}</td>
+      <td>${formatarMoeda(Number(p.valor || 0))}</td>
       <td>${formatarDataBR(p.data)}</td>
       <td>
         <button onclick="removerPagamento(${p.id})">🗑️</button>
       </td>
-    `
-
-    grupo.appendChild(tr)
-  }
-
-  lista.appendChild(grupo)
-
-})
-
-calcularTotalMes()
-
-}
+    </tr>
+  `).join("")
+}*/
 
 async function removerPagamento(id){
 
@@ -159,7 +191,7 @@ async function removerPagamento(id){
   await carregarPagamentos()
 
   // 🔥 GARANTE render correto
-  //mostrarPagamentos()
+  mostrarPagamentos()
 }
 
 function calcularTotalMes(){
@@ -301,6 +333,7 @@ ordemMeses.forEach(mes => {
     let tr = document.createElement("tr")
     tr.classList.add(grupoId)
     //tr.style.display = "none"
+    
 
     tr.innerHTML = `
       <td>${d.descricao}</td>

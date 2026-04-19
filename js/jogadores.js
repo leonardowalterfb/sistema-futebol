@@ -333,7 +333,6 @@ function editarJogador(id){
   document.getElementById("posicao").value = jogador.posicao || ""
 }
 
-//APP
 function criarCardJogador(j){
 
   return `
@@ -361,4 +360,5 @@ function criarCardJogador(j){
 
   </div>
   `
+
 }
