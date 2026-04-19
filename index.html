@@ -576,10 +576,16 @@ await Promise.all([
   carregarRanking(),
   carregarModalidade(),
 ])
-  atualizarSelectJogadores()
-  mostrarPagamentos()
-  mostrarDespesas()
-  atualizarPainel()
+
+await carregarReceitas()
+
+atualizarSelectJogadores()
+mostrarPagamentos()
+mostrarDespesas()
+atualizarPainel()
+
+mostrarReceitaPorMes()
+mostrarAniversarios()
 }
 
 let dataSalva = localStorage.getItem("dataJogo")
@@ -1492,13 +1498,13 @@ try{
   document.getElementById("telaLogin").style.display = "none"
   document.getElementById("sistema").style.display = "flex"
 
-  await carregarJogadores()
-  await carregarPagamentos()
-  await carregarDespesas()
-  await carregarRanking()
-  await carregarReceitas()
+  //await carregarJogadores()
+  //await carregarPagamentos()
+ //await carregarDespesas()
+  //await carregarRanking()
+  //await carregarReceitas()
   mostrarReceitaPorMes()
-
+   
   atualizarSelectJogadores()
   mostrarPagamentos()
   mostrarInadimplentes()
@@ -1543,7 +1549,7 @@ if ("serviceWorker" in navigator) {
   <button onclick="mostrarSecao('jogadores')">👥</button>
   <button onclick="mostrarSecao('financeiro')">💰</button>
   <button onclick="mostrarSecao('jogos')">⚽</button>
-  <button onclick="mostrarSecao('config')">⚙️</button>
+  <button onclick="mostrarSecao('configuracoes')">⚙️</button>
 
 </div>
 
