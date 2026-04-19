@@ -598,7 +598,7 @@ container.innerHTML = Object.keys(grupos).map(mes => {
   return `
 
     <!-- 🔹 MÊS -->
-    <div class="mes-card" onclick="toggleMes('${chave}')">
+    <div class="mes-card" onclick="toggleMesMobile('${chave}')"
       ▶ ${mes}
     </div>
 
@@ -644,10 +644,14 @@ function renderPagamentos(){
   }
 }
 
-function toggleMes(mes){
+function toggleMesMobile(mes){
 
   let el = document.getElementById("grupo_" + mes)
-  if(!el) return
+
+  if(!el){
+    console.warn("Não encontrou:", mes)
+    return
+  }
 
   let aberto = el.style.display === "block"
 
@@ -664,16 +668,4 @@ function togglePagamento(id){
   el.style.display = aberto ? "none" : "block"
 }
 
-function toggleMesPagamento(mes){
 
-  let el = document.getElementById("grupo_" + mes)
-
-  if(!el){
-    console.warn("Não encontrou:", mes)
-    return
-  }
-
-  let aberto = el.style.display === "block"
-
-  el.style.display = aberto ? "none" : "block"
-}
