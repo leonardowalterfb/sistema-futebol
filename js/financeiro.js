@@ -664,3 +664,16 @@ function togglePagamento(id){
   el.style.display = aberto ? "none" : "block"
 }
 
+function toggleMesPagamento(mes){
+
+  let el = document.getElementById("grupo_" + mes)
+
+  if(!el){
+    console.warn("Não encontrou:", mes)
+    return
+  }
+
+  let aberto = el.style.display === "block"
+
+  el.style.display = aberto ? "none" : "block"
+}
