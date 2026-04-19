@@ -816,23 +816,25 @@ limite.setHours(23,59,59,999)
 
   let data = j.nascimento
 
-  // 🔥 GARANTE FORMATO CORRETO
+  // 🔥 remove timezone se existir
   if(data.includes("T")){
     data = data.split("T")[0]
   }
 
-  // 🔥 SE NÃO FOR yyyy-mm-dd, IGNORA
+  // 🔥 valida formato yyyy-mm-dd
   if(!data.includes("-")) return null
 
   let partes = data.split("-")
 
   if(partes.length !== 3) return null
 
-  let nascimento = new Date(
-    Number(partes[0]),
-    Number(partes[1]) - 1,
-    Number(partes[2])
-  )
+  let ano = Number(partes[0])
+  let mes = Number(partes[1])
+  let dia = Number(partes[2])
+
+  if(!ano || !mes || !dia) return null
+
+  let nascimento = new Date(ano, mes - 1, dia)
 
   let aniversario = new Date(
     hoje.getFullYear(),
@@ -848,8 +850,11 @@ limite.setHours(23,59,59,999)
     ...j,
     proximaData: aniversario
   }
+
 })
 .filter(j => j !== null)
+    // 🔥 FILTRA APENAS PRÓXIMOS 30 DIAS
+    .filter(j => j.proximaData <= limite)
     // 🔥 ORDENA
     .sort((a, b) => a.proximaData - b.proximaData)
 
@@ -872,7 +877,6 @@ limite.setHours(23,59,59,999)
 `
   }
 }
-
 
 function toggleGrupo(id, el){
   let div = document.getElementById(id)
