@@ -569,12 +569,12 @@ async function iniciarSistema(){
   }
 
   // 🔥 CARREGA SISTEMA NORMAL
-  await Promise.all([
-  await carregarJogadores(),
-  await carregarPagamentos(),
-  await carregarDespesas(),
-  await carregarRanking(),
-  await carregarModalidade(),
+await Promise.all([
+  carregarJogadores(),
+  carregarPagamentos(),
+  carregarDespesas(),
+  carregarRanking(),
+  carregarModalidade(),
 ])
   atualizarSelectJogadores()
   mostrarPagamentos()
@@ -1503,7 +1503,7 @@ try{
   mostrarPagamentos()
   mostrarInadimplentes()
   atualizarPainel()
-  //mostrarAniversarios()
+  mostrarAniversarios()
   mostrarPresenca()
   await carregarHistorico()
   mostrarRanking()
