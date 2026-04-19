@@ -284,6 +284,28 @@ function mostrarJogadoresMobile(){
   `).join("")
 }
   
+function mostrarJogadoresInativosMobile(){
+
+  let container = document.getElementById("listaJogadoresInativosMobile")
+  if(!container) return
+
+  let inativos = jogadores.filter(j => j.status !== "ativo")
+
+  container.innerHTML = inativos.map(j => `
+    <div class="card-jogador" onclick="toggleDetalhe(${j.id})">
+      👤 ${j.nome}
+    </div>
+
+    <div id="detalhe_${j.id}" class="detalhe-jogador" style="display:none">
+      📞 ${j.telefone || "-"} <br>
+      📄 ${j.cpf || "-"} <br>
+      ⚽ ${j.posicao || "-"} <br><br>
+
+      <button onclick="ativarJogador(${j.id})">✅ Ativar</button>
+      <button onclick="excluirJogador(${j.id})">🗑️ Excluir</button>
+    </div>
+  `).join("")
+}
 
 function atualizarSelectJogadores(){
 
@@ -387,14 +409,29 @@ function criarCardJogador(j){
 
 function renderJogadores(){
 
-  if(window.matchMedia("(max-width: 768px)").matches){
+  let mobile = window.matchMedia("(max-width: 768px)").matches
+
+  if(mobile){
+
+    // ATIVOS
     document.getElementById("tabelaJogadores").style.display = "none"
     document.getElementById("listaJogadoresMobile").style.display = "block"
-
     mostrarJogadoresMobile()
+
+    // INATIVOS
+    document.getElementById("tabelaJogadoresInativos").style.display = "none"
+    document.getElementById("listaJogadoresInativosMobile").style.display = "block"
+    mostrarJogadoresInativosMobile()
+
   } else {
+
+    // ATIVOS
     document.getElementById("tabelaJogadores").style.display = "table"
     document.getElementById("listaJogadoresMobile").style.display = "none"
+
+    // INATIVOS
+    document.getElementById("tabelaJogadoresInativos").style.display = "table"
+    document.getElementById("listaJogadoresInativosMobile").style.display = "none"
 
     mostrarJogadores()
   }
