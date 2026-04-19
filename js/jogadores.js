@@ -155,7 +155,6 @@ async function carregarJogadores(){
       `
     }
 
-    // 🔥 separação correta
     if(jogador.status === "ativo"){
       listaAtivos.innerHTML += html
     } else {
@@ -164,6 +163,8 @@ async function carregarJogadores(){
 
   })
 
+  // 🔥 ADICIONA ISSO AQUI
+  mostrarAniversarios()
 }
 
 async function salvarJogadorBackend(jogador){
