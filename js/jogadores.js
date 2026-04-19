@@ -102,9 +102,6 @@ jogador.turma_id = turmaId
   // 🔥 RECARREGA
   await carregarJogadores()
 
-  console.log("🔥 FUNÇÃO ANIVERSÁRIOS RODOU")
-console.log("JOGADORES:", jogadores)
-
   // 🔥 LIMPA CAMPOS
   document.getElementById("nome").value=""
   document.getElementById("telefone").value=""
@@ -126,47 +123,11 @@ async function carregarJogadores(){
 
   jogadores = await apiGet(`/jogadores/${turmaId}`)
 
-  let listaAtivos = document.getElementById("listaJogadores")
-  let listaInativos = document.getElementById("listaInativos")
+  console.log("Jogadores carregados:", jogadores)
 
-  listaAtivos.innerHTML = ""
-  listaInativos.innerHTML = ""
-
-  jogadores.forEach(jogador => {
-
-    let html = ""
-
-    if(document.body.classList.contains("modo-mobile")){
-      html = criarCardJogador(jogador)
-    } else {
-      html = `
-        <tr>
-          <td>${jogador.id}</td>
-          <td>${jogador.nome}</td>
-          <td>${jogador.cpf}</td>
-          <td>${jogador.telefone}</td>
-          <td>${jogador.posicao}</td>
-          <td>${formatarDataBR(jogador.nascimento)}</td>
-          <td>${jogador.idade}</td>
-          <td>${formatarDataBR(jogador.dataCadastro)}</td>
-          <td>
-            <button onclick="editar(${jogador.id})">✏️</button>
-            <button onclick="inativar(${jogador.id})">🚫</button>
-            <button onclick="excluir(${jogador.id})">🗑️</button>
-          </td>
-        </tr>
-      `
-    }
-
-    if(jogador.status === "ativo"){
-      listaAtivos.innerHTML += html
-    } else {
-      listaInativos.innerHTML += html
-    }
-
-  })
-
-  // 🔥 ADICIONA ISSO AQUI
+  mostrarJogadores()
+  atualizarSelectJogadores()
+  atualizarPainel()
   mostrarAniversarios()
 }
 
