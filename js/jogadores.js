@@ -102,6 +102,9 @@ jogador.turma_id = turmaId
   // 🔥 RECARREGA
   await carregarJogadores()
 
+  console.log("🔥 FUNÇÃO ANIVERSÁRIOS RODOU")
+console.log("JOGADORES:", jogadores)
+
   // 🔥 LIMPA CAMPOS
   document.getElementById("nome").value=""
   document.getElementById("telefone").value=""
