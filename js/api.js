@@ -5,22 +5,26 @@ const API =
 
 // GET
 async function apiGet(url){
-
-  let res = await fetch(API + url)
-
-  let data
-
   try {
-    data = await res.json()
-  } catch {
-    throw { erro: "Erro ao buscar dados" }
-  }
 
-  if(!res.ok){
-    throw data
-  }
+    let res = await fetch(API + url)
 
-  return data
+    let data = await res.json()
+
+    if(!res.ok){
+      throw data
+    }
+
+    return data
+
+  } catch (e){
+
+    console.error("Erro API:", e)
+
+    mostrarToast("⚠️ Servidor offline ou indisponível")
+
+    return []
+  }
 }
 
 // POST
@@ -113,29 +117,5 @@ async function apiDelete(url){
   }
 
   return data
-}
-
-async function apiGet(url){
-
-  try {
-
-    let res = await fetch(BASE_URL + url)
-
-    if(!res.ok){
-      throw new Error("Erro no servidor")
-    }
-
-    return await res.json()
-
-  } catch (e){
-
-    console.error("Erro API:", e)
-
-    mostrarToast("⚠️ Servidor offline ou indisponível")
-
-    return []
-
-  }
-
 }
 
