@@ -124,7 +124,7 @@ async function carregarJogadores(){
   jogadores = await apiGet(`/jogadores/${turmaId}`)
 
   console.log("Jogadores carregados:", jogadores)
-
+  renderJogadores()
   mostrarJogadores()
   atualizarSelectJogadores()
   atualizarPainel()
