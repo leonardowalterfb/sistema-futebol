@@ -267,7 +267,9 @@ function mostrarJogadoresMobile(){
   let container = document.getElementById("listaJogadoresMobile")
   if(!container) return
 
-  container.innerHTML = jogadores.map(j => `
+  let ativos = jogadores.filter(j => j.status === "ativo")
+
+  container.innerHTML = ativos.map(j => `
     <div class="card-jogador" onclick="toggleJogador(${j.id})">
       👤 ${j.nome}
     </div>
@@ -275,11 +277,10 @@ function mostrarJogadoresMobile(){
     <div id="detalhe_${j.id}" class="detalhe-jogador" style="display:none">
       📞 ${j.telefone || "-"} <br>
       📄 ${j.cpf || "-"} <br>
-      ⚽ ${j.posicao || "-"} <br>
-      🎂 ${calcularIdade(j.nascimento)} anos <br><br>
+      ⚽ ${j.posicao || "-"} <br><br>
 
-      <button onclick="editar(${j.id})">✏️ Editar</button>
-      <button onclick="excluir(${j.id})">🗑️ Excluir</button>
+      <button onclick="editarJogador(${j.id})">✏️</button>
+      <button onclick="inativarJogador(${j.id})">🚫</button>
     </div>
   `).join("")
 }
@@ -292,7 +293,7 @@ function mostrarJogadoresInativosMobile(){
   let inativos = jogadores.filter(j => j.status !== "ativo")
 
   container.innerHTML = inativos.map(j => `
-    <div class="card-jogador" onclick="toggleDetalhe(${j.id})">
+    <div class="card-jogador" onclick="toggleJogador(${j.id})">
       👤 ${j.nome}
     </div>
 
@@ -301,8 +302,8 @@ function mostrarJogadoresInativosMobile(){
       📄 ${j.cpf || "-"} <br>
       ⚽ ${j.posicao || "-"} <br><br>
 
-      <button onclick="ativarJogador(${j.id})">✅ Ativar</button>
-      <button onclick="excluirJogador(${j.id})">🗑️ Excluir</button>
+      <button onclick="ativarJogador(${j.id})">✅</button>
+      <button onclick="excluirJogador(${j.id})">🗑️</button>
     </div>
   `).join("")
 }
@@ -425,11 +426,9 @@ function renderJogadores(){
 
   } else {
 
-    // ATIVOS
     document.getElementById("tabelaJogadores").style.display = "table"
     document.getElementById("listaJogadoresMobile").style.display = "none"
 
-    // INATIVOS
     document.getElementById("tabelaJogadoresInativos").style.display = "table"
     document.getElementById("listaJogadoresInativosMobile").style.display = "none"
 
