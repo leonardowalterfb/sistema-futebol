@@ -23,7 +23,8 @@ async function apiGet(url){
 
     mostrarToast("⚠️ Servidor offline ou indisponível")
 
-    return []
+    //return []
+    throw e
   }
 }
 
