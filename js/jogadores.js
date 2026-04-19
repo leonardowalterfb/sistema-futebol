@@ -261,6 +261,28 @@ let linhaInativo = `
   }
 
 }
+
+function mostrarJogadoresMobile(){
+
+  let container = document.getElementById("listaJogadoresMobile")
+  if(!container) return
+
+  container.innerHTML = jogadores.map(j => `
+    <div class="card-jogador" onclick="toggleJogador(${j.id})">
+      👤 ${j.nome}
+    </div>
+
+    <div id="detalhe_${j.id}" class="detalhe-jogador" style="display:none">
+      📞 ${j.telefone || "-"} <br>
+      📄 ${j.cpf || "-"} <br>
+      ⚽ ${j.posicao || "-"} <br>
+      🎂 ${calcularIdade(j.nascimento)} anos <br><br>
+
+      <button onclick="editar(${j.id})">✏️ Editar</button>
+      <button onclick="excluir(${j.id})">🗑️ Excluir</button>
+    </div>
+  `).join("")
+}
   
 
 function atualizarSelectJogadores(){
@@ -360,5 +382,20 @@ function criarCardJogador(j){
 
   </div>
   `
+  
+}
 
+function renderJogadores(){
+
+  if(window.matchMedia("(max-width: 768px)").matches){
+    document.getElementById("tabelaJogadores").style.display = "none"
+    document.getElementById("listaJogadoresMobile").style.display = "block"
+
+    mostrarJogadoresMobile()
+  } else {
+    document.getElementById("tabelaJogadores").style.display = "table"
+    document.getElementById("listaJogadoresMobile").style.display = "none"
+
+    mostrarJogadores()
+  }
 }
