@@ -648,6 +648,20 @@ function togglePagamento(id){
   el.style.display = aberto ? "none" : "block"
 }
 
+function toggleMesInad(id){
+
+  let el = document.getElementById(id)
+
+  if(!el){
+    console.warn("Não encontrou:", id)
+    return
+  }
+
+  let aberto = el.style.display === "block"
+
+  el.style.display = aberto ? "none" : "block"
+}
+
 // ===== UTIL =====
 function extrairMes(data){
 
