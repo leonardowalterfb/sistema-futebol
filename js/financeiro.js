@@ -70,7 +70,8 @@ async function carregarPagamentos(){
 
   console.log("Pagamentos carregados:", pagamentos)
 
-  mostrarPagamentos()
+  //mostrarPagamentos()
+  renderPagamentos()
   atualizarPainel()
 
   // 🔥 ESSA LINHA É OBRIGATÓRIA
@@ -156,30 +157,6 @@ if(!chave) return
   //mostrarPagamentos()
   calcularTotalMes()
 }
-
-/*function mostrarPagamentos(){
-
-  let lista = document.getElementById("listaPagamentos")
-
-  if(!lista){
-    console.error("listaPagamentos não encontrado")
-    return
-  }
-
-  console.log("Renderizando pagamentos:", pagamentos)
-
-  lista.innerHTML = pagamentos.map(p => `
-    <tr>
-      <td>${p.jogador_nome || p.jogador || "-"}</td>
-      <td>${p.mes || "-"}</td>
-      <td>${formatarMoeda(Number(p.valor || 0))}</td>
-      <td>${formatarDataBR(p.data)}</td>
-      <td>
-        <button onclick="removerPagamento(${p.id})">🗑️</button>
-      </td>
-    </tr>
-  `).join("")
-}*/
 
 async function removerPagamento(id){
 
@@ -601,8 +578,8 @@ container.innerHTML = Object.keys(grupos).map(mes => {
   return `
 
     <!-- 🔹 MÊS -->
-    <div class="mes-card" onclick="toggleMesMobile('${chave}')"
-      ▶ ${mes}
+    <div class="mes-card" onclick="toggleMesMobile('${chave}')">
+  ▶ ${mes}
     </div>
 
     <div id="grupo_${chave}" style="display:none">
@@ -611,7 +588,7 @@ container.innerHTML = Object.keys(grupos).map(mes => {
 
         <!-- 🔸 JOGADOR -->
         <div class="card-pagamento" onclick="togglePagamento(${p.id})">
-          👤 ${p.jogador_nome}
+          👤 ${p.jogador_nome || p.jogador || "Sem nome"}
         </div>
 
         <!-- 🔸 DETALHE -->
