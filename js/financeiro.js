@@ -585,10 +585,13 @@ function mostrarPagamentosMobile(){
   let grupos = {}
 
   pagamentos.forEach(p => {
-    if(!grupos[p.mes]){
-      grupos[p.mes] = []
-    }
-    grupos[p.mes].push(p)
+    let mes = p.mes || p.mes_pagamento || extrairMes(p.data)
+
+if(!grupos[mes]){
+  grupos[mes] = []
+}
+
+grupos[mes].push(p)
   })
 
 container.innerHTML = Object.keys(grupos).map(mes => {
@@ -666,6 +669,19 @@ function togglePagamento(id){
   let aberto = el.style.display === "block"
 
   el.style.display = aberto ? "none" : "block"
+}
+
+// ===== UTIL =====
+function extrairMes(data){
+
+  let d = new Date(data)
+
+  let meses = [
+    "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+    "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+  ]
+
+  return meses[d.getMonth()]
 }
 
 
