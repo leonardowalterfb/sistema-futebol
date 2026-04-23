@@ -145,7 +145,7 @@ if(!pode){
   return res.status(403).json({ erro: "Sem permissão" })
 }
 
-    if (d.status && Object.keys(d).length === 1) {
+    if (d.status && !d.cpf) {
       await pool.query(
         "UPDATE jogadores SET status = $1 WHERE id = $2",
         [d.status, id]
