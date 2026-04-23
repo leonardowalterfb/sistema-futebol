@@ -340,11 +340,24 @@ async function inativarJogador(id){
 
   console.log("ID RECEBIDO:", id)
 
-  await apiPut(`/jogadores/${id}`, {
-    status: "inativo"
-  })
+  if(!id){
+    mostrarToast("Erro: ID inválido")
+    return
+  }
 
-  await carregarJogadores()
+  try {
+
+    await apiPut(`/jogadores/${id}`, {
+      status: "inativo"
+    })
+
+    mostrarToast("Jogador inativado!")
+    await carregarJogadores()
+
+  } catch(e){
+    console.error("Erro:", e)
+    mostrarToast("Erro ao inativar jogador")
+  }
 }
 
 async function ativarJogador(id){
