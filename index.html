@@ -1551,6 +1551,29 @@ try{
 
   await iniciarSistema()
 
+  // 🔥 RESTAURAR JOGO (COLE EXATAMENTE AQUI 👇)
+let jogoAbertoStorage = localStorage.getItem("jogoAberto")
+
+if(jogoAbertoStorage){
+
+  let data = localStorage.getItem("dataJogo")
+  let local = localStorage.getItem("localJogo")
+  let pres = localStorage.getItem("presencas")
+
+  if(data) document.getElementById("dataJogo").value = data
+  if(local) document.getElementById("localJogo").value = local
+
+  if(pres){
+    presencas = JSON.parse(pres)
+  }
+
+  jogoAberto = true
+
+  mostrarPresenca()
+}
+
+atualizarBotaoPagamento()
+
   atualizarBotaoPagamento()
 
 
