@@ -955,6 +955,20 @@ function toggleMes(mes, el){
   }
 }
 
+function toggleInad(id){
+
+  let el = document.getElementById(id)
+
+  if(!el){
+    console.warn("Não encontrou:", id)
+    return
+  }
+
+  let aberto = el.style.display === "none"
+
+  el.style.display = aberto ? "table-row-group" : "none"
+}
+
 function toggleMesDespesa(classe){
 
   let linhas = document.getElementsByClassName(classe)
@@ -1050,9 +1064,13 @@ for(let mes of meses){
 
 let titulo = document.createElement("tr")
 
-titulo.innerHTML =
-"<td colspan='5' style='font-weight:bold;background:#eee;cursor:pointer;text-align:left;padding-left:10px' onclick='toggleMes(\"inad_"+mes+"\")'>▶ "+mes+"</td>"
-
+titulo.innerHTML = `
+<td colspan='5'
+    style='font-weight:bold;background:#eee;cursor:pointer;text-align:left;padding-left:10px'
+    onclick="toggleInad('inad_${mes}')">
+  ▶ ${mes}
+</td>
+`
 lista.appendChild(titulo)
 
 let grupo = document.createElement("tr")
