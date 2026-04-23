@@ -338,6 +338,8 @@ select.appendChild(option)
 
 async function inativarJogador(id){
 
+  console.log("ID RECEBIDO:", id)
+
   await apiPut(`/jogadores/${id}`, {
     status: "inativo"
   })
