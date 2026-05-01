@@ -550,8 +550,14 @@ async function fazerLogin(){
 
   let aceitou = document.getElementById("aceiteLgpd").checked
 
-  if(!aceitou){
+if(!aceitou){
   mostrarToast("Você precisa aceitar os termos")
+
+  // 🔥 DESFAZ ESTADO DO BOTÃO
+  let btn = document.getElementById("btnLogin")
+  btn.innerText = "Entrar"
+  btn.disabled = false
+
   return
 }
 
