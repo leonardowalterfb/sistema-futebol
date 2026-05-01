@@ -597,10 +597,11 @@ let dashboard = await carregarDashboard()
   document.getElementById("totalDespesas").innerText = formatarMoeda(dashboard.totalDespesas)
   document.getElementById("saldoTurma").innerText = formatarMoeda(dashboard.saldo)
 
-  atualizarSelectJogadores()
-  renderPagamentos()
-  mostrarDespesas()
-  atualizarPainel()
+  await carregarPagamentos()
+  await carregarDespesas()
+  await carregarJogadores()
+  await carregarRanking()
+  await carregarModalidade()
   mostrarSecao("painel")
 }
 
