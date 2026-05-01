@@ -561,6 +561,7 @@ async function fazerLogin(){
   const usuario = dados.usuario
 
   localStorage.setItem("usuarioLogado", JSON.stringify(usuario))
+  localStorage.setItem("token", dados.token)
 
   // 🔥 ADMIN
   if(usuario.tipo === "admin"){

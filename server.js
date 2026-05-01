@@ -14,7 +14,7 @@ if (!process.env.DATABASE_URL) {
 const express = require("express")
 const cors = require("cors")
 const bcrypt = require("bcrypt")
-
+const jwt = require("jsonwebtoken")
 const app = express()
 
 const pool = require("./db")
@@ -379,9 +379,9 @@ app.post("/login", async (req, res) => {
     const { login, senha } = req.body
 
     const result = await pool.query(
-  "SELECT * FROM usuarios WHERE login=$1",
-  [login]
-)
+      "SELECT * FROM usuarios WHERE login=$1",
+      [login]
+    )
 
     const user = result.rows[0]
 
@@ -390,15 +390,22 @@ app.post("/login", async (req, res) => {
     }
 
     const ok = await bcrypt.compare(senha, user.senha)
-    //const ok = senha === user.senha
 
     if (!ok) {
       return res.status(401).json({ erro: "Login inválido" })
     }
 
+    // 🔐 GERAR TOKEN
+    const token = jwt.sign(
+      { id: user.id },
+      process.env.JWT_SECRET || "segredo_super_forte",
+      { expiresIn: "7d" }
+    )
+
     res.json({
       ok: true,
-      usuario: user
+      usuario: user,
+      token // 🔥 AQUI ESTÁ O NOVO
     })
 
   } catch (err) {
