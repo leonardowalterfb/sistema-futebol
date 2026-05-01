@@ -110,8 +110,9 @@ app.post("/jogadores", async (req, res) => {
 
     const j = req.body
 
-    // 🔥 VALIDA PERMISSÃO
-    const pode = await temPermissao(j.usuario_id, "jogadores", "cadastrar")
+    // VALIDA PERMISSÃO
+    const usuarioId = req.usuario.id
+const pode = await temPermissao(usuarioId, "jogadores", "cadastrar")
 
     if(!pode){
       return res.status(403).json({ erro: "Sem permissão" })
@@ -157,7 +158,8 @@ app.put("/jogadores/:id", async (req, res) => {
     const { id } = req.params
     const d = req.body
 
-    const pode = await temPermissao(d.usuario_id, "jogadores", "editar")
+    const usuarioId = req.usuario.id
+const pode = await temPermissao(usuarioId, "jogadores", "editar")
 
 if(!pode){
   return res.status(403).json({ erro: "Sem permissão" })
@@ -189,8 +191,8 @@ if(!pode){
 
 app.delete("/jogadores/:id", async (req, res) => {
   try {
-    const { usuario_id } = req.body
-    const pode = await temPermissao(usuario_id, "jogadores", "excluir")
+    const usuarioId = req.usuario.id
+const pode = await temPermissao(usuarioId, "jogadores", "excluir")
     if(!pode){
     return res.status(403).json({ erro: "Sem permissão" })
 }
@@ -216,8 +218,8 @@ app.get("/pagamentos/:turmaId", async (req, res) => {
 
 app.post("/pagamentos", async (req, res) => {
   try {
-    const { jogador, jogador_id, mes, valor, data, turma_id, usuario_id } = req.body
-    const pode = await temPermissao(usuario_id, "financeiro", "registrar")
+    const usuarioId = req.usuario.id
+const pode = await temPermissao(usuarioId, "financeiro", "registrar")
     if(!pode){
     return res.status(403).json({ erro: "Sem permissão" })
 }
@@ -246,7 +248,7 @@ app.post("/pagamentos", async (req, res) => {
 
 app.delete("/pagamentos/:id", async (req, res) => {
   try {
-    const { usuario_id } = req.body
+    const usuarioId = req.usuario.id
     const pode = await temPermissao(usuario_id, "financeiro", "excluir")
     if(!pode){
   return res.status(403).json({ erro: "Sem permissão" })

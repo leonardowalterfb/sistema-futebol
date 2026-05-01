@@ -44,10 +44,7 @@ async function apiPost(url, body){
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      ...body,
-      usuario_id: usuario?.id 
-    })
+      body: JSON.stringify(body)
   })
 
   let data
@@ -75,10 +72,7 @@ async function apiPut(url, body){
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      ...body,
-      usuario_id: usuario?.id // 🔥 AQUI ESTÁ A MUDANÇA
-    })
+   body: JSON.stringify(body)
   })
 
   let data
@@ -106,9 +100,7 @@ async function apiDelete(url){
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      usuario_id: usuario?.id
-    })
+    body: JSON.stringify(body)
   })
 
   let data
