@@ -544,53 +544,52 @@ Salvar
 // 🔐 LOGIN
 async function fazerLogin(){
 
+  let aceitou = document.getElementById("aceiteLgpd").checked
+
+  if(!aceitou){
+    mostrarToast("Você precisa aceitar os termos")
+    return
+  }
+
   let btn = document.getElementById("btnLogin")
   btn.innerText = "Entrando..."
   btn.disabled = true
 
-  let aceitou = document.getElementById("aceiteLgpd").checked
+  try {
 
-if(!aceitou){
-  mostrarToast("Você precisa aceitar os termos")
+    let login = document.getElementById("login").value
+    let senha = document.getElementById("senha").value
 
-  // 🔥 DESFAZ ESTADO DO BOTÃO
-  let btn = document.getElementById("btnLogin")
-  btn.innerText = "Entrar"
-  btn.disabled = false
+    let res = await fetch(API + "/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ login, senha })
+    })
 
-  return
-}
+    let dados = await res.json()
 
-  let login = document.getElementById("login").value
-  let senha = document.getElementById("senha").value
+    if(!res.ok){
+      throw new Error(dados.erro || "Erro no login")
+    }
 
-  let dados = await apiPost("/login", {
-    login: login,
-    senha: senha
-  })
+    // 🔥 SUCESSO
+    localStorage.setItem("usuarioLogado", JSON.stringify(dados.usuario))
+    localStorage.setItem("token", dados.token)
 
-  if(!dados || dados.erro){
-    mostrarToast("Login ou senha inválido")
+    iniciarSistema()
 
+  } catch (err){
+
+    mostrarToast(err.message || "Login inválido", "error")
+
+  } finally {
+
+    // 🔥 SEMPRE EXECUTA (SUCESSO OU ERRO)
     btn.innerText = "Entrar"
     btn.disabled = false
-    return
+
   }
-
-  const usuario = dados.usuario
-
-  localStorage.setItem("usuarioLogado", JSON.stringify(usuario))
-  localStorage.setItem("token", dados.token)
-
-  // 🔥 ADMIN
-  if(usuario.tipo === "admin"){
-    localStorage.removeItem("turmaSelecionada")
-  }
-
-  // 🔥 CHAMA SISTEMA (ESSA LINHA RESOLVE TUDO)
-  await iniciarSistema()
 }
-
 
 async function iniciarSistema(){
 
