@@ -25,6 +25,24 @@ pool.query("SELECT NOW()")
 app.use(cors())
 app.use(express.json())
 
+function verificarToken(req, res, next){
+  const auth = req.headers.authorization
+
+  if(!auth){
+    return res.status(401).json({ erro: "Token não enviado" })
+  }
+
+  const token = auth.split(" ")[1]
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "segredo_super_forte")
+    req.usuario = decoded
+    next()
+  } catch {
+    return res.status(401).json({ erro: "Token inválido" })
+  }
+}
+
 async function temPermissao(usuarioId, modulo, acao){
 
   // 🔥 verifica se é master
@@ -70,7 +88,7 @@ app.get("/teste-jogadores", async (req, res) => {
   }
 })
 // ================= JOGADORES =================
-app.get("/jogadores/:turmaId", async (req, res) => {
+app.get("/jogadores/:turmaId", verificarToken, async (req, res) => {
   try {
     const { turmaId } = req.params
 

@@ -7,7 +7,13 @@ const API =
 async function apiGet(url){
   try {
 
-    let res = await fetch(API + url)
+    let token = localStorage.getItem("token")
+
+let res = await fetch(API + url, {
+  headers: {
+    "Authorization": "Bearer " + token
+  }
+})
 
     let data = await res.json()
 
