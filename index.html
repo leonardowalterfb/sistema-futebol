@@ -42,6 +42,10 @@
 
 <div class="sidebar">
 
+  <div class="menu-item" onclick="logout()">
+  🚪 Sair
+</div>
+
 <h2>Gew Sports</h2>
 
 <p id="nomeUsuarioLogado" style="margin-bottom:10px;font-weight:bold;"></p>
@@ -1512,12 +1516,16 @@ async function mostrarSecao(id){
     atualizarBotaoPagamento()
   }
 }
+
 function logout(){
 
   // 🔥 LIMPA SESSÃO
   localStorage.removeItem("usuarioLogado")
 
-  // 🔥 LIMPA CONTROLE DA TURMA (ESSENCIAL)
+  // 🔥 LIMPA TOKEN (ESSENCIAL AGORA)
+  localStorage.removeItem("token")
+
+  // 🔥 LIMPA TURMA
   localStorage.removeItem("turmaSelecionada")
 
   // 🔥 VOLTA PRO LOGIN
@@ -1525,7 +1533,6 @@ function logout(){
   document.getElementById("telaLogin").style.display = "flex"
 
 }
-
 
 document.addEventListener("DOMContentLoaded", async function(){
 
