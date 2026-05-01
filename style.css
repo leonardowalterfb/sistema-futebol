@@ -965,3 +965,34 @@ hr{
     text-align: center;
   }
 }
+
+.lgpd-box{
+  margin-top: 12px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.lgpd-label{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.lgpd-label input{
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.lgpd-label a{
+  color: #38bdf8;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.lgpd-label a:hover{
+  text-decoration: underline;
+}
