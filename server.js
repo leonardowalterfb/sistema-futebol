@@ -613,6 +613,63 @@ app.delete("/receitas/:id", async (req, res) => {
   }
 })
 
+// ================= DASHBOARD =================
+app.get("/dashboard/:turmaId", async (req, res) => {
+  try {
+    const { turmaId } = req.params
+
+    // 🔹 TOTAL JOGADORES ATIVOS
+    const jogadores = await pool.query(
+      "SELECT COUNT(*) FROM jogadores WHERE turma_id = $1 AND status = 'ativo'",
+      [turmaId]
+    )
+
+    // 🔹 PAGAMENTOS
+    const pagamentos = await pool.query(
+      "SELECT * FROM pagamentos WHERE turma_id = $1",
+      [turmaId]
+    )
+
+    // 🔹 DESPESAS
+    const despesas = await pool.query(
+      "SELECT * FROM despesas WHERE turma_id = $1",
+      [turmaId]
+    )
+
+    // 🔹 CALCULOS
+    const totalPagamentos = pagamentos.rows.length
+
+    const totalAno = pagamentos.rows.reduce((acc, p) => acc + Number(p.valor), 0)
+
+    const totalDespesas = despesas.rows.reduce((acc, d) => acc + Number(d.valor), 0)
+
+    const saldo = totalAno - totalDespesas
+
+    // 🔹 MES ATUAL
+    const mesAtual = new Date().getMonth()
+
+    const totalMesAtual = pagamentos.rows
+      .filter(p => {
+        const data = new Date(p.data)
+        return data.getMonth() === mesAtual
+      })
+      .reduce((acc, p) => acc + Number(p.valor), 0)
+
+    res.json({
+      totalJogadores: Number(jogadores.rows[0].count),
+      totalPagamentos,
+      totalMesAtual,
+      totalAno,
+      totalDespesas,
+      saldo
+    })
+
+  } catch (err) {
+    console.error("Erro dashboard:", err)
+    res.status(500).json({ erro: err.message })
+  }
+})
+
 // ================= START =================
 const PORT = process.env.PORT || 3000
 

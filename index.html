@@ -588,15 +588,16 @@ async function iniciarSistema(){
   }
 
   // 🔥 CARREGA SISTEMA NORMAL
-  await Promise.all([
-  await carregarJogadores(),
-  await carregarPagamentos(),
-  await carregarDespesas(),
-  await carregarRanking(),
-  await carregarModalidade(),
-])
+let dashboard = await carregarDashboard()
+
+  document.getElementById("totalJogadores").innerText = dashboard.totalJogadores
+  document.getElementById("totalPagamentos").innerText = dashboard.totalPagamentos
+  document.getElementById("totalMesAtual").innerText = formatarMoeda(dashboard.totalMesAtual)
+  document.getElementById("totalAno").innerText = formatarMoeda(dashboard.totalAno)
+  document.getElementById("totalDespesas").innerText = formatarMoeda(dashboard.totalDespesas)
+  document.getElementById("saldoTurma").innerText = formatarMoeda(dashboard.saldo)
+
   atualizarSelectJogadores()
-  //mostrarPagamentos()
   renderPagamentos()
   mostrarDespesas()
   atualizarPainel()

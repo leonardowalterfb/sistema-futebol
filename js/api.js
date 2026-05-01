@@ -120,3 +120,11 @@ async function apiDelete(url){
   return data
 }
 
+//DASHBOARD
+
+async function carregarDashboard(){
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaId = usuario.turma_id
+
+  return await apiGet(`/dashboard/${turmaId}`)
+}
