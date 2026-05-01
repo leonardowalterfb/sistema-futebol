@@ -646,14 +646,16 @@ app.get("/dashboard/:turmaId", async (req, res) => {
     const saldo = totalAno - totalDespesas
 
     // 🔹 MES ATUAL
-    const mesAtual = new Date().getMonth()
+    const nomesMeses = [
+  "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+  "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+    ]
+
+    const mesAtual = nomesMeses[new Date().getMonth()]
 
     const totalMesAtual = pagamentos.rows
-      .filter(p => {
-        const data = new Date(p.data)
-        return data.getMonth() === mesAtual
-      })
-      .reduce((acc, p) => acc + Number(p.valor), 0)
+    .filter(p => p.mes === mesAtual)
+    .reduce((acc, p) => acc + Number(p.valor), 0)
 
     res.json({
       totalJogadores: Number(jogadores.rows[0].count),
