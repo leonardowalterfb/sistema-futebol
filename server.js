@@ -422,6 +422,12 @@ app.post("/login", async (req, res) => {
       { expiresIn: "7d" }
     )
 
+    // 🔥 SALVAR ACEITE LGPD
+await pool.query(
+  "UPDATE usuarios SET aceitou_lgpd = true WHERE id = $1",
+  [user.id]
+)
+
     res.json({
       ok: true,
       usuario: user,
