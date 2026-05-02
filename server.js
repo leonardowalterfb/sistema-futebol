@@ -131,10 +131,10 @@ const pode = await temPermissao(usuarioId, "jogadores", "cadastrar")
       return res.status(400).json({ erro: "Jogador já existe" })
     }
 
-   const result = await pool.query(
+const result = await pool.query(
   `INSERT INTO jogadores
-   (nome, telefone, cpf, nascimento, posicao, turma_id, data_cadastro, status)
-   VALUES ($1,$2,$3,$4,$5,$6,NOW(),'ativo')
+   (nome, telefone, cpf, nascimento, posicao, nivel, turma_id, data_cadastro, status)
+   VALUES ($1,$2,$3,$4,$5,$6,$7,NOW(),'ativo')
    RETURNING id`,
   [
     j.nome,
@@ -142,6 +142,7 @@ const pode = await temPermissao(usuarioId, "jogadores", "cadastrar")
     cpfLimpo,
     j.nascimento,
     j.posicao,
+    j.nivel || "prata",
     j.turma_id
   ]
 )
@@ -176,11 +177,16 @@ if(!pode){
     const cpfLimpo = d.cpf.replace(/\D/g, "")
 
     await pool.query(
-      `UPDATE jogadores SET
-      nome=$1, telefone=$2, cpf=$3, nascimento=$4, posicao=$5
-      WHERE id=$6`,
-      [d.nome, d.telefone, cpfLimpo, d.nascimento, d.posicao, id]
-    )
+  `UPDATE jogadores SET
+  nome=$1,
+  telefone=$2,
+  cpf=$3,
+  nascimento=$4,
+  posicao=$5,
+  nivel=$6
+  WHERE id=$7`,
+  [d.nome, d.telefone, cpfLimpo, d.nascimento, d.posicao, d.nivel || "prata", id]
+)
 
     res.json({ ok: true })
 

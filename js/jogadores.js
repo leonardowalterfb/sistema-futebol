@@ -396,7 +396,7 @@ function editarJogador(id){
   document.getElementById("nome").value = jogador.nome || ""
   document.getElementById("telefone").value = jogador.telefone || ""
   document.getElementById("cpf").value = jogador.cpf || ""
-  document.getElementById("nascimento").value = jogador.nascimento || ""
+  document.getElementById("nascimento").value = jogador.nascimento ? jogador.nascimento.split("T")[0] : ""
   document.getElementById("posicao").value = jogador.posicao || ""
 }
 
