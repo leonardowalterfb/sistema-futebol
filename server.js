@@ -444,6 +444,14 @@ app.post("/login", async (req, res) => {
       return res.status(401).json({ erro: "Login inválido" })
     }
 
+    // 🔥 NOVO: PRIMEIRO ACESSO (ANTES DO BCRYPT)
+    if(user.primeiro_acesso){
+      return res.json({
+        primeiroAcesso: true,
+        usuarioId: user.id
+      })
+    }
+
     const ok = await bcrypt.compare(senha, user.senha)
 
     if (!ok) {
@@ -458,16 +466,36 @@ app.post("/login", async (req, res) => {
     )
 
     // 🔥 SALVAR ACEITE LGPD
-await pool.query(
-  "UPDATE usuarios SET aceitou_lgpd = true WHERE id = $1",
-  [user.id]
-)
+    await pool.query(
+      "UPDATE usuarios SET aceitou_lgpd = true WHERE id = $1",
+      [user.id]
+    )
 
     res.json({
       ok: true,
       usuario: user,
-      token // 🔥 AQUI ESTÁ O NOVO
+      token
     })
+
+  } catch (err) {
+    res.status(500).json({ erro: err.message })
+  }
+})
+
+app.post("/criar-senha", async (req, res) => {
+  try {
+    const { usuarioId, senha } = req.body
+
+    const hash = await bcrypt.hash(senha, 10)
+
+    await pool.query(
+      `UPDATE usuarios 
+       SET senha=$1, primeiro_acesso=false 
+       WHERE id=$2`,
+      [hash, usuarioId]
+    )
+
+    res.json({ ok: true })
 
   } catch (err) {
     res.status(500).json({ erro: err.message })
