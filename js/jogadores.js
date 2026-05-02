@@ -16,6 +16,7 @@ async function cadastrar(){
   let cpf=document.getElementById("cpf").value
   let nascimento=document.getElementById("nascimento").value
   let posicao=document.getElementById("posicao").value
+  let nivel = document.getElementById("nivel").value
 
   if(nome===""){
     mostrarToast("Digite o nome do jogador")
@@ -35,6 +36,7 @@ async function cadastrar(){
     cpf:cpf,
     nascimento:nascimento,
     posicao:posicao,
+    nivel:nivel,
     dataCadastro:dataCadastro,
     status:"ativo"
   }
@@ -220,7 +222,7 @@ function mostrarJogadores(){
 let linhaAtivo = `
 <tr>
 <td>${numero}</td>
-<td>${j.nome || "-"}</td>
+<td>${getMedalha(j.nivel)} ${j.nome || "-"}</td>
 <td>${j.cpf || "-"}</td>
 <td>${j.telefone || "-"}</td>
 <td>${j.posicao || "-"}</td>
@@ -238,7 +240,7 @@ let linhaAtivo = `
 let linhaInativo = `
 <tr>
 <td>${numero}</td>
-<td>${j.nome || "-"}</td>
+<td>${getMedalha(j.nivel)} ${j.nome || "-"}</td>
 <td>${j.cpf || "-"}</td>
 <td>${j.telefone || "-"}</td>
 <td>${j.posicao || "-"}</td>
@@ -271,7 +273,7 @@ function mostrarJogadoresMobile(){
 
   container.innerHTML = ativos.map(j => `
     <div class="card-jogador" onclick="toggleJogador(${j.id})">
-      👤 ${j.nome}
+      👤 ${getMedalha(j.nivel)} ${j.nome}
     </div>
 
     <div id="detalhe_${j.id}" class="detalhe-jogador" style="display:none">
@@ -297,7 +299,7 @@ function mostrarJogadoresInativosMobile(){
 
   container.innerHTML = inativos.map(j => `
     <div class="card-jogador" onclick="toggleJogador(${j.id})">
-      👤 ${j.nome}
+      👤 ${getMedalha(j.nivel)} ${j.nome}
     </div>
 
     <div id="detalhe_${j.id}" class="detalhe-jogador" style="display:none">
@@ -404,7 +406,7 @@ function criarCardJogador(j){
   <div class="card-jogador">
 
     <div class="card-header" onclick="toggleDetalhe(${j.id})">
-      👤 ${j.nome}
+      👤 ${getMedalha(j.nivel)} ${j.nome}
     </div>
 
     <div id="detalhe_${j.id}" class="card-detalhe" style="display:none">
@@ -465,4 +467,11 @@ function toggleJogador(id){
   let aberto = el.style.display === "block"
 
   el.style.display = aberto ? "none" : "block"
+}
+
+function getMedalha(nivel){
+  if(nivel === "ouro") return "🥇"
+  if(nivel === "prata") return "🥈"
+  if(nivel === "bronze") return "🥉"
+  return ""
 }
