@@ -594,7 +594,18 @@ async function fazerLogin(){
       throw new Error(dados.erro || "Erro no login")
     }
 
-    // 🔥 SUCESSO
+    // 🔥 🔥 🔥 PRIMEIRO ACESSO (AQUI ESTÁ A CORREÇÃO)
+    if(dados.primeiroAcesso){
+
+      localStorage.removeItem("usuarioLogado")
+      localStorage.setItem("usuarioTemp", dados.usuarioId)
+
+      mostrarTelaCriarSenha()
+
+      return
+    }
+
+    // 🔥 LOGIN NORMAL
     localStorage.setItem("usuarioLogado", JSON.stringify(dados.usuario))
     localStorage.setItem("token", dados.token)
 
@@ -606,7 +617,6 @@ async function fazerLogin(){
 
   } finally {
 
-    // 🔥 SEMPRE EXECUTA (SUCESSO OU ERRO)
     btn.innerText = "Entrar"
     btn.disabled = false
 
