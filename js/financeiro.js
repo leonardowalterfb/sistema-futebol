@@ -547,7 +547,7 @@ function mostrarDespesasPorMes(){
 
     let data = new Date(d.data)
 
-    let mes = data.toLocaleString("pt-BR", { month: "long" })
+    let mes = data.toLocaleString("pt-BR", { month: "long", year: "numeric" })
 
     mes = mes.charAt(0).toUpperCase() + mes.slice(1)
 
