@@ -373,6 +373,43 @@ app.post("/usuarios", async (req, res) => {
   }
 })
 
+app.put("/usuarios/:id", async (req, res) => {
+  try {
+    const { id } = req.params
+    const { nome, login, senha, turma_id } = req.body
+
+    let query
+    let params
+
+    if(senha){
+      const hash = await bcrypt.hash(senha, 10)
+
+      query = `
+        UPDATE usuarios 
+        SET nome=$1, login=$2, senha=$3, turma_id=$4
+        WHERE id=$5
+      `
+      params = [nome, login, hash, turma_id, id]
+
+    } else {
+
+      query = `
+        UPDATE usuarios 
+        SET nome=$1, login=$2, turma_id=$3
+        WHERE id=$4
+      `
+      params = [nome, login, turma_id, id]
+    }
+
+    await pool.query(query, params)
+
+    res.json({ ok: true })
+
+  } catch (err) {
+    res.status(500).json({ erro: err.message })
+  }
+})
+
 app.delete("/usuarios/:id", async (req, res) => {
   try {
     await pool.query("DELETE FROM usuarios WHERE id=$1", [req.params.id])
