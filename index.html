@@ -1614,6 +1614,13 @@ function logout(){
   document.getElementById("telaLogin").style.display = "flex"
 
 }
+function pode(m, a){
+  return permissoes.some(p =>
+    p.modulo === m &&
+    p.acao === a &&
+    p.permitido
+  )
+}
 
 document.addEventListener("DOMContentLoaded", async function(){
 
