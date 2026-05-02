@@ -358,9 +358,7 @@ function mostrarReceitaPorMes(){
 
   let mapa = {}
 
-  // 🔵 PAGAMENTOS
   for(let p of pagamentos){
-
     let data = new Date(p.data)
 
     let chave = `${data.getFullYear()}-${data.getMonth()}`
@@ -377,9 +375,7 @@ function mostrarReceitaPorMes(){
     mapa[chave].total += Number(p.valor || 0)
   }
 
-  // 🟢 RECEITAS
   for(let r of receitas){
-
     let data = new Date(r.data)
 
     let chave = `${data.getFullYear()}-${data.getMonth()}`
@@ -396,24 +392,48 @@ function mostrarReceitaPorMes(){
     mapa[chave].total += Number(r.valor || 0)
   }
 
+  let lista = Object.values(mapa).sort((a,b) => a.data - b.data)
+
   let div = document.getElementById("receitaPorMes")
   if(!div) return
 
   div.innerHTML = ""
 
-  // 🔥 ORDENA CORRETAMENTE POR DATA
-  Object.values(mapa)
-    .sort((a,b) => a.data - b.data)
-    .forEach(item => {
+  let limite = 3
+  let expandido = false
 
+  function render(){
+
+    div.innerHTML = ""
+
+    let dados = expandido ? lista : lista.slice(-limite)
+
+    dados.forEach(item => {
       div.innerHTML += `
-        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;">
+        <div class="linha-mes">
           <span>${item.label}</span>
           <strong>${formatarMoeda(item.total)}</strong>
         </div>
       `
     })
+
+    if(lista.length > limite){
+      div.innerHTML += `
+        <button onclick="toggleReceitaMes()" class="btn-expandir">
+          ${expandido ? "Ver menos" : "Ver mais"}
+        </button>
+      `
+    }
+  }
+
+  window.toggleReceitaMes = function(){
+    expandido = !expandido
+    render()
+  }
+
+  render()
 }
+
   function atualizarBotaoPagamento(){
   const botao = document.getElementById("btnPagamento");
 
@@ -548,7 +568,6 @@ async function carregarReceitas(){
 function mostrarDespesasPorMes(){
 
   let container = document.getElementById("despesasPorMes")
-
   if(!container) return
 
   let mapa = {}
@@ -557,32 +576,55 @@ function mostrarDespesasPorMes(){
 
     let data = new Date(d.data)
 
-    let mes = data.toLocaleString("pt-BR", { month: "long", year: "numeric" })
+    let chave = `${data.getFullYear()}-${data.getMonth()}`
 
-    mes = mes.charAt(0).toUpperCase() + mes.slice(1)
+    let label = data.toLocaleString("pt-BR", {
+      month: "long",
+      year: "numeric"
+    })
 
-    if(!mapa[mes]){
-      mapa[mes] = 0
+    if(!mapa[chave]){
+      mapa[chave] = { label, total: 0, data }
     }
 
-    mapa[mes] += Number(d.valor)
+    mapa[chave].total += Number(d.valor)
   }
 
-  container.innerHTML = ""
+  let lista = Object.values(mapa).sort((a,b) => a.data - b.data)
 
-  for(let mes in mapa){
+  let limite = 3
+  let expandido = false
 
-    container.innerHTML += `
-      <div class="linha-mes">
-        <span>${mes}</span>
-        <strong>${mapa[mes].toLocaleString("pt-BR", {
-  style: "currency",
-  currency: "BRL"
-})}</strong>
-      </div>
-    `
+  function render(){
+
+    container.innerHTML = ""
+
+    let dados = expandido ? lista : lista.slice(-limite)
+
+    dados.forEach(item => {
+      container.innerHTML += `
+        <div class="linha-mes">
+          <span>${item.label}</span>
+          <strong>${formatarMoeda(item.total)}</strong>
+        </div>
+      `
+    })
+
+    if(lista.length > limite){
+      container.innerHTML += `
+        <button onclick="toggleDespesasMes()" class="btn-expandir">
+          ${expandido ? "Ver menos" : "Ver mais"}
+        </button>
+      `
+    }
   }
 
+  window.toggleDespesasMes = function(){
+    expandido = !expandido
+    render()
+  }
+
+  render()
 }
 
 async function excluirReceita(id){
