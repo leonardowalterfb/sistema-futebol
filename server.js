@@ -154,14 +154,13 @@ const result = await pool.query(
   }
 })
 
-app.put("/jogadores/:id", async (req, res) => {
+app.put("/jogadores/:id", verificarToken, async (req, res) => {
   try {
     const { id } = req.params
     const d = req.body
 
     const usuarioId = req.usuario.id
 const pode = await temPermissao(usuarioId, "jogadores", "editar")
-console.log("REQ.USUARIO:", req.usuario)
 if(!pode){
   return res.status(403).json({ erro: "Sem permissão" })
 }
