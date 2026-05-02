@@ -705,7 +705,7 @@ function mostrarResultadoFinanceiroPorMes(){
     mapa[chave].despesa += Number(d.valor || 0)
   }
 
-  let lista = Object.values(mapa).sort((a,b) => b.data - a.data)
+  let lista = Object.values(mapa).sort((a,b) => a.data - b.data)
 
   let limite = 3
   let expandido = false
