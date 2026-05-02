@@ -379,6 +379,7 @@ let data = new Date(
       month: "long",
       year: "numeric"
     })
+    label = label.charAt(0).toUpperCase() + label.slice(1)
 
     if(!mapa[chave]){
       mapa[chave] = { label, total: 0, data }
@@ -402,6 +403,7 @@ let data = new Date(
       month: "long",
       year: "numeric"
     })
+    label = label.charAt(0).toUpperCase() + label.slice(1)
 
     if(!mapa[chave]){
       mapa[chave] = { label, total: 0, data }
@@ -606,6 +608,7 @@ function mostrarDespesasPorMes(){
       month: "long",
       year: "numeric"
     })
+    label = label.charAt(0).toUpperCase() + label.slice(1)
 
     if(!mapa[chave]){
       mapa[chave] = { label, total: 0, data }
