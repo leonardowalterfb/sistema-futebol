@@ -392,7 +392,7 @@ function mostrarReceitaPorMes(){
     mapa[chave].total += Number(r.valor || 0)
   }
 
-  let lista = Object.values(mapa).sort((a,b) => b.data - a.data)
+  let lista = Object.values(mapa).sort((a,b) => a.data - b.data)
 
   let div = document.getElementById("receitaPorMes")
   if(!div) return
@@ -590,7 +590,7 @@ function mostrarDespesasPorMes(){
     mapa[chave].total += Number(d.valor)
   }
 
-  let lista = Object.values(mapa).sort((a,b) => b.data - a.data)
+  let lista = Object.values(mapa).sort((a,b) => a.data - b.data)
 
   let limite = 3
   let expandido = false
