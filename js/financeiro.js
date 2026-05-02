@@ -359,7 +359,12 @@ function mostrarReceitaPorMes(){
   let mapa = {}
 
   for(let p of pagamentos){
-    let data = new Date(p.data)
+    let data = p.data ? new Date(p.data) : null
+
+if(!data || isNaN(data)){
+  console.warn("Pagamento com data inválida:", p)
+  continue
+}
 
     let chave = `${data.getFullYear()}-${data.getMonth()}`
 
