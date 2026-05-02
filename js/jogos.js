@@ -597,6 +597,38 @@ html += `
 }
 
 //SORTEAR JOGO//
+function dividirPorNivel(lista){
+
+  let ouro = lista.filter(j => j.nivel === "ouro")
+  let prata = lista.filter(j => j.nivel === "prata")
+  let bronze = lista.filter(j => j.nivel === "bronze")
+
+  function dividir(arr){
+    arr = embaralhar(arr)
+
+    let A = []
+    let B = []
+
+    for(let i=0;i<arr.length;i++){
+      if(i % 2 === 0){
+        A.push(arr[i])
+      } else {
+        B.push(arr[i])
+      }
+    }
+
+    return {A, B}
+  }
+
+  let ouroDiv = dividir(ouro)
+  let prataDiv = dividir(prata)
+  let bronzeDiv = dividir(bronze)
+
+  return {
+    A: [...ouroDiv.A, ...prataDiv.A, ...bronzeDiv.A],
+    B: [...ouroDiv.B, ...prataDiv.B, ...bronzeDiv.B]
+  }
+}
 
 function sortearTimes(){
 
@@ -637,18 +669,20 @@ goleiros.splice(0,2)
 }
 
 // embaralhar restante
-linha = embaralhar(linha)
+let timesLinha = dividirPorNivel(linha)
 
-let todos = linha.concat(goleiros)
+timeA = [...timeA, ...timesLinha.A]
+timeB = [...timeB, ...timesLinha.B]
 
-for(let i=0;i<todos.length;i++){
+// adiciona goleiros restantes (se tiver)
+let resto = embaralhar(goleiros)
 
-if(i % 2 === 0){
-timeA.push(todos[i])
-}else{
-timeB.push(todos[i])
-}
-
+for(let i=0;i<resto.length;i++){
+  if(i % 2 === 0){
+    timeA.push(resto[i])
+  } else {
+    timeB.push(resto[i])
+  }
 }
 
 // mostrar times
