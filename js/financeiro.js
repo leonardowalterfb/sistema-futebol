@@ -359,12 +359,19 @@ function mostrarReceitaPorMes(){
   let mapa = {}
 
   for(let p of pagamentos){
-    let data = p.data ? new Date(p.data) : null
+    let d = p.data ? new Date(p.data) : null
 
-if(!data || isNaN(data)){
+if(!d || isNaN(d)){
   console.warn("Pagamento com data inválida:", p)
   continue
 }
+
+// 🔥 CORREÇÃO DO FUSO HORÁRIO
+let data = new Date(
+  d.getUTCFullYear(),
+  d.getUTCMonth(),
+  d.getUTCDate()
+)
 
     let chave = `${data.getFullYear()}-${data.getMonth()}`
 
@@ -381,7 +388,13 @@ if(!data || isNaN(data)){
   }
 
   for(let r of receitas){
-    let data = new Date(r.data)
+    let d = new Date(r.data)
+
+let data = new Date(
+  d.getUTCFullYear(),
+  d.getUTCMonth(),
+  d.getUTCDate()
+)
 
     let chave = `${data.getFullYear()}-${data.getMonth()}`
 
@@ -511,7 +524,13 @@ async function carregarReceitas(){
 
   receitas.forEach(r => {
 
-    let data = new Date(r.data)
+    let d = new Date(r.data)
+
+let data = new Date(
+  d.getUTCFullYear(),
+  d.getUTCMonth(),
+  d.getUTCDate()
+)
 
     let mes = data.toLocaleString("pt-BR",{month:"long"})
     mes = mes.charAt(0).toUpperCase()+mes.slice(1)
