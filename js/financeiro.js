@@ -356,31 +356,44 @@ async function removerDespesa(id){
 
 function mostrarReceitaPorMes(){
 
-  let totais = {}
+  let mapa = {}
 
   // 🔵 PAGAMENTOS
-  for(let i=0;i<pagamentos.length;i++){
+  for(let p of pagamentos){
 
-    let mes = pagamentos[i].mes
+    let data = new Date(p.data)
 
-    if(!totais[mes]) totais[mes] = 0
+    let chave = `${data.getFullYear()}-${data.getMonth()}`
 
-    totais[mes] += Number(pagamentos[i].valor || 0)
+    let label = data.toLocaleString("pt-BR", {
+      month: "long",
+      year: "numeric"
+    })
+
+    if(!mapa[chave]){
+      mapa[chave] = { label, total: 0, data }
+    }
+
+    mapa[chave].total += Number(p.valor || 0)
   }
 
-  // 🟢 RECEITAS (AGORA ENTRA)
-  if(receitas && receitas.length){
-    for(let i=0;i<receitas.length;i++){
+  // 🟢 RECEITAS
+  for(let r of receitas){
 
-      let data = new Date(receitas[i].data)
+    let data = new Date(r.data)
 
-      let mes = data.toLocaleString("pt-BR",{month:"long"})
-      mes = mes.charAt(0).toUpperCase()+mes.slice(1)
+    let chave = `${data.getFullYear()}-${data.getMonth()}`
 
-      if(!totais[mes]) totais[mes] = 0
+    let label = data.toLocaleString("pt-BR", {
+      month: "long",
+      year: "numeric"
+    })
 
-      totais[mes] += Number(receitas[i].valor || 0)
+    if(!mapa[chave]){
+      mapa[chave] = { label, total: 0, data }
     }
+
+    mapa[chave].total += Number(r.valor || 0)
   }
 
   let div = document.getElementById("receitaPorMes")
@@ -388,21 +401,18 @@ function mostrarReceitaPorMes(){
 
   div.innerHTML = ""
 
-  const ordemMeses = [
-    "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
-    "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
-  ]
+  // 🔥 ORDENA CORRETAMENTE POR DATA
+  Object.values(mapa)
+    .sort((a,b) => a.data - b.data)
+    .forEach(item => {
 
-  ordemMeses.forEach(mes => {
-    if(totais[mes]){
       div.innerHTML += `
         <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;">
-          <span>${mes}</span>
-          <strong>${formatarMoeda(totais[mes])}</strong>
+          <span>${item.label}</span>
+          <strong>${formatarMoeda(item.total)}</strong>
         </div>
       `
-    }
-  })
+    })
 }
   function atualizarBotaoPagamento(){
   const botao = document.getElementById("btnPagamento");
