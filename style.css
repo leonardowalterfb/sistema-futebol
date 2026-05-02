@@ -1039,3 +1039,11 @@ hr{
 .btn-expandir:hover {
   opacity: 0.9;
 }
+
+.card:nth-child(1) .btn-expandir {
+  background: linear-gradient(90deg, #16a34a, #15803d); /* receita verde */
+}
+
+.card:nth-child(2) .btn-expandir {
+  background: linear-gradient(90deg, #dc2626, #b91c1c); /* despesa vermelho */
+}
