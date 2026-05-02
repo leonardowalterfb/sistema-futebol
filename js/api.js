@@ -66,14 +66,15 @@ async function apiPost(url, body){
 // PUT
 async function apiPut(url, body){
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let token = localStorage.getItem("token")
 
   let res = await fetch(API + url, {
     method: "PUT",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
     },
-   body: JSON.stringify(body)
+    body: JSON.stringify(body)
   })
 
   let data
@@ -94,14 +95,14 @@ async function apiPut(url, body){
 // DELETE
 async function apiDelete(url){
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let token = localStorage.getItem("token")
 
   let res = await fetch(API + url, {
     method: "DELETE",
     headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(body)
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    }
   })
 
   let data
