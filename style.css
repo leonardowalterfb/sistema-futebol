@@ -1003,3 +1003,23 @@ hr{
   padding: 6px 0;
   border-bottom: 1px solid #eee;
 }
+
+.linha-dupla {
+  display: flex;
+  gap: 20px;
+}
+
+.linha-dupla .card {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .linha-dupla {
+    flex-direction: column;
+  }
+}
+
+#proximosAniversarios {
+  max-height: 200px;
+  overflow-y: auto;
+}
