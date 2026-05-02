@@ -36,10 +36,6 @@
 
 </div>
 
-<div class="container" id="sistema" style="display:none;">
-
-  </div> <!-- fecha telaLogin -->
-
 <!-- 🔐 TELA CRIAR SENHA -->
 <div id="telaCriarSenha" class="login-container" style="display:none;">
 
@@ -71,10 +67,10 @@
 
 <button onclick="mostrarSecao('painel')">📊 Painel</button>
 <button id="btnConfiguracoes" onclick="mostrarSecao('configuracoes'); abrirAbaConfig('usuarios')"> ⚙️ Configurações</button>
-<button onclick="mostrarSecao('jogadores')">👥 Jogadores</button>
-<button onclick="mostrarSecao('financeiro')">💰 Financeiro</button>
-<button onclick="mostrarSecao('jogos')">⚽ Jogos</button>
-<button onclick="mostrarSecao('ranking')">🏆 Ranking</button>
+<button id="menuJogadores" onclick="mostrarSecao('jogadores')">👥 Jogadores</button>
+<button id="menuFinanceiro" onclick="mostrarSecao('financeiro')">💰 Financeiro</button>
+<button id="menuJogos" onclick="mostrarSecao('jogos')">⚽ Jogos</button>
+<button id="menuRanking" onclick="mostrarSecao('ranking')">🏆 Ranking</button>
 <button onclick="mostrarSecao('historico')">📜 Histórico</button>
 <button onclick="logout()">🚪 Sair</button>
 
