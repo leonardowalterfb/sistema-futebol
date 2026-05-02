@@ -651,6 +651,104 @@ function mostrarDespesasPorMes(){
   render()
 }
 
+function mostrarResultadoFinanceiroPorMes(){
+
+  let container = document.getElementById("resultadoFinanceiroPorMes")
+  if(!container) return
+
+  let mapa = {}
+
+  // 🔵 RECEITAS (pagamentos + receitas extras)
+  for(let p of pagamentos){
+
+    let d = new Date(p.data)
+    let data = new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())
+
+    let chave = `${data.getFullYear()}-${data.getMonth()}`
+    let label = data.toLocaleString("pt-BR", { month: "long", year: "numeric" })
+
+    if(!mapa[chave]){
+      mapa[chave] = { label, receita: 0, despesa: 0, data }
+    }
+
+    mapa[chave].receita += Number(p.valor || 0)
+  }
+
+  for(let r of receitas){
+
+    let d = new Date(r.data)
+    let data = new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())
+
+    let chave = `${data.getFullYear()}-${data.getMonth()}`
+    let label = data.toLocaleString("pt-BR", { month: "long", year: "numeric" })
+
+    if(!mapa[chave]){
+      mapa[chave] = { label, receita: 0, despesa: 0, data }
+    }
+
+    mapa[chave].receita += Number(r.valor || 0)
+  }
+
+  // 🔴 DESPESAS
+  for(let d of despesas){
+
+    let dd = new Date(d.data)
+    let data = new Date(dd.getUTCFullYear(), dd.getUTCMonth(), dd.getUTCDate())
+
+    let chave = `${data.getFullYear()}-${data.getMonth()}`
+    let label = data.toLocaleString("pt-BR", { month: "long", year: "numeric" })
+
+    if(!mapa[chave]){
+      mapa[chave] = { label, receita: 0, despesa: 0, data }
+    }
+
+    mapa[chave].despesa += Number(d.valor || 0)
+  }
+
+  let lista = Object.values(mapa).sort((a,b) => b.data - a.data)
+
+  let limite = 3
+  let expandido = false
+
+  function render(){
+
+    container.innerHTML = ""
+
+    let dados = expandido ? lista : lista.slice(0, limite)
+
+    dados.forEach(item => {
+
+      let saldo = item.receita - item.despesa
+
+      let cor = saldo >= 0 ? "green" : "red"
+
+      container.innerHTML += `
+        <div class="linha-mes">
+          <span>${item.label}</span>
+          <strong style="color:${cor}">
+            ${saldo >= 0 ? "+" : ""}${formatarMoeda(saldo)}
+          </strong>
+        </div>
+      `
+    })
+
+    if(lista.length > limite){
+      container.innerHTML += `
+        <button onclick="toggleResultadoFinanceiro()" class="btn-expandir">
+          ${expandido ? "Ver menos" : "Ver mais"}
+        </button>
+      `
+    }
+  }
+
+  window.toggleResultadoFinanceiro = function(){
+    expandido = !expandido
+    render()
+  }
+
+  render()
+}
+
 async function excluirReceita(id){
 
   let pode = await usuarioTemPermissao("financeiro", "excluir")
