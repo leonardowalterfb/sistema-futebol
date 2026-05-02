@@ -233,13 +233,18 @@ app.get("/pagamentos/:turmaId", async (req, res) => {
   }
 })
 
-app.post("/pagamentos", async (req, res) => {
+app.post("/pagamentos", verificarToken, async (req, res) => {
   try {
+
     const usuarioId = req.usuario.id
-const pode = await temPermissao(usuarioId, "financeiro", "registrar")
+
+    const pode = await temPermissao(usuarioId, "financeiro", "registrar")
     if(!pode){
-    return res.status(403).json({ erro: "Sem permissão" })
-}
+      return res.status(403).json({ erro: "Sem permissão" })
+    }
+
+    // 🔥 AQUI ESTAVA FALTANDO
+    const { jogador_id, jogador, mes, valor, data, turma_id } = req.body
 
     const existe = await pool.query(
       "SELECT id FROM pagamentos WHERE jogador_nome=$1 AND mes=$2 AND turma_id=$3",
@@ -251,14 +256,15 @@ const pode = await temPermissao(usuarioId, "financeiro", "registrar")
     }
 
     await pool.query(
-  `INSERT INTO pagamentos (jogador_id, jogador_nome, mes, valor, data, turma_id)
-   VALUES ($1,$2,$3,$4,$5,$6)`,
-  [jogador_id, jogador, mes, valor, data, turma_id]
-
-)
+      `INSERT INTO pagamentos (jogador_id, jogador_nome, mes, valor, data, turma_id)
+       VALUES ($1,$2,$3,$4,$5,$6)`,
+      [jogador_id, jogador, mes, valor, data, turma_id]
+    )
 
     res.json({ ok: true })
+
   } catch (err) {
+    console.error("ERRO PAGAMENTO:", err)
     res.status(500).json({ erro: err.message })
   }
 })
@@ -278,7 +284,7 @@ app.delete("/pagamentos/:id", async (req, res) => {
 })
 
 // ================= DESPESAS =================
-app.get("/despesas/:turmaId", async (req, res) => {
+app.get("/despesas/:turmaId", verificarToken, async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT * FROM despesas WHERE turma_id=$1",
@@ -290,13 +296,17 @@ app.get("/despesas/:turmaId", async (req, res) => {
   }
 })
 
-app.post("/despesas", async (req, res) => {
+app.post("/despesas", verificarToken, async (req, res) => {
   try {
-    const { descricao, valor, data, turma_id, usuario_id } = req.body
-    const pode = await temPermissao(usuario_id, "financeiro", "registrar")
+
+    const usuarioId = req.usuario.id
+
+    const pode = await temPermissao(usuarioId, "financeiro", "registrar")
     if(!pode){
-  return res.status(403).json({ erro: "Sem permissão" })
-}
+      return res.status(403).json({ erro: "Sem permissão" })
+    }
+
+    const { descricao, valor, data, turma_id } = req.body
 
     await pool.query(
       `INSERT INTO despesas (descricao, valor, data, turma_id)
@@ -305,21 +315,29 @@ app.post("/despesas", async (req, res) => {
     )
 
     res.json({ ok: true })
+
   } catch (err) {
+    console.error("ERRO DESPESA:", err)
     res.status(500).json({ erro: err.message })
   }
 })
 
-app.delete("/despesas/:id", async (req, res) => {
+app.delete("/despesas/:id", verificarToken, async (req, res) => {
   try {
-    const { usuario_id } = req.body
-    const pode = await temPermissao(usuario_id, "financeiro", "excluir")
+
+    const usuarioId = req.usuario.id
+
+    const pode = await temPermissao(usuarioId, "financeiro", "excluir")
     if(!pode){
-  return res.status(403).json({ erro: "Sem permissão" })
-}
+      return res.status(403).json({ erro: "Sem permissão" })
+    }
+
     await pool.query("DELETE FROM despesas WHERE id=$1", [req.params.id])
+
     res.json({ ok: true })
+
   } catch (err) {
+    console.error("ERRO DELETE DESPESA:", err)
     res.status(500).json({ erro: err.message })
   }
 })
