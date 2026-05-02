@@ -38,6 +38,29 @@
 
 <div class="container" id="sistema" style="display:none;">
 
+  </div> <!-- fecha telaLogin -->
+
+<!-- 🔐 TELA CRIAR SENHA -->
+<div id="telaCriarSenha" class="login-container" style="display:none;">
+
+  <div class="login-box">
+
+    <h2>🔐 Criar Senha</h2>
+
+    <input type="password" id="novaSenha" placeholder="Digite sua senha">
+    <input type="password" id="confirmarSenha" placeholder="Confirme sua senha">
+
+    <button onclick="salvarSenha()">
+      Salvar
+    </button>
+
+  </div>
+
+</div>
+
+<!-- SISTEMA -->
+<div class="container" id="sistema" style="display:none;">
+
 <!-- MENU LATERAL -->
 
 <div class="sidebar">
@@ -621,6 +644,35 @@ async function fazerLogin(){
     btn.disabled = false
 
   }
+}
+
+function mostrarTelaCriarSenha(){
+
+  document.getElementById("telaLogin").style.display = "none"
+
+  document.getElementById("telaCriarSenha").style.display = "flex"
+}
+
+async function salvarSenha(){
+
+  let senha = document.getElementById("novaSenha").value
+  let confirmar = document.getElementById("confirmarSenha").value
+
+  if(senha !== confirmar){
+    mostrarToast("Senhas não conferem")
+    return
+  }
+
+  let usuarioId = localStorage.getItem("usuarioTemp")
+
+  await apiPost("/criar-senha", {
+    usuarioId,
+    senha
+  })
+
+  mostrarToast("Senha criada com sucesso!")
+
+  location.reload()
 }
 
 async function iniciarSistema(){
