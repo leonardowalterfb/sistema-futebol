@@ -161,7 +161,7 @@ app.put("/jogadores/:id", async (req, res) => {
 
     const usuarioId = req.usuario.id
 const pode = await temPermissao(usuarioId, "jogadores", "editar")
-
+console.log("REQ.USUARIO:", req.usuario)
 if(!pode){
   return res.status(403).json({ erro: "Sem permissão" })
 }
