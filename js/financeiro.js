@@ -714,7 +714,7 @@ function mostrarResultadoFinanceiroPorMes(){
 
     container.innerHTML = ""
 
-    let dados = expandido ? lista : lista.slice(0, limite)
+    let dados = expandido ? lista : lista.slice(-limite)
 
     dados.forEach(item => {
 
