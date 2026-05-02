@@ -669,6 +669,7 @@ function mostrarResultadoFinanceiroPorMes(){
 
     let chave = `${data.getFullYear()}-${data.getMonth()}`
     let label = data.toLocaleString("pt-BR", { month: "long", year: "numeric" })
+    label = label.charAt(0).toUpperCase() + label.slice(1)
 
     if(!mapa[chave]){
       mapa[chave] = { label, receita: 0, despesa: 0, data }
@@ -684,6 +685,7 @@ function mostrarResultadoFinanceiroPorMes(){
 
     let chave = `${data.getFullYear()}-${data.getMonth()}`
     let label = data.toLocaleString("pt-BR", { month: "long", year: "numeric" })
+    label = label.charAt(0).toUpperCase() + label.slice(1)
 
     if(!mapa[chave]){
       mapa[chave] = { label, receita: 0, despesa: 0, data }
@@ -700,6 +702,7 @@ function mostrarResultadoFinanceiroPorMes(){
 
     let chave = `${data.getFullYear()}-${data.getMonth()}`
     let label = data.toLocaleString("pt-BR", { month: "long", year: "numeric" })
+    label = label.charAt(0).toUpperCase() + label.slice(1)
 
     if(!mapa[chave]){
       mapa[chave] = { label, receita: 0, despesa: 0, data }
