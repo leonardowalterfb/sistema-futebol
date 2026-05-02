@@ -996,3 +996,10 @@ hr{
 .lgpd-label a:hover{
   text-decoration: underline;
 }
+
+.linha-mes {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+}

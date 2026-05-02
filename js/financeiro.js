@@ -535,6 +535,43 @@ async function carregarReceitas(){
   mostrarReceitaPorMes()
 }
 
+function mostrarDespesasPorMes(){
+
+  let container = document.getElementById("despesasPorMes")
+
+  if(!container) return
+
+  let mapa = {}
+
+  for(let d of despesas){
+
+    let data = new Date(d.data)
+
+    let mes = data.toLocaleString("pt-BR", { month: "long" })
+
+    mes = mes.charAt(0).toUpperCase() + mes.slice(1)
+
+    if(!mapa[mes]){
+      mapa[mes] = 0
+    }
+
+    mapa[mes] += Number(d.valor)
+  }
+
+  container.innerHTML = ""
+
+  for(let mes in mapa){
+
+    container.innerHTML += `
+      <div class="linha-mes">
+        <span>${mes}</span>
+        <strong>R$ ${mapa[mes].toFixed(2)}</strong>
+      </div>
+    `
+  }
+
+}
+
 async function excluirReceita(id){
 
   let pode = await usuarioTemPermissao("financeiro", "excluir")
