@@ -565,7 +565,10 @@ function mostrarDespesasPorMes(){
     container.innerHTML += `
       <div class="linha-mes">
         <span>${mes}</span>
-        <strong>R$ ${mapa[mes].toFixed(2)}</strong>
+        <strong>${mapa[mes].toLocaleString("pt-BR", {
+  style: "currency",
+  currency: "BRL"
+})}</strong>
       </div>
     `
   }
