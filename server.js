@@ -26,19 +26,31 @@ app.use(cors())
 app.use(express.json())
 
 function verificarToken(req, res, next){
-  const auth = req.headers.authorization
 
-  if(!auth){
+  const authHeader = req.headers.authorization
+
+  if(!authHeader){
     return res.status(401).json({ erro: "Token não enviado" })
   }
 
-  const token = auth.split(" ")[1]
+  const token = authHeader.split(" ")[1]
+
+  if(!token){
+    return res.status(401).json({ erro: "Token inválido" })
+  }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "segredo_super_forte")
+
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "segredo_super_forte"
+    )
+
     req.usuario = decoded
+
     next()
-  } catch {
+
+  } catch (err){
     return res.status(401).json({ erro: "Token inválido" })
   }
 }
@@ -105,7 +117,7 @@ app.get("/jogadores/:turmaId", verificarToken, async (req, res) => {
   }
 })
 
-app.post("/jogadores", async (req, res) => {
+app.post("/jogadores", verificarToken, async (req, res) => {
   try {
 
     const j = req.body
@@ -194,7 +206,7 @@ if(!pode){
   }
 })
 
-app.delete("/jogadores/:id", async (req, res) => {
+app.delete("/jogadores/:id", verificarToken, async (req, res) => {
   try {
     const usuarioId = req.usuario.id
 const pode = await temPermissao(usuarioId, "jogadores", "excluir")
