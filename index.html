@@ -716,7 +716,8 @@ await Promise.all([
   carregarDespesas(),
   carregarJogadores(),
   carregarRanking(),
-  carregarModalidade()
+  carregarModalidade(),
+  carregarNomeTurma()
 ])
 
 mostrarSecao("painel")
@@ -750,6 +751,21 @@ document.getElementById("dataJogo").addEventListener("change", function(){
 document.getElementById("localJogo").addEventListener("input", function(){
 })
 
+}
+
+function salvarNomeTurma(){
+
+  let nome = document.getElementById("nomeSistema").value
+
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
+  usuario.nome = nome
+
+  localStorage.setItem("usuarioLogado", JSON.stringify(usuario))
+
+  carregarNomeTurma()
+
+  mostrarToast("Nome atualizado!")
 }
 
 // Link Para WhatsApp//
