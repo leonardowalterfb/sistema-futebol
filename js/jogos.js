@@ -25,53 +25,45 @@ async function criarJogo(){
     return
   }
 
-  // 🔥 VERIFICA SE EXISTE JOGO SALVO REAL
+  // 🔥 PEGA UMA VEZ SÓ
   let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
   let turmaId = usuario.turma_id
 
   let jogoSalvo = localStorage.getItem(`jogoAtual_${turmaId}`)
 
-  // 🔥 CORRIGE ESTADO BUGADO
   if(!jogoSalvo){
     jogoAberto = false
   }
 
-  // 🔥 BLOQUEIO INTELIGENTE
   if(jogoAberto && jogoSalvo){
     mostrarToast("Já existe um jogo aberto.")
     return
   }
 
-  // 🔥 RESET TOTAL
- presencas = []
+  // 🔥 RESET
+  presencas = []
 
-let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-let turmaId = usuario.turma_id
+  let jogadoresAtuais = await apiGet(`/jogadores/${turmaId}`)
 
-let jogadoresAtuais = await apiGet(`/jogadores/${turmaId}`)
-
-for(let i = 0; i < jogadoresAtuais.length; i++){
-
-  if(jogadoresAtuais[i].status === "ativo"){
-
-    presencas.push({
-      nome: jogadoresAtuais[i].nome,
-      confirmado: false,
-      respondido: false
-    })
+  for(let i = 0; i < jogadoresAtuais.length; i++){
+    if(jogadoresAtuais[i].status === "ativo"){
+      presencas.push({
+        nome: jogadoresAtuais[i].nome,
+        confirmado: false,
+        respondido: false
+      })
+    }
   }
-}
 
   jogoAberto = true
 
-  // 🔥 SALVAR NO LOCALSTORAGE
-localStorage.setItem(`jogoAberto_${turmaId}`, "true")
-localStorage.setItem(`dataJogo_${turmaId}`, data)
-localStorage.setItem(`localJogo_${turmaId}`, local)
-localStorage.setItem(`presencas_${turmaId}`, JSON.stringify(presencas))
+  // 🔥 STORAGE CORRETO
+  localStorage.setItem(`jogoAberto_${turmaId}`, "true")
+  localStorage.setItem(`dataJogo_${turmaId}`, data)
+  localStorage.setItem(`localJogo_${turmaId}`, local)
+  localStorage.setItem(`presencas_${turmaId}`, JSON.stringify(presencas))
 
   salvarJogo()
-
   mostrarPresenca()
 }
 
