@@ -58,10 +58,10 @@ async function criarJogo(){
   jogoAberto = true
 
   // 🔥 SALVAR NO LOCALSTORAGE
-localStorage.setItem("jogoAberto", "true")
-localStorage.setItem("dataJogo", data)
-localStorage.setItem("localJogo", local)
-localStorage.setItem("presencas", JSON.stringify(presencas))
+localStorage.setItem(`jogoAberto_${turmaId}`, "true")
+localStorage.setItem(`dataJogo_${turmaId}`, data)
+localStorage.setItem(`localJogo_${turmaId}`, local)
+localStorage.setItem(`presencas_${turmaId}`, JSON.stringify(presencas))
 
   salvarJogo()
 
