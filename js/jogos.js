@@ -194,6 +194,7 @@ function salvarJogo(){
 }
 
 function carregarJogoSalvo(){
+  presencas = [] // 🔥 FORÇA LIMPEZA
 
 let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
 
@@ -709,6 +710,7 @@ document.getElementById("timeB").innerHTML=""
 }
 
 async function mostrarSecao(secao){
+  console.log("PRESENCAS ANTES:", presencas)
 
   // 🔥 BLOQUEIO DE CONFIGURAÇÕES
   if(secao === "configuracoes"){
@@ -733,11 +735,15 @@ async function mostrarSecao(secao){
     ativa.style.display = "block"
   }
 
-  // 🔥 lógica específica
   if(secao === "jogos"){
-    await carregarJogadores()
-    carregarJogoSalvo()
-  }
+
+  // 🔥 LIMPA ESTADO ANTES DE TUDO
+  presencas = []
+  jogoAberto = false
+
+  await carregarJogadores()
+  carregarJogoSalvo()
+}
 }
 
 function toggleJogo(index){
