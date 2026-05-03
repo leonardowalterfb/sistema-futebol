@@ -289,8 +289,8 @@ for(let i=0;i<presentes.length;i++){
 //localStorage.setItem("ranking", JSON.stringify(ranking))
 
 // objeto do jogo
-let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-let turmaId = usuario.turma_id
+usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+turmaId = usuario.turma_id
 
 let jogo = {
   data: data,
