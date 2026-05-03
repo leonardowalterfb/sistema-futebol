@@ -54,10 +54,8 @@ let pagamento = {
   //  SALVA NO BACKEND
   await apiPost("/pagamentos", pagamento)
 
-  //  ATUALIZA DO BACKEND (ESSENCIAL)
-  await carregarPagamentos()
-  mostrarInadimplentes()
-  mostrarReceitaPorMes()
+await carregarPagamentos()
+renderizarPainelCompleto()
 
 }
 
@@ -70,12 +68,8 @@ async function carregarPagamentos(){
 
   console.log("Pagamentos carregados:", pagamentos)
 
-  //mostrarPagamentos()
   renderPagamentos()
-  atualizarPainel()
-
-  // 🔥 ESSA LINHA É OBRIGATÓRIA
-  mostrarReceitaPorMes()
+  renderizarPainelCompleto()
 }
 
 function mostrarPagamentos(){
@@ -226,10 +220,7 @@ async function registrarDespesa(){
   // 🔥 ATUALIZA DADOS
   await carregarDespesas()
 
-  // 🔥 ATUALIZA PAINEL (FALTAVA ISSO)
-  mostrarDespesasPorMes()
-  mostrarResultadoFinanceiroPorMes()
-  atualizarPainel()
+  renderizarPainelCompleto()
 
   // limpar campos
   document.getElementById("descricaoDespesa").value = ""
@@ -246,7 +237,7 @@ async function carregarDespesas(){
   console.log("Despesas carregadas:", despesas)
 
   mostrarDespesas()
-  atualizarPainel()
+  renderizarPainelCompleto()
 }
 
 function mostrarDespesas(){
@@ -589,7 +580,7 @@ let data = new Date(
     `
   })
 
-  mostrarReceitaPorMes()
+  renderizarPainelCompleto()
 }
 
 function mostrarDespesasPorMes(){
@@ -894,6 +885,15 @@ async function atualizarFinanceiro(){
   mostrarReceitaPorMes()
   mostrarDespesasPorMes()
   mostrarResultadoFinanceiroPorMes()
+  atualizarPainel()
+}
+
+function renderizarPainelCompleto(){
+
+  mostrarReceitaPorMes()
+  mostrarDespesasPorMes()
+  mostrarResultadoFinanceiroPorMes()
+  mostrarInadimplentes()
   atualizarPainel()
 }
 
