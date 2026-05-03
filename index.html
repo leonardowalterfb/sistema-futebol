@@ -719,6 +719,18 @@ await Promise.all([
   carregarModalidade()
 ])
 
+// 🔥 RENDERIZA TUDO DO PAINEL
+mostrarReceitaPorMes()
+mostrarDespesasPorMes()
+mostrarResultadoFinanceiroPorMes()
+mostrarInadimplentes()
+atualizarPainel()
+mostrarAniversarios()
+mostrarRanking()
+
+// 🔥 AGORA SIM
+mostrarSecao("painel")
+
 let dataSalva = localStorage.getItem("dataJogo")
 let localSalvo = localStorage.getItem("localJogo")
 
