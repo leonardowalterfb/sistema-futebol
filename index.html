@@ -696,13 +696,13 @@ let dashboard = await carregarDashboard()
   document.getElementById("totalDespesas").innerText = formatarMoeda(dashboard.totalDespesas)
   document.getElementById("saldoTurma").innerText = formatarMoeda(dashboard.saldo)
 
-  await carregarPagamentos()
-  await carregarDespesas()
-  await carregarJogadores()
-  await carregarRanking()
-  await carregarModalidade()
-  mostrarSecao("painel")
-}
+await Promise.all([
+  carregarPagamentos(),
+  carregarDespesas(),
+  carregarJogadores(),
+  carregarRanking(),
+  carregarModalidade()
+])
 
 let dataSalva = localStorage.getItem("dataJogo")
 let localSalvo = localStorage.getItem("localJogo")
@@ -1694,28 +1694,29 @@ atualizarBotaoPagamento()
   document.getElementById("telaLogin").style.display = "none"
   document.getElementById("sistema").style.display = "flex"
 
-  await carregarJogadores()
-  await carregarPagamentos()
-  await carregarDespesas()
-  await carregarRanking()
-  await carregarReceitas()
-  mostrarReceitaPorMes()
-  mostrarDespesasPorMes()
-  mostrarResultadoFinanceiroPorMes()
+  //await carregarJogadores()
+  //await carregarPagamentos()
+  //await carregarDespesas()
+  //await carregarRanking()
+  //await carregarReceitas()
+  //mostrarReceitaPorMes()
+  //mostrarDespesasPorMes()
+  //mostrarResultadoFinanceiroPorMes()
 
-  atualizarSelectJogadores()
+  //atualizarSelectJogadores()
   //mostrarPagamentos()
-  renderPagamentos()
-  mostrarInadimplentes()
-  atualizarPainel()
-  mostrarAniversarios()
-  mostrarPresenca()
-  await carregarHistorico()
-  mostrarRanking()
-  mostrarDespesas()
-  mostrarSecao("painel")
-  verificarConfirmacaoLink()
-  atualizarTituloSistema()
+  //renderPagamentos()
+  //mostrarInadimplentes()
+  //atualizarPainel()
+  //mostrarAniversarios()
+  //mostrarPresenca()
+  //await carregarHistorico()
+  //mostrarRanking()
+  //mostrarDespesas()
+  //mostrarSecao("painel")
+  //verificarConfirmacaoLink()
+  //atualizarTituloSistema()
+  await iniciarSistema()
 })
 
 </script>
