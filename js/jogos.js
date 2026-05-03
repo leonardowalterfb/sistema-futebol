@@ -43,17 +43,24 @@ async function criarJogo(){
   }
 
   // 🔥 RESET TOTAL
-  presencas = []
+ presencas = []
 
-  for(let i = 0; i < jogadores.length; i++){
-    if(jogadores[i].status === "ativo"){
-      presencas.push({
-        nome: jogadores[i].nome,
-        confirmado: false,
-        respondido: false
-      })
-    }
+let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+let turmaId = usuario.turma_id
+
+let jogadoresAtuais = await apiGet(`/jogadores/${turmaId}`)
+
+for(let i = 0; i < jogadoresAtuais.length; i++){
+
+  if(jogadoresAtuais[i].status === "ativo"){
+
+    presencas.push({
+      nome: jogadoresAtuais[i].nome,
+      confirmado: false,
+      respondido: false
+    })
   }
+}
 
   jogoAberto = true
 
