@@ -358,14 +358,21 @@ app.get("/usuarios/:turmaId", async (req, res) => {
 app.post("/usuarios", async (req, res) => {
   try {
     const { nome, login, senha, turma_id } = req.body
+    
+let hash = null
+let primeiro_acesso = true
 
-    const hash = await bcrypt.hash(senha, 10)
+if(senha && senha.trim() !== ""){
+  hash = await bcrypt.hash(senha, 10)
+  primeiro_acesso = false
+}
 
-    await pool.query(
-      `INSERT INTO usuarios (nome, login, senha, turma_id)
-       VALUES ($1,$2,$3,$4)`,
-      [nome, login, hash, turma_id]
-    )
+await pool.query(
+  `INSERT INTO usuarios (nome, login, senha, turma_id, primeiro_acesso)
+   VALUES ($1,$2,$3,$4,$5)`,
+  [nome, login, hash, turma_id, primeiro_acesso]
+)
+    
 
     res.json({ ok: true })
   } catch (err) {

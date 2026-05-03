@@ -1250,10 +1250,10 @@ async function cadastrarUsuario(){
   let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
   let turma_id = usuario.turma_id
 
-  if(!nome || !login || !senha){
-    mostrarToast("Preencha todos os campos")
-    return
-  }
+ if(!nome || !login){
+  mostrarToast("Preencha nome e login")
+  return
+}
 
   // 🔥 EDITAR
   if(usuarioEditando){
