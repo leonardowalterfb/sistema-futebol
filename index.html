@@ -734,21 +734,6 @@ setTimeout(() => {
 let dataSalva = localStorage.getItem("dataJogo")
 let localSalvo = localStorage.getItem("localJogo")
 
-//const mapaMeses = {
- // "Janeiro": 1,
-//  "Fevereiro": 2,
- // "Março": 3,
- // "Abril": 4,
- // "Maio": 5,
- // "Junho": 6,
- // "Julho": 7,
- // "Agosto": 8,
- // "Setembro": 9,
-//  "Outubro": 10,
- // "Novembro": 11,
- // "Dezembro": 12
-//}
-
 if(dataSalva){
   document.getElementById("dataJogo").value = dataSalva
 }
@@ -932,8 +917,6 @@ if(typeof receitas !== "undefined"){
   }
 }
 
-//totalAno += totalReceitas
-
 document.getElementById("totalDespesas").innerText =
 "Total de Despesas: "+formatarMoeda(totalDespesas)
 
@@ -1002,7 +985,6 @@ function mostrarAniversarios(){
   </div>
 `
   }
-
 }
 
 function toggleGrupo(id, el){
@@ -1109,7 +1091,6 @@ function toggleMesDespesa(classe){
     }else{
       linhas[i].style.display = "none"
     }
-
   }
 }
 
@@ -1246,12 +1227,9 @@ tr.innerHTML =
 "<td style='text-align:left;padding-left:10px'>"+jogadores[j].nome+"</td>"
 
 grupo.appendChild(tr)
-
 }
 }
-
 lista.appendChild(grupo)
-
 }
 }
 
@@ -1467,7 +1445,6 @@ carregarPagamentos()
 carregarDespesas()
 carregarRanking()
 atualizarPainel()
-//mostrarPagamentos()
 renderPagamentos()
 mostrarDespesas()
 }
@@ -1610,8 +1587,6 @@ async function mostrarSecao(id){
     await carregarPagamentos()
     await carregarReceitas()
     await carregarDespesas()
-
-    //mostrarPagamentos()
     renderPagamentos()
     mostrarDespesas()
     mostrarReceitaPorMes()
@@ -1711,39 +1686,14 @@ if(jogoAbertoStorage){
 
   mostrarPresenca()
 }
-
 atualizarBotaoPagamento()
-
-  atualizarBotaoPagamento()
-
+atualizarBotaoPagamento()
 
   // 🔥 DAQUI PRA BAIXO SÓ EXECUTA COM TURMA DEFINIDA
 
   document.getElementById("telaLogin").style.display = "none"
   document.getElementById("sistema").style.display = "flex"
 
-  //await carregarJogadores()
-  //await carregarPagamentos()
-  //await carregarDespesas()
-  //await carregarRanking()
-  //await carregarReceitas()
-  //mostrarReceitaPorMes()
-  //mostrarDespesasPorMes()
-  //mostrarResultadoFinanceiroPorMes()
-
-  //atualizarSelectJogadores()
-  //mostrarPagamentos()
-  //renderPagamentos()
-  //mostrarInadimplentes()
-  //atualizarPainel()
-  //mostrarAniversarios()
-  //mostrarPresenca()
-  //await carregarHistorico()
-  //mostrarRanking()
-  //mostrarDespesas()
-  //mostrarSecao("painel")
-  //verificarConfirmacaoLink()
-  //atualizarTituloSistema()
 })
 
 </script>
