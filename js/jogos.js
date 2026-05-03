@@ -58,8 +58,6 @@ async function criarJogo(){
   jogoAberto = true
 
   // 🔥 SALVAR NO LOCALSTORAGE
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-  let turmaId = usuario.turma_id
 localStorage.setItem("jogoAberto", "true")
 localStorage.setItem("dataJogo", data)
 localStorage.setItem("localJogo", local)
@@ -772,7 +770,10 @@ async function limparJogo(){
   jogoAberto = false
 
   // limpar storage
-  localStorage.removeItem("jogoAtual")
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaId = usuario.turma_id
+
+localStorage.removeItem(`jogoAtual_${turmaId}`)
 
   // limpar interface
   document.getElementById("listaPresenca").innerHTML = ""
