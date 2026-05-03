@@ -201,38 +201,39 @@ function calcularTotalMes(){
 
 async function registrarDespesa(){
 
-let descricao = document.getElementById("descricaoDespesa").value
-let valor = document.getElementById("valorDespesa").value
+  let descricao = document.getElementById("descricaoDespesa").value
+  let valor = document.getElementById("valorDespesa").value
 
-if(descricao === "" || valor === ""){
-mostrarToast("Informe a descrição e o valor da despesa")
-return
-}
+  if(descricao === "" || valor === ""){
+    mostrarToast("Informe a descrição e o valor da despesa")
+    return
+  }
 
-let hoje = new Date()
+  let data = new Date().toISOString()
 
-let data = new Date().toISOString()
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaId = usuario.turma_id
 
-let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-let turmaId = usuario.turma_id
+  let despesa = {
+    descricao,
+    valor: parseFloat(valor),
+    data,
+    turma_id: turmaId
+  }
 
-let despesa = {
-  descricao:descricao,
-  valor:parseFloat(valor),
-  data:data,
-  turma_id: turmaId
-}
+  await apiPost("/despesas", despesa)
 
-// 🔥 SALVAR NO BACKEND
-await apiPost("/despesas", despesa)
+  // 🔥 ATUALIZA DADOS
+  await carregarDespesas()
 
-// 🔥 RECARREGAR DO BACKEND
-await carregarDespesas()
+  // 🔥 ATUALIZA PAINEL (FALTAVA ISSO)
+  mostrarDespesasPorMes()
+  mostrarResultadoFinanceiroPorMes()
+  atualizarPainel()
 
-// limpar campos
-document.getElementById("descricaoDespesa").value=""
-document.getElementById("valorDespesa").value=""
-
+  // limpar campos
+  document.getElementById("descricaoDespesa").value = ""
+  document.getElementById("valorDespesa").value = ""
 }
 
 async function carregarDespesas(){
@@ -880,6 +881,20 @@ function toggleMesInad(id){
   let aberto = el.style.display === "block"
 
   el.style.display = aberto ? "none" : "block"
+}
+
+async function atualizarFinanceiro(){
+
+  await Promise.all([
+    carregarPagamentos(),
+    carregarDespesas(),
+    carregarReceitas()
+  ])
+
+  mostrarReceitaPorMes()
+  mostrarDespesasPorMes()
+  mostrarResultadoFinanceiroPorMes()
+  atualizarPainel()
 }
 
 // ===== UTIL =====
