@@ -686,6 +686,32 @@ async function salvarSenha(){
   location.reload()
 }
 
+function carregarNomeTurma(){
+
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
+  if(!usuario || !usuario.turma_id) return
+
+  // 🔥 BUSCA DO BACKEND (CORRETO)
+  fetch(`https://sistema-futebol-1.onrender.com/turmas/${usuario.turma_id}`)
+    .then(res => res.json())
+    .then(turma => {
+
+      // 🔥 PREENCHE INPUT
+      let input = document.getElementById("nomeSistema")
+      if(input){
+        input.value = turma.nome || ""
+      }
+
+      // 🔥 ATUALIZA TÍTULO
+      let titulo = document.getElementById("tituloSistema")
+      if(titulo){
+        titulo.innerText = "⚽ " + (turma.nome || "Sistema")
+      }
+
+    })
+}
+
 async function iniciarSistema(){
 
   let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
