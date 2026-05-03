@@ -26,7 +26,10 @@ async function criarJogo(){
   }
 
   // 🔥 VERIFICA SE EXISTE JOGO SALVO REAL
-  let jogoSalvo = localStorage.getItem("jogoAtual")
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaId = usuario.turma_id
+
+  let jogoSalvo = localStorage.getItem(`jogoAtual_${turmaId}`)
 
   // 🔥 CORRIGE ESTADO BUGADO
   if(!jogoSalvo){
@@ -55,6 +58,8 @@ async function criarJogo(){
   jogoAberto = true
 
   // 🔥 SALVAR NO LOCALSTORAGE
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaId = usuario.turma_id
 localStorage.setItem("jogoAberto", "true")
 localStorage.setItem("dataJogo", data)
 localStorage.setItem("localJogo", local)
@@ -179,7 +184,10 @@ function voltarLista(index){
 
 function salvarJogo(){
 
-  localStorage.setItem("jogoAtual", JSON.stringify({
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaId = usuario.turma_id
+
+  localStorage.setItem(`jogoAtual_${turmaId}`, JSON.stringify({
     data: document.getElementById("dataJogo").value,
     local: document.getElementById("localJogo").value,
     presencas: presencas,
@@ -189,11 +197,9 @@ function salvarJogo(){
 
 function carregarJogoSalvo(){
 
-//let jogo = localStorage.getItem("jogoAtual")
+let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
 
-//if(!jogo) return
-
-let jogo = localStorage.getItem("jogoAtual")
+let jogo = localStorage.getItem(`jogoAtual_${usuario.turma_id}`)
 
 // 🔥 SE NÃO EXISTE → limpa tudo
 if(!jogo){
@@ -216,19 +222,14 @@ if(!jogo){
 // 🔥 VERIFICA SE JOGO JÁ FOI SALVO
 let jogoJaSalvo = sessionStorage.getItem("jogoSalvo")
 
-//if(jogoJaSalvo === "true"){
-  // 🔥 NÃO CARREGA MAIS
-  //localStorage.removeItem("jogoAtual")
-  //jogoAberto = false
-  //presencas = []
-  //return
-//}
-
 let dados = JSON.parse(jogo)
 
 // 🔥 VALIDAÇÃO INTELIGENTE
 if(!dados || !dados.presencas || dados.presencas.length === 0){
-  localStorage.removeItem("jogoAtual")
+  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaId = usuario.turma_id
+
+localStorage.removeItem(`jogoAtual_${turmaId}`)
   jogoAberto = false
   presencas = []
   return
