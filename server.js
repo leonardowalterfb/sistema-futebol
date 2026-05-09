@@ -620,10 +620,11 @@ app.get("/jogos/:turmaId", async (req, res) => {
   }
 })
 
-app.post("/jogos", async (req, res) => {
+app.post("/jogos", verificarToken, async (req, res) => {
   try {
-    const { data, local, presentes, faltaram, turma_id, usuario_id } = req.body
-    const pode = await temPermissao(usuario_id, "jogos", "salvar")
+    const { data, local, presentes, faltaram, turma_id } = req.body
+    const usuarioId = req.usuario.id
+    const pode = await temPermissao(usuarioId, "jogos", "salvar")
     if(!pode){
     return res.status(403).json({ erro: "Sem permissão" })
 }
