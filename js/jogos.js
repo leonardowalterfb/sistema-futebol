@@ -223,8 +223,8 @@ let dados = JSON.parse(jogo)
 
 // 🔥 VALIDAÇÃO INTELIGENTE
 if(!dados || !dados.presencas || dados.presencas.length === 0){
-usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-turmaId = usuario.turma_id
+let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+let turmaId = usuario.turma_id
 
 localStorage.removeItem(`jogoAtual_${turmaId}`)
   jogoAberto = false
@@ -314,9 +314,6 @@ await carregarRanking()
 // LIMPA JOGO APÓS SALVAR
 presencas = []
 jogoAberto = false
-
-// PEGA TURMA
-let usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"))
 
 // REMOVE STORAGE
 localStorage.removeItem(`jogoAtual_${turmaId}`)
