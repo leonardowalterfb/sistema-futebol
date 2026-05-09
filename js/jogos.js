@@ -196,7 +196,6 @@ function carregarJogoSalvo(){
   presencas = [] // 🔥 FORÇA LIMPEZA
 
 let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-
 let jogo = localStorage.getItem(`jogoAtual_${usuario.turma_id}`)
 
 // 🔥 SE NÃO EXISTE → limpa tudo
@@ -312,7 +311,26 @@ mostrarToast("Jogo Salvo!")
 await carregarHistorico()
 await carregarRanking()
 
-// 🔥 ATUALIZA TELA
+// LIMPA JOGO APÓS SALVAR
+presencas = []
+jogoAberto = false
+
+// PEGA TURMA
+let usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"))
+let turmaId = usuarioLogado.turma_id
+
+// REMOVE STORAGE
+localStorage.removeItem(`jogoAtual_${turmaId}`)
+localStorage.removeItem(`jogoAberto_${turmaId}`)
+localStorage.removeItem(`dataJogo_${turmaId}`)
+localStorage.removeItem(`localJogo_${turmaId}`)
+localStorage.removeItem(`presencas_${turmaId}`)
+
+// LIMPA INPUTS
+document.getElementById("dataJogo").value = ""
+document.getElementById("localJogo").value = ""
+
+// LIMPA LISTAS
 mostrarPresenca()
 
 }
