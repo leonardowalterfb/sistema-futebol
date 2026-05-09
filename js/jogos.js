@@ -317,7 +317,6 @@ jogoAberto = false
 
 // PEGA TURMA
 let usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"))
-let turmaId = usuarioLogado.turma_id
 
 // REMOVE STORAGE
 localStorage.removeItem(`jogoAtual_${turmaId}`)
