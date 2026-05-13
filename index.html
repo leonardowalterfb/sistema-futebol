@@ -986,7 +986,13 @@ function mostrarAniversarios(){
     .filter(j => j.nascimento)
     .map(j => {
 
-      let nascimento = new Date(j.nascimento)
+      let partes = j.nascimento.split("-")
+
+let nascimento = new Date(
+  partes[0],
+  partes[1] - 1,
+  partes[2]
+)
 
       let aniversario = new Date(
         hoje.getFullYear(),
