@@ -17,9 +17,23 @@ let res = await fetch(API + url, {
 
     let data = await res.json()
 
-    if(!res.ok){
-      throw data
-    }
+    if(res.status === 401){
+
+  localStorage.removeItem("token")
+  localStorage.removeItem("usuarioLogado")
+
+  mostrarToast("Sessão expirada. Faça login novamente.")
+
+  setTimeout(() => {
+    location.reload()
+  }, 1000)
+
+  throw data
+}
+
+if(!res.ok){
+  throw data
+}
 
     return data
 
@@ -27,7 +41,11 @@ let res = await fetch(API + url, {
 
     console.error("Erro API:", e)
 
-    mostrarToast("⚠️ Servidor offline ou indisponível")
+    if(e.erro){
+  mostrarToast(e.erro)
+}else{
+  mostrarToast("⚠️ Servidor offline ou indisponível")
+}
 
     //return []
     throw e
@@ -56,9 +74,23 @@ async function apiPost(url, body){
     throw { erro: "Erro inesperado do servidor" }
   }
 
-  if(!res.ok){
-    throw data
-  }
+  if(res.status === 401){
+
+  localStorage.removeItem("token")
+  localStorage.removeItem("usuarioLogado")
+
+  mostrarToast("Sessão expirada")
+
+  setTimeout(() => {
+    location.reload()
+  }, 1000)
+
+  throw data
+}
+
+if(!res.ok){
+  throw data
+}
 
   return data
 }
@@ -85,9 +117,23 @@ async function apiPut(url, body){
     throw new Error("Erro inesperado do servidor")
   }
 
-  if(!res.ok){
-    throw new Error(data.erro || "Erro ao atualizar")
-  }
+ if(res.status === 401){
+
+  localStorage.removeItem("token")
+  localStorage.removeItem("usuarioLogado")
+
+  mostrarToast("Sessão expirada")
+
+  setTimeout(() => {
+    location.reload()
+  }, 1000)
+
+  throw data
+}
+
+if(!res.ok){
+  throw new Error(data.erro || "Erro ao atualizar")
+}
 
   return data
 }
@@ -113,9 +159,23 @@ async function apiDelete(url){
     throw { erro: "Erro inesperado ao deletar" }
   }
 
-  if(!res.ok){
-    throw data
-  }
+  if(res.status === 401){
+
+  localStorage.removeItem("token")
+  localStorage.removeItem("usuarioLogado")
+
+  mostrarToast("Sessão expirada")
+
+  setTimeout(() => {
+    location.reload()
+  }, 1000)
+
+  throw data
+}
+
+if(!res.ok){
+  throw data
+}
 
   return data
 }
