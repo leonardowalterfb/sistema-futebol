@@ -973,65 +973,92 @@ document.getElementById("saldoTurma").innerText =
 
 function mostrarAniversarios(){
 
-  let hoje = new Date()
-  hoje.setHours(0,0,0,0)
-
-  let limite = new Date()
-  limite.setDate(hoje.getDate() + 30)
-
   let lista = document.getElementById("listaAniversarios")
+
+  if(!lista) return
+
   lista.innerHTML = ""
 
-  let aniversarios = jogadores
-    .filter(j => j.nascimento)
-    .map(j => {
+  let hoje = new Date()
 
-      let partes = j.nascimento.split("-")
+  let proximos = []
 
-let nascimento = new Date(
-  partes[0],
-  partes[1] - 1,
-  partes[2]
-)
+  for(let j of jogadores){
 
-      let aniversario = new Date(
-        hoje.getFullYear(),
-        nascimento.getMonth(),
-        nascimento.getDate()
-      )
+    if(!j.nascimento) continue
 
-      // se já passou esse ano → joga pro próximo
-      if(aniversario < hoje){
-        aniversario.setFullYear(hoje.getFullYear() + 1)
-      }
+    // 🔥 PARSE CORRETO
+    let partes = j.nascimento.split("-")
 
-      return {
-        ...j,
-        proximaData: aniversario
-      }
-    })
-    // 🔥 FILTRA APENAS PRÓXIMOS 30 DIAS
-    .filter(j => j.proximaData <= limite)
-    // 🔥 ORDENA
-    .sort((a, b) => a.proximaData - b.proximaData)
+    let dia = parseInt(partes[2])
+    let mes = parseInt(partes[1]) - 1
 
-  // 🔥 MOSTRAR
-  for(let i=0;i<aniversarios.length;i++){
+    // 🔥 ANIVERSÁRIO NO ANO ATUAL
+    let aniversario = new Date(
+      hoje.getFullYear(),
+      mes,
+      dia
+    )
 
-    let j = aniversarios[i]
+    // 🔥 SE JÁ PASSOU, JOGA PRO ANO QUE VEM
+    if(aniversario < hoje){
+      aniversario.setFullYear(hoje.getFullYear() + 1)
+    }
 
-    let dataFormatada = formatarDataBR(j.nascimento)
-    let idade = calcularIdade(j.nascimento)
+    // 🔥 DIFERENÇA EM DIAS
+    let diff = Math.ceil(
+      (aniversario - hoje) / (1000 * 60 * 60 * 24)
+    )
 
-    let isHoje = j.proximaData.toDateString() === hoje.toDateString()
+    // 🔥 PRÓXIMOS 30 DIAS
+    if(diff >= 0 && diff <= 30){
 
-   lista.innerHTML += `
-  <div class="card-aniversario ${isHoje ? "hoje" : ""}">
-    <strong>${isHoje ? "🎉 HOJE! " : "🎂 "} ${j.nome}</strong><br>
-    📅 ${dataFormatada}<br>
-    🎂 ${idade} anos
-  </div>
-`
+      let idade =
+        hoje.getFullYear() - parseInt(partes[0])
+
+      proximos.push({
+        nome: j.nome,
+        data: aniversario,
+        nascimento: j.nascimento,
+        idade,
+        dias: diff
+      })
+    }
+  }
+
+  // 🔥 ORDENA MAIS PRÓXIMOS
+  proximos.sort((a,b) => a.dias - b.dias)
+
+  if(proximos.length === 0){
+
+    lista.innerHTML = `
+      <div class="sem-aniversarios">
+        Nenhum aniversário nos próximos 30 dias
+      </div>
+    `
+
+    return
+  }
+
+  for(let a of proximos){
+
+    let texto = ""
+
+    if(a.dias === 0){
+      texto = "🎉 HOJE!"
+    } else if(a.dias === 1){
+      texto = "🎂 Amanhã"
+    } else {
+      texto = `🎈 Em ${a.dias} dias`
+    }
+
+    lista.innerHTML += `
+      <div class="card-aniversario">
+        <strong>${texto} ${a.nome}</strong><br>
+        📅 ${formatarDataBR(a.nascimento)}<br>
+        🎂 ${a.idade} anos
+      </div>
+    `
   }
 }
 
