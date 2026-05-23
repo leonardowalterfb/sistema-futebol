@@ -740,6 +740,7 @@ let dashboard = await carregarDashboard()
 await Promise.all([
   carregarPagamentos(),
   carregarDespesas(),
+  carregarReceitas(),
   carregarJogadores(),
   carregarRanking(),
   carregarModalidade(),
@@ -1517,6 +1518,7 @@ function confirmarTurma(){
 carregarJogadores()
 carregarPagamentos()
 carregarDespesas()
+carregarReceitas()
 carregarRanking()
 atualizarPainel()
 renderPagamentos()
