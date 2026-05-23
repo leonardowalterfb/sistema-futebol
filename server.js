@@ -777,10 +777,24 @@ app.get("/dashboard/:turmaId", async (req, res) => {
       [turmaId]
     )
 
+    // 🔹 OUTRAS RECEITAS
+const receitas = await pool.query(
+  "SELECT * FROM receitas WHERE turma_id = $1",
+  [turmaId]
+)
+
     // 🔹 CALCULOS
     const totalPagamentos = pagamentos.rows.length
 
-    const totalAno = pagamentos.rows.reduce((acc, p) => acc + Number(p.valor), 0)
+    const totalPagamentos = pagamentos.rows.reduce(
+  (acc, p) => acc + Number(p.valor),
+  0
+)
+const totalReceitas = receitas.rows.reduce(
+  (acc, r) => acc + Number(r.valor),
+  0
+)
+const totalAno = totalPagamentos + totalReceitas
 
     const totalDespesas = despesas.rows.reduce((acc, d) => acc + Number(d.valor), 0)
 
@@ -794,9 +808,21 @@ app.get("/dashboard/:turmaId", async (req, res) => {
 
     const mesAtual = nomesMeses[new Date().getMonth()]
 
-    const totalMesAtual = pagamentos.rows
-    .filter(p => p.mes === mesAtual)
-    .reduce((acc, p) => acc + Number(p.valor), 0)
+    const totalPagamentosMes = pagamentos.rows
+  .filter(p => p.mes === mesAtual)
+  .reduce((acc, p) => acc + Number(p.valor), 0)
+
+const totalReceitasMes = receitas.rows
+  .filter(r => {
+
+    let data = new Date(r.data)
+
+    return nomesMeses[data.getMonth()] === mesAtual
+  })
+  .reduce((acc, r) => acc + Number(r.valor), 0)
+
+const totalMesAtual =
+  totalPagamentosMes + totalReceitasMes
 
     res.json({
       totalJogadores: Number(jogadores.rows[0].count),
