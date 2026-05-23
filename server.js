@@ -784,7 +784,7 @@ const receitas = await pool.query(
 )
 
     // 🔹 CALCULOS
-    const totalPagamentos = pagamentos.rows.length
+    const quantidadePagamentos = pagamentos.rows.length
 
     const totalPagamentos = pagamentos.rows.reduce(
   (acc, p) => acc + Number(p.valor),
