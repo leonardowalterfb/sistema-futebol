@@ -78,11 +78,37 @@ function logout(){
 //VALOR MENSALIDADE 
 
 function setMensalidade(valor){
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-  localStorage.setItem("mensalidade_" + usuario.turma_id, valor)
+
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
+
+  if(!turmaSelecionada){
+    console.warn("Nenhuma turma selecionada")
+    return
+  }
+
+  let turmaId = Number(turmaSelecionada.turma_id)
+
+  localStorage.setItem("mensalidade_" + turmaId, valor)
+
 }
 
 function getMensalidade(){
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-  return Number(localStorage.getItem("mensalidade_" + usuario.turma_id) || 0)
+
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
+
+  if(!turmaSelecionada){
+    console.warn("Nenhuma turma selecionada")
+    return 0
+  }
+
+  let turmaId = Number(turmaSelecionada.turma_id)
+
+  return Number(
+    localStorage.getItem("mensalidade_" + turmaId) || 0
+  )
+
 }

@@ -55,11 +55,76 @@ function verificarToken(req, res, next){
   }
 }
 
-async function temPermissao(usuarioId, modulo, acao){
+async function verificarAcessoTurma(req, res, next) {
+
+  const turmaId = Number(req.params.turmaId)
+
+  if (!Number.isInteger(turmaId)) {
+    return res.status(400).json({
+      erro: "Turma inválida"
+    })
+  }
+
+  try {
+
+    // Verifica se o usuário existe e se é master
+    const usuarioResult = await pool.query(
+      `SELECT is_master
+       FROM usuarios
+       WHERE id = $1`,
+      [req.usuario.id]
+    )
+
+    if (usuarioResult.rows.length === 0) {
+      return res.status(401).json({
+        erro: "Usuário não encontrado"
+      })
+    }
+
+    const usuario = usuarioResult.rows[0]
+
+    // Usuário master pode acessar qualquer turma
+    if (usuario.is_master === true) {
+      return next()
+    }
+
+    // Usuário normal precisa possuir vínculo com a turma
+    const acesso = await pool.query(
+      `SELECT id, perfil, jogador_id
+       FROM usuarios_turmas
+       WHERE usuario_id = $1
+         AND turma_id = $2`,
+      [req.usuario.id, turmaId]
+    )
+
+    if (acesso.rows.length === 0) {
+      return res.status(403).json({
+        erro: "Você não tem acesso a esta turma"
+      })
+    }
+
+    // Guarda o vínculo da turma na requisição
+    req.usuarioTurma = acesso.rows[0]
+
+    next()
+
+  } catch (err) {
+
+    console.error("Erro ao verificar acesso à turma:", err)
+
+    return res.status(500).json({
+      erro: "Erro ao verificar acesso à turma"
+    })
+  }
+}
+
+async function temPermissao(usuarioId, turmaId, modulo, acao){
 
   // 🔥 verifica se é master
   const user = await pool.query(
-    "SELECT is_master FROM usuarios WHERE id = $1",
+    `SELECT is_master
+     FROM usuarios
+     WHERE id = $1`,
     [usuarioId]
   )
 
@@ -67,14 +132,21 @@ async function temPermissao(usuarioId, modulo, acao){
     return true
   }
 
-  // 🔥 verifica permissões normais
+  // 🔥 verifica a permissão do usuário dentro da turma
   const result = await pool.query(
-    `SELECT permitido FROM permissoes 
-     WHERE usuario_id = $1 AND modulo = $2 AND acao = $3`,
-    [usuarioId, modulo, acao]
+    `SELECT p.permitido
+     FROM permissoes p
+     INNER JOIN usuarios_turmas ut
+       ON ut.id = p.usuario_turma_id
+     WHERE ut.usuario_id = $1
+       AND ut.turma_id = $2
+       AND p.modulo = $3
+       AND p.acao = $4`,
+    [usuarioId, turmaId, modulo, acao]
   )
 
-  return result.rows.length > 0 && result.rows[0].permitido === true
+  return result.rows.length > 0 &&
+         result.rows[0].permitido === true
 }
 
 //const db = require("./config/db")
@@ -100,22 +172,54 @@ app.get("/teste-jogadores", async (req, res) => {
   }
 })
 // ================= JOGADORES =================
-app.get("/jogadores/:turmaId", verificarToken, async (req, res) => {
-  try {
-    const { turmaId } = req.params
+app.get(
+  "/jogadores/:turmaId",
+  verificarToken,
+  verificarAcessoTurma,
+  async (req, res) => {
 
-    const result = await pool.query(
-  "SELECT * FROM jogadores WHERE turma_id = $1 ORDER BY nome",
-  [turmaId]
-)
+    try {
 
-    res.json(result.rows)
+      const { turmaId } = req.params
 
-  } catch (err) {
-    console.error("Erro ao buscar jogadores:", err)
-    res.status(500).json({ erro: err.message })
+      // JOGADOR
+      if(req.usuarioTurma?.perfil === "JOGADOR"){
+
+        const result = await pool.query(
+          `SELECT
+              nome,
+              posicao
+           FROM jogadores
+           WHERE turma_id = $1
+             AND status = 'ativo'
+           ORDER BY nome`,
+          [turmaId]
+        )
+
+        return res.json(result.rows)
+      }
+
+      // ADMIN
+      const result = await pool.query(
+        `SELECT *
+         FROM jogadores
+         WHERE turma_id = $1
+         ORDER BY nome`,
+        [turmaId]
+      )
+
+      res.json(result.rows)
+
+    } catch (err) {
+
+      console.error("Erro ao buscar jogadores:", err)
+
+      res.status(500).json({
+        erro: err.message
+      })
+    }
   }
-})
+)
 
 app.post("/jogadores", verificarToken, async (req, res) => {
   try {
@@ -124,7 +228,7 @@ app.post("/jogadores", verificarToken, async (req, res) => {
 
     // VALIDA PERMISSÃO
     const usuarioId = req.usuario.id
-const pode = await temPermissao(usuarioId, "jogadores", "cadastrar")
+const pode = await temPermissao(usuarioId, j.turma_id, "jogadores", "cadastrar")
 
     if(!pode){
       return res.status(403).json({ erro: "Sem permissão" })
@@ -145,13 +249,14 @@ const pode = await temPermissao(usuarioId, "jogadores", "cadastrar")
 
 const result = await pool.query(
   `INSERT INTO jogadores
-   (nome, telefone, cpf, nascimento, posicao, nivel, turma_id, data_cadastro, status)
-   VALUES ($1,$2,$3,$4,$5,$6,$7,NOW(),'ativo')
+   (nome, telefone, cpf, email, nascimento, posicao, nivel, turma_id, data_cadastro, status)
+   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,NOW(),'ativo')
    RETURNING id`,
   [
     j.nome,
     j.telefone,
     cpfLimpo,
+    j.email || null,
     j.nascimento,
     j.posicao,
     j.nivel || "prata",
@@ -171,8 +276,28 @@ app.put("/jogadores/:id", verificarToken, async (req, res) => {
     const { id } = req.params
     const d = req.body
 
-    const usuarioId = req.usuario.id
-const pode = await temPermissao(usuarioId, "jogadores", "editar")
+const usuarioId = req.usuario.id
+
+const jogador = await pool.query(
+  `SELECT turma_id
+   FROM jogadores
+   WHERE id = $1`,
+  [id]
+)
+
+if (jogador.rows.length === 0) {
+  return res.status(404).json({ erro: "Jogador não encontrado" })
+}
+
+const turmaId = jogador.rows[0].turma_id
+
+const pode = await temPermissao(
+  usuarioId,
+  turmaId,
+  "jogadores",
+  "editar"
+)
+
 if(!pode){
   return res.status(403).json({ erro: "Sem permissão" })
 }
@@ -187,16 +312,26 @@ if(!pode){
 
     const cpfLimpo = d.cpf.replace(/\D/g, "")
 
-    await pool.query(
+await pool.query(
   `UPDATE jogadores SET
   nome=$1,
   telefone=$2,
   cpf=$3,
-  nascimento=$4,
-  posicao=$5,
-  nivel=$6
-  WHERE id=$7`,
-  [d.nome, d.telefone, cpfLimpo, d.nascimento, d.posicao, d.nivel || "prata", id]
+  email=$4,
+  nascimento=$5,
+  posicao=$6,
+  nivel=$7
+  WHERE id=$8`,
+  [
+    d.nome,
+    d.telefone,
+    cpfLimpo,
+    d.email || null,
+    d.nascimento,
+    d.posicao,
+    d.nivel || "prata",
+    id
+  ]
 )
 
     res.json({ ok: true })
@@ -209,9 +344,29 @@ if(!pode){
 app.delete("/jogadores/:id", verificarToken, async (req, res) => {
   try {
     const usuarioId = req.usuario.id
-const pode = await temPermissao(usuarioId, "jogadores", "excluir")
-    if(!pode){
-    return res.status(403).json({ erro: "Sem permissão" })
+
+const jogador = await pool.query(
+  `SELECT turma_id
+   FROM jogadores
+   WHERE id = $1`,
+  [req.params.id]
+)
+
+if (jogador.rows.length === 0) {
+  return res.status(404).json({ erro: "Jogador não encontrado" })
+}
+
+const turmaId = jogador.rows[0].turma_id
+
+const pode = await temPermissao(
+  usuarioId,
+  turmaId,
+  "jogadores",
+  "excluir"
+)
+
+if(!pode){
+  return res.status(403).json({ erro: "Sem permissão" })
 }
     await pool.query("DELETE FROM jogadores WHERE id=$1", [req.params.id])
     res.json({ ok: true })
@@ -221,7 +376,8 @@ const pode = await temPermissao(usuarioId, "jogadores", "excluir")
 })
 
 // ================= PAGAMENTOS =================
-app.get("/pagamentos/:turmaId", async (req, res) => {
+app.get(
+  "/pagamentos/:turmaId", verificarToken, verificarAcessoTurma, async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT * FROM pagamentos WHERE turma_id=$1",
@@ -238,13 +394,18 @@ app.post("/pagamentos", verificarToken, async (req, res) => {
 
     const usuarioId = req.usuario.id
 
-    const pode = await temPermissao(usuarioId, "financeiro", "registrar")
-    if(!pode){
-      return res.status(403).json({ erro: "Sem permissão" })
-    }
+const { jogador_id, jogador, mes, valor, data, turma_id } = req.body
 
-    // 🔥 AQUI ESTAVA FALTANDO
-    const { jogador_id, jogador, mes, valor, data, turma_id } = req.body
+const pode = await temPermissao(
+  usuarioId,
+  turma_id,
+  "financeiro",
+  "registrar"
+)
+
+if(!pode){
+  return res.status(403).json({ erro: "Sem permissão" })
+}
 
     const existe = await pool.query(
       "SELECT id FROM pagamentos WHERE jogador_nome=$1 AND mes=$2 AND turma_id=$3",
@@ -269,22 +430,56 @@ app.post("/pagamentos", verificarToken, async (req, res) => {
   }
 })
 
-app.delete("/pagamentos/:id", async (req, res) => {
+app.delete("/pagamentos/:id", verificarToken, async (req, res) => {
   try {
+
     const usuarioId = req.usuario.id
-    const pode = await temPermissao(usuario_id, "financeiro", "excluir")
+
+    const pagamento = await pool.query(
+      `SELECT turma_id
+       FROM pagamentos
+       WHERE id = $1`,
+      [req.params.id]
+    )
+
+    if (pagamento.rows.length === 0) {
+      return res.status(404).json({
+        erro: "Pagamento não encontrado"
+      })
+    }
+
+    const turmaId = pagamento.rows[0].turma_id
+
+    const pode = await temPermissao(
+      usuarioId,
+      turmaId,
+      "financeiro",
+      "excluir"
+    )
+
     if(!pode){
-  return res.status(403).json({ erro: "Sem permissão" })
-}
-    await pool.query("DELETE FROM pagamentos WHERE id=$1", [req.params.id])
+      return res.status(403).json({
+        erro: "Sem permissão"
+      })
+    }
+
+    await pool.query(
+      "DELETE FROM pagamentos WHERE id=$1",
+      [req.params.id]
+    )
+
     res.json({ ok: true })
+
   } catch (err) {
-    res.status(500).json({ erro: err.message })
+    console.error("ERRO AO EXCLUIR PAGAMENTO:", err)
+    res.status(500).json({
+      erro: err.message
+    })
   }
 })
 
 // ================= DESPESAS =================
-app.get("/despesas/:turmaId", verificarToken, async (req, res) => {
+app.get("/despesas/:turmaId", verificarToken, verificarAcessoTurma, async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT * FROM despesas WHERE turma_id=$1",
@@ -301,12 +496,18 @@ app.post("/despesas", verificarToken, async (req, res) => {
 
     const usuarioId = req.usuario.id
 
-    const pode = await temPermissao(usuarioId, "financeiro", "registrar")
-    if(!pode){
-      return res.status(403).json({ erro: "Sem permissão" })
-    }
+const { descricao, valor, data, turma_id } = req.body
 
-    const { descricao, valor, data, turma_id } = req.body
+const pode = await temPermissao(
+  usuarioId,
+  turma_id,
+  "financeiro",
+  "registrar"
+)
+
+if(!pode){
+  return res.status(403).json({ erro: "Sem permissão" })
+}
 
     await pool.query(
       `INSERT INTO despesas (descricao, valor, data, turma_id)
@@ -327,10 +528,33 @@ app.delete("/despesas/:id", verificarToken, async (req, res) => {
 
     const usuarioId = req.usuario.id
 
-    const pode = await temPermissao(usuarioId, "financeiro", "excluir")
-    if(!pode){
-      return res.status(403).json({ erro: "Sem permissão" })
-    }
+const despesa = await pool.query(
+  `SELECT turma_id
+   FROM despesas
+   WHERE id = $1`,
+  [req.params.id]
+)
+
+if (despesa.rows.length === 0) {
+  return res.status(404).json({
+    erro: "Despesa não encontrada"
+  })
+}
+
+const turmaId = despesa.rows[0].turma_id
+
+const pode = await temPermissao(
+  usuarioId,
+  turmaId,
+  "financeiro",
+  "excluir"
+)
+
+if(!pode){
+  return res.status(403).json({
+    erro: "Sem permissão"
+  })
+}
 
     await pool.query("DELETE FROM despesas WHERE id=$1", [req.params.id])
 
@@ -343,105 +567,262 @@ app.delete("/despesas/:id", verificarToken, async (req, res) => {
 })
 
 // ================= USUÁRIOS =================
-app.get("/usuarios/:turmaId", async (req, res) => {
+app.get("/usuarios/:turmaId", verificarToken, verificarAcessoTurma, async (req, res) => {
   try {
+
+    const turmaId = Number(req.params.turmaId)
+
     const result = await pool.query(
-      "SELECT * FROM usuarios WHERE turma_id=$1",
-      [req.params.turmaId]
+      `
+      SELECT
+        u.id,
+        u.nome,
+        u.email,
+        u.cpf,
+        ut.id AS usuario_turma_id,
+        ut.perfil,
+        ut.jogador_id,
+        j.nome AS jogador_nome
+      FROM usuarios_turmas ut
+      INNER JOIN usuarios u
+        ON u.id = ut.usuario_id
+      LEFT JOIN jogadores j
+        ON j.id = ut.jogador_id
+      WHERE ut.turma_id = $1
+      ORDER BY u.nome
+      `,
+      [turmaId]
     )
+
     res.json(result.rows)
+
   } catch (err) {
-    res.status(500).json({ erro: err.message })
+
+    console.error("ERRO AO CARREGAR USUÁRIOS:", err)
+
+    res.status(500).json({
+      erro: "Erro ao carregar usuários"
+    })
   }
 })
 
-app.post("/usuarios", async (req, res) => {
+app.post("/usuarios/:turmaId", verificarToken, verificarAcessoTurma, async (req, res) => {
   try {
-    const { nome, login, senha, turma_id } = req.body
-    
-let hash = null
-let primeiro_acesso = true
 
-if(senha && senha.trim() !== ""){
-  hash = await bcrypt.hash(senha, 10)
-  primeiro_acesso = false
-}
+    const {
+      nome,
+      email,
+      cpf,
+      perfil,
+      jogador_id
+    } = req.body
 
-await pool.query(
-  `INSERT INTO usuarios (nome, login, senha, turma_id, primeiro_acesso)
-   VALUES ($1,$2,$3,$4,$5)`,
-  [nome, login, hash, turma_id, primeiro_acesso]
-)
-    
+    const turmaId = Number(req.params.turmaId)
 
-    res.json({ ok: true })
-  } catch (err) {
-    res.status(500).json({ erro: err.message })
-  }
-})
-
-app.put("/usuarios/:id", async (req, res) => {
-  try {
-    const { id } = req.params
-    const { nome, login, senha, turma_id } = req.body
-
-    let query
-    let params
-
-    if(senha){
-      const hash = await bcrypt.hash(senha, 10)
-
-      query = `
-        UPDATE usuarios 
-        SET nome=$1, login=$2, senha=$3, turma_id=$4
-        WHERE id=$5
-      `
-      params = [nome, login, hash, turma_id, id]
-
-    } else {
-
-      query = `
-        UPDATE usuarios 
-        SET nome=$1, login=$2, turma_id=$3
-        WHERE id=$4
-      `
-      params = [nome, login, turma_id, id]
+    if (!nome || !nome.trim()) {
+      return res.status(400).json({
+        erro: "Nome é obrigatório"
+      })
     }
 
-    await pool.query(query, params)
+    if (!email && !cpf) {
+      return res.status(400).json({
+        erro: "Informe o e-mail ou CPF"
+      })
+    }
 
-    res.json({ ok: true })
+    if (!["ADMIN", "JOGADOR"].includes(perfil)) {
+      return res.status(400).json({
+        erro: "Perfil inválido"
+      })
+    }
 
-  } catch (err) {
-    res.status(500).json({ erro: err.message })
+    if (perfil === "JOGADOR" && !jogador_id) {
+      return res.status(400).json({
+        erro: "Selecione o jogador"
+      })
+    }
+
+    // Apenas administrador ou usuário master pode cadastrar usuários
+    if (
+      req.usuario.is_master !== true &&
+      req.usuarioTurma?.perfil !== "ADMIN"
+    ) {
+      return res.status(403).json({
+        erro: "Você não tem permissão para cadastrar usuários"
+      })
+    }
+
+    // Verifica se e-mail já existe
+    if (email && email.trim()) {
+
+      const emailExistente = await pool.query(
+        `
+        SELECT id
+        FROM usuarios
+        WHERE LOWER(email) = LOWER($1)
+        `,
+        [email.trim()]
+      )
+
+      if (emailExistente.rows.length > 0) {
+        return res.status(409).json({
+          erro: "Este e-mail já está cadastrado"
+        })
+      }
+    }
+
+    // Verifica se CPF já existe
+    if (cpf && cpf.trim()) {
+
+      const cpfExistente = await pool.query(
+        `
+        SELECT id
+        FROM usuarios
+        WHERE cpf = $1
+        `,
+        [cpf.trim()]
+      )
+
+      if (cpfExistente.rows.length > 0) {
+        return res.status(409).json({
+          erro: "Este CPF já está cadastrado"
+        })
+      }
+    }
+
+    // Se for jogador, verifica se o jogador pertence à turma
+if (jogador_id) {
+
+  const jogador = await pool.query(
+    `
+    SELECT id
+    FROM jogadores
+    WHERE id = $1
+      AND turma_id = $2
+    `,
+    [jogador_id, turmaId]
+  )
+
+  if (jogador.rows.length === 0) {
+    return res.status(400).json({
+      erro: "O jogador não pertence a esta turma"
+    })
   }
-})
 
-app.delete("/usuarios/:id", async (req, res) => {
-  try {
-    await pool.query("DELETE FROM usuarios WHERE id=$1", [req.params.id])
-    res.json({ ok: true })
+  // Verifica se o jogador já possui uma conta nesta turma
+  const usuarioExistente = await pool.query(
+    `
+    SELECT ut.id
+    FROM usuarios_turmas ut
+    WHERE ut.jogador_id = $1
+      AND ut.turma_id = $2
+    `,
+    [jogador_id, turmaId]
+  )
+
+  if (usuarioExistente.rows.length > 0) {
+    return res.status(409).json({
+      erro: "Este jogador já possui uma conta de acesso nesta turma"
+    })
+  }
+}
+
+    // Cria o usuário sem senha.
+    // Ele deverá definir a senha no primeiro acesso.
+    const usuarioResult = await pool.query(
+      `
+      INSERT INTO usuarios (
+        nome,
+        email,
+        cpf,
+        senha,
+        primeiro_acesso
+      )
+      VALUES ($1, $2, $3, NULL, true)
+      RETURNING id
+      `,
+      [
+        nome.trim(),
+        email ? email.trim() : null,
+        cpf ? cpf.trim() : null
+      ]
+    )
+
+    const usuarioId = usuarioResult.rows[0].id
+
+    // Cria o vínculo do usuário com a turma
+    await pool.query(
+      `
+      INSERT INTO usuarios_turmas (
+        usuario_id,
+        turma_id,
+        perfil,
+        jogador_id
+      )
+      VALUES ($1, $2, $3, $4)
+      `,
+      [
+        usuarioId,
+        turmaId,
+        perfil,
+        jogador_id || null
+      ]
+    )
+
+    res.json({
+      ok: true,
+      usuarioId
+    })
+
   } catch (err) {
-    res.status(500).json({ erro: err.message })
+
+    console.error("ERRO AO CADASTRAR USUÁRIO:", err)
+
+    res.status(500).json({
+      erro: "Erro ao cadastrar usuário"
+    })
   }
 })
 
 // ===============PERMISSÕES================
 
-app.get("/permissoes/:usuarioId", async (req, res) => {
+app.get("/permissoes/:turmaId", verificarToken, verificarAcessoTurma, async (req, res) => {
   try {
 
-    const { usuarioId } = req.params
+    const turmaId = Number(req.params.turmaId)
+    const usuarioId = req.usuario.id
+
+    if(!Number.isInteger(turmaId)){
+      return res.status(400).json({
+        erro: "Turma inválida"
+      })
+    }
 
     const result = await pool.query(
-      "SELECT * FROM permissoes WHERE usuario_id = $1",
-      [usuarioId]
+      `SELECT
+          p.id,
+          p.modulo,
+          p.acao,
+          p.permitido
+       FROM permissoes p
+       INNER JOIN usuarios_turmas ut
+         ON ut.id = p.usuario_turma_id
+       WHERE ut.usuario_id = $1
+         AND ut.turma_id = $2
+       ORDER BY p.modulo, p.acao`,
+      [usuarioId, turmaId]
     )
 
     res.json(result.rows)
 
   } catch (err) {
-    res.status(500).json({ erro: err.message })
+
+    console.error("ERRO AO CARREGAR PERMISSÕES:", err)
+
+    res.status(500).json({
+      erro: err.message
+    })
   }
 })
 
@@ -475,36 +856,74 @@ app.post("/permissoes", async (req, res) => {
 // ================= LOGIN =================
 app.post("/login", async (req, res) => {
   try {
-    const { login, senha } = req.body
 
+    const { identificador, senha } = req.body
+
+    if (!identificador || !senha) {
+      return res.status(400).json({
+        erro: "Informe CPF ou e-mail e a senha"
+      })
+    }
+
+    const valor = identificador.trim()
+
+    // 🔎 Procura por e-mail ou CPF
     const result = await pool.query(
-      "SELECT * FROM usuarios WHERE login=$1",
-      [login]
+      `SELECT *
+       FROM usuarios
+       WHERE LOWER(email) = LOWER($1)
+          OR cpf = $1
+       LIMIT 1`,
+      [valor]
     )
 
     const user = result.rows[0]
 
     if (!user) {
-      return res.status(401).json({ erro: "Login inválido" })
+      return res.status(401).json({
+        erro: "CPF/e-mail ou senha inválidos"
+      })
     }
 
-    // 🔥 NOVO: PRIMEIRO ACESSO (ANTES DO BCRYPT)
-    if(user.primeiro_acesso){
+    // 🔥 PRIMEIRO ACESSO
+    if (user.primeiro_acesso) {
       return res.json({
         primeiroAcesso: true,
         usuarioId: user.id
       })
     }
 
+    // 🔐 Verifica senha
     const ok = await bcrypt.compare(senha, user.senha)
 
     if (!ok) {
-      return res.status(401).json({ erro: "Login inválido" })
+      return res.status(401).json({
+        erro: "CPF/e-mail ou senha inválidos"
+      })
     }
 
-    // 🔐 GERAR TOKEN
+    // 🔎 Busca as turmas do usuário
+    const turmasResult = await pool.query(
+      `SELECT
+          ut.id AS usuario_turma_id,
+          ut.turma_id,
+          ut.perfil,
+          ut.jogador_id,
+          t.nome AS turma_nome
+       FROM usuarios_turmas ut
+       INNER JOIN turmas t
+         ON t.id = ut.turma_id
+       WHERE ut.usuario_id = $1
+       ORDER BY t.nome`,
+      [user.id]
+    )
+
+    // 🔐 TOKEN
     const token = jwt.sign(
-      { id: user.id },
+      {
+        id: user.id,
+        is_master: user.is_master
+      },
       process.env.JWT_SECRET || "segredo_super_forte",
       { expiresIn: "7d" }
     )
@@ -515,40 +934,98 @@ app.post("/login", async (req, res) => {
       [user.id]
     )
 
+    // Não enviar a senha para o frontend
+    const usuario = {
+      id: user.id,
+      nome: user.nome,
+      email: user.email,
+      cpf: user.cpf,
+      is_master: user.is_master,
+      aceitou_lgpd: true,
+      primeiro_acesso: user.primeiro_acesso
+    }
+
     res.json({
       ok: true,
-      usuario: user,
+      usuario,
+      turmas: turmasResult.rows,
       token
     })
 
   } catch (err) {
-    res.status(500).json({ erro: err.message })
+
+    console.error("ERRO LOGIN:", err)
+
+    res.status(500).json({
+      erro: err.message
+    })
   }
 })
 
+// CRIAR SENHA
 app.post("/criar-senha", async (req, res) => {
   try {
+
     const { usuarioId, senha } = req.body
+
+    if (!usuarioId || !senha) {
+      return res.status(400).json({
+        erro: "Usuário e senha são obrigatórios"
+      })
+    }
+
+    if (senha.length < 6) {
+      return res.status(400).json({
+        erro: "A senha deve ter pelo menos 6 caracteres"
+      })
+    }
+
+    const usuario = await pool.query(
+      `SELECT id, primeiro_acesso
+       FROM usuarios
+       WHERE id = $1`,
+      [usuarioId]
+    )
+
+    if (usuario.rows.length === 0) {
+      return res.status(404).json({
+        erro: "Usuário não encontrado"
+      })
+    }
+
+    if (!usuario.rows[0].primeiro_acesso) {
+      return res.status(403).json({
+        erro: "Este usuário não está em primeiro acesso"
+      })
+    }
 
     const hash = await bcrypt.hash(senha, 10)
 
     await pool.query(
-      `UPDATE usuarios 
-       SET senha=$1, primeiro_acesso=false 
-       WHERE id=$2`,
+      `UPDATE usuarios
+       SET senha = $1,
+           primeiro_acesso = false
+       WHERE id = $2`,
       [hash, usuarioId]
     )
 
-    res.json({ ok: true })
+    res.json({
+      ok: true
+    })
 
   } catch (err) {
-    res.status(500).json({ erro: err.message })
+
+    console.error("ERRO AO CRIAR SENHA:", err)
+
+    res.status(500).json({
+      erro: err.message
+    })
   }
 })
 
 //RANKING
 
-app.get("/ranking/:turmaId", async (req, res) => {
+app.get("/ranking/:turmaId", verificarToken, verificarAcessoTurma, async (req, res) => {
   try {
 
     const { turmaId } = req.params
@@ -603,7 +1080,7 @@ app.get("/ranking/:turmaId", async (req, res) => {
 
 //JOGOS
 
-app.get("/jogos/:turmaId", async (req, res) => {
+app.get("/jogos/:turmaId", verificarToken, verificarAcessoTurma, async (req, res) => {
   try {
     const { turmaId } = req.params
 
@@ -623,10 +1100,20 @@ app.get("/jogos/:turmaId", async (req, res) => {
 app.post("/jogos", verificarToken, async (req, res) => {
   try {
     const { data, local, presentes, faltaram, turma_id } = req.body
-    const usuarioId = req.usuario.id
-    const pode = await temPermissao(usuarioId, "jogos", "salvar")
-    if(!pode){
-    return res.status(403).json({ erro: "Sem permissão" })
+
+const usuarioId = req.usuario.id
+
+const pode = await temPermissao(
+  usuarioId,
+  turma_id,
+  "jogos",
+  "salvar"
+)
+
+if(!pode){
+  return res.status(403).json({
+    erro: "Sem permissão"
+  })
 }
 
     const result = await pool.query(
@@ -724,7 +1211,7 @@ app.post("/receitas", async (req, res) => {
   }
 })
 
-app.get("/receitas/:turmaId", async (req, res) => {
+app.get("/receitas/:turmaId", verificarToken, verificarAcessoTurma, async (req, res) => {
 
   const { turmaId } = req.params
 
@@ -755,9 +1242,16 @@ app.delete("/receitas/:id", async (req, res) => {
 })
 
 // ================= DASHBOARD =================
-app.get("/dashboard/:turmaId", async (req, res) => {
+app.get("/dashboard/:turmaId", verificarToken, verificarAcessoTurma, async (req, res) => {
   try {
     const { turmaId } = req.params
+
+        // Jogador não pode acessar o dashboard
+    if (req.usuarioTurma?.perfil === "JOGADOR") {
+      return res.status(403).json({
+        erro: "Você não tem permissão para acessar o dashboard"
+      })
+    }
 
     // 🔹 TOTAL JOGADORES ATIVOS
     const jogadores = await pool.query(

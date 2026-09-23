@@ -26,8 +26,16 @@ async function criarJogo(){
   }
 
   // 🔥 PEGA UMA VEZ SÓ
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-  let turmaId = usuario.turma_id
+  let turmaSelecionada = JSON.parse(
+  localStorage.getItem("turmaSelecionada")
+)
+
+if(!turmaSelecionada){
+  mostrarToast("Selecione uma turma primeiro", "error")
+  return
+}
+
+let turmaId = Number(turmaSelecionada.turma_id)
 
   let jogoSalvo = localStorage.getItem(`jogoAtual_${turmaId}`)
 
@@ -181,8 +189,16 @@ function voltarLista(index){
 
 function salvarJogo(){
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-  let turmaId = usuario.turma_id
+  let turmaSelecionada = JSON.parse(
+  localStorage.getItem("turmaSelecionada")
+)
+
+if(!turmaSelecionada){
+  console.warn("Nenhuma turma selecionada")
+  return
+}
+
+let turmaId = Number(turmaSelecionada.turma_id)
 
   localStorage.setItem(`jogoAtual_${turmaId}`, JSON.stringify({
     data: document.getElementById("dataJogo").value,
@@ -193,53 +209,63 @@ function salvarJogo(){
 }
 
 function carregarJogoSalvo(){
+
   presencas = [] // 🔥 FORÇA LIMPEZA
 
-let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-let jogo = localStorage.getItem(`jogoAtual_${usuario.turma_id}`)
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
 
-// 🔥 SE NÃO EXISTE → limpa tudo
-if(!jogo){
-  jogoAberto = false
-  presencas = []
+  if(!turmaSelecionada){
+    console.warn("Nenhuma turma selecionada")
+    return
+  }
 
-  // 🔥 LIMPA A TELA NA HORA
-  document.getElementById("listaPresenca").innerHTML = ""
-  document.getElementById("confirmados").innerHTML = ""
-  document.getElementById("naoConfirmados").innerHTML = ""
+  let turmaId = Number(turmaSelecionada.turma_id)
 
-  document.getElementById("dataJogo").value = ""
-  document.getElementById("localJogo").value = ""
+  let jogo = localStorage.getItem(`jogoAtual_${turmaId}`)
+
+  // 🔥 SE NÃO EXISTE → limpa tudo
+  if(!jogo){
+    jogoAberto = false
+    presencas = []
+
+    // 🔥 LIMPA A TELA NA HORA
+    document.getElementById("listaPresenca").innerHTML = ""
+    document.getElementById("confirmados").innerHTML = ""
+    document.getElementById("naoConfirmados").innerHTML = ""
+
+    document.getElementById("dataJogo").value = ""
+    document.getElementById("localJogo").value = ""
+
+    mostrarPresenca()
+
+    return
+  }
+
+  // 🔥 VERIFICA SE JOGO JÁ FOI SALVO
+  let jogoJaSalvo = sessionStorage.getItem("jogoSalvo")
+
+  let dados = JSON.parse(jogo)
+
+  // 🔥 VALIDAÇÃO INTELIGENTE
+  if(!dados || !dados.presencas || dados.presencas.length === 0){
+
+    localStorage.removeItem(`jogoAtual_${turmaId}`)
+
+    jogoAberto = false
+    presencas = []
+
+    return
+  }
+
+  presencas = dados.presencas || []
+  jogoAberto = dados.jogoAberto === true
+
+  document.getElementById("dataJogo").value = dados.data || ""
+  document.getElementById("localJogo").value = dados.local || ""
 
   mostrarPresenca()
-
-  return
-}
-
-// 🔥 VERIFICA SE JOGO JÁ FOI SALVO
-let jogoJaSalvo = sessionStorage.getItem("jogoSalvo")
-
-let dados = JSON.parse(jogo)
-
-// 🔥 VALIDAÇÃO INTELIGENTE
-if(!dados || !dados.presencas || dados.presencas.length === 0){
-let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-let turmaId = usuario.turma_id
-
-localStorage.removeItem(`jogoAtual_${turmaId}`)
-  jogoAberto = false
-  presencas = []
-  return
-}
-
-
-presencas = dados.presencas || []
-jogoAberto = dados.jogoAberto === true
-
-document.getElementById("dataJogo").value = dados.data || ""
-document.getElementById("localJogo").value = dados.local || ""
-
-mostrarPresenca()
 }
 
 //HISTORICO//
@@ -288,8 +314,16 @@ for(let i=0;i<presentes.length;i++){
 //localStorage.setItem("ranking", JSON.stringify(ranking))
 
 // objeto do jogo
-let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-let turmaId = usuario.turma_id
+let turmaSelecionada = JSON.parse(
+  localStorage.getItem("turmaSelecionada")
+)
+
+if(!turmaSelecionada){
+  mostrarToast("Selecione uma turma primeiro", "error")
+  return
+}
+
+let turmaId = Number(turmaSelecionada.turma_id)
 
 let jogo = {
   data: data,
@@ -333,8 +367,16 @@ mostrarPresenca()
 
 async function carregarHistorico(){
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-  let turmaId = usuario.turma_id
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
+
+  if(!turmaSelecionada){
+    console.warn("Nenhuma turma selecionada")
+    return
+  }
+
+  let turmaId = Number(turmaSelecionada.turma_id)
 
   historicoJogos = await apiGet(`/jogos/${turmaId}`)
 
@@ -406,8 +448,16 @@ async function removerJogo(id){
 
 async function carregarRanking(){
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-  let turmaId = usuario.turma_id
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
+
+  if(!turmaSelecionada){
+    console.warn("Nenhuma turma selecionada")
+    return
+  }
+
+  let turmaId = Number(turmaSelecionada.turma_id)
 
   // 🔥 GARANTE QUE HISTÓRICO ESTÁ CARREGADO
   if(historicoJogos.length === 0){
@@ -789,10 +839,18 @@ async function limparJogo(){
   jogoAberto = false
 
   // limpar storage
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-  let turmaId = usuario.turma_id
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
 
-localStorage.removeItem(`jogoAtual_${turmaId}`)
+  if(!turmaSelecionada){
+    console.warn("Nenhuma turma selecionada")
+    return
+  }
+
+  let turmaId = Number(turmaSelecionada.turma_id)
+
+  localStorage.removeItem(`jogoAtual_${turmaId}`)
 
   // limpar interface
   document.getElementById("listaPresenca").innerHTML = ""

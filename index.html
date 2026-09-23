@@ -65,13 +65,14 @@
 
 <p id="nomeUsuarioLogado" style="margin-bottom:10px;font-weight:bold;"></p>
 
-<button onclick="mostrarSecao('painel')">📊 Painel</button>
-<button id="btnConfiguracoes" onclick="mostrarSecao('configuracoes'); abrirAbaConfig('usuarios')"> ⚙️ Configurações</button>
+<button id="menuPainel" onclick="mostrarSecao('painel')">📊 Painel</button>
+
+<button id="btnConfiguracoes" onclick="mostrarSecao('configuracoes'); abrirAbaConfig('usuarios')">⚙️ Configurações</button>
 <button id="menuJogadores" onclick="mostrarSecao('jogadores')">👥 Jogadores</button>
 <button id="menuFinanceiro" onclick="mostrarSecao('financeiro')">💰 Financeiro</button>
 <button id="menuJogos" onclick="mostrarSecao('jogos')">⚽ Jogos</button>
 <button id="menuRanking" onclick="mostrarSecao('ranking')">🏆 Ranking</button>
-<button onclick="mostrarSecao('historico')">📜 Histórico</button>
+<button id="menuHistorico" onclick="mostrarSecao('historico')">📜 Histórico</button>
 <button onclick="logout()">🚪 Sair</button>
 
 </div>
@@ -177,29 +178,57 @@
   </div>
 
   <!-- ABA USUÁRIOS -->
-  <div id="aba-usuarios" class="aba-config">
+<div id="aba-usuarios" class="aba-config">
 
-    <h3>Cadastrar Usuário</h3>
+  <input
+  type="text"
+  id="nomeUsuario"
+  placeholder="Nome"
+  readonly
+>
 
-    <input type="text" id="nomeUsuario" placeholder="Nome">
-    <input type="text" id="loginUsuario" placeholder="Login">
-    <input type="password" id="senhaUsuario" placeholder="Senha">
+<input
+  type="email"
+  id="emailUsuario"
+  placeholder="E-mail"
+  readonly
+>
 
-    <button onclick="cadastrarUsuario()">Salvar</button>
+<input
+  type="text"
+  id="cpfUsuario"
+  placeholder="CPF"
+  readonly
+>
 
-    <h3>Usuários cadastrados</h3>
-    <table>
-  <thead>
-    <tr>
-      <th>Nome</th>
-      <th>Login</th>
-      <th>Ações</th>
-    </tr>
-  </thead>
-  <tbody id="listaUsuarios"></tbody>
-</table>
+  <select id="perfilUsuario" onchange="alterarPerfilUsuario()">
+  <option value="JOGADOR">Jogador</option>
+  <option value="ADMIN">Administrador</option>
+</select>
 
-  </div>
+  <select id="jogadorUsuario" onchange="preencherDadosUsuario()">
+  <option value="">Selecione o jogador</option>
+  </select>
+
+  <button onclick="cadastrarUsuario()">Salvar</button>
+
+  <h3>Usuários cadastrados</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>E-mail</th>
+        <th>CPF</th>
+        <th>Perfil</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+
+    <tbody id="listaUsuarios"></tbody>
+  </table>
+
+</div>
 
   <div id="aba-permissoes" class="aba-config" style="display:none">
     <h3>🔐 Permissões</h3>
@@ -272,35 +301,36 @@
 
 <div id="jogadores" class="secao">
 
-<h3>🔎 Buscar Jogador</h3>
+<div id="cadastroJogador">
 
-<input type="text" id="buscarJogador" placeholder="Digite o nome..." onkeyup="buscarJogador()">
+  <h2>Cadastrar Jogador</h2>
 
-<h2>Cadastrar Jogador</h2>
+  <input type="text" id="nome" placeholder="Nome do jogador">
+  <input type="text" id="telefone" placeholder="Telefone">
+  <input type="text" id="cpf" placeholder="CPF">
+  <input type="email" id="email" placeholder="E-mail">
+  <input type="date" id="nascimento">
 
-<input type="text" id="nome" placeholder="Nome do jogador">
-<input type="text" id="telefone" placeholder="Telefone">
-<input type="text" id="cpf" placeholder="CPF">
-<input type="date" id="nascimento">
+  <select id="posicao">
+    <option value="">Posição</option>
+    <option>Goleiro</option>
+    <option>Zagueiro</option>
+    <option>Lateral</option>
+    <option>Meia</option>
+    <option>Atacante</option>
+  </select>
 
-<select id="posicao">
-  <option value="">Posição</option>
-  <option>Goleiro</option>
-  <option>Zagueiro</option>
-  <option>Lateral</option>
-  <option>Meia</option>
-  <option>Atacante</option>
-</select>
+  <select id="nivel">
+    <option value="ouro">🥇 Ouro</option>
+    <option value="prata">🥈 Prata</option>
+    <option value="bronze">🥉 Bronze</option>
+  </select>
 
-<select id="nivel">
-  <option value="prata">🥈 Prata</option>
-  <option value="ouro">🥇 Ouro</option>
-  <option value="bronze">🥉 Bronze</option>
-</select>
+  <button onclick="cadastrar()">
+    Salvar
+  </button>
 
-<button onclick="cadastrar()">
-Salvar
-</button>
+  </div>
 
 <h2 class="toggle-title" onclick="toggleSecao('ativos')">
   ▶ Jogadores Ativos
@@ -317,6 +347,7 @@ Salvar
 <th>Nome</th>
 <th>CPF</th>
 <th>Telefone</th>
+<th>Email</th>
 <th>Posição</th>
 <th>Nascimento</th>
 <th>Idade</th>
@@ -347,6 +378,7 @@ Salvar
       <th>Nome</th>
       <th>CPF</th>
       <th>Telefone</th>
+      <th>Email</th>
       <th>Posição</th>
       <th>Nascimento</th>
       <th>Idade</th>
@@ -613,13 +645,22 @@ async function fazerLogin(){
 
   try {
 
-    let login = document.getElementById("login").value
+    let identificador = document.getElementById("login").value.trim()
     let senha = document.getElementById("senha").value
+
+    if(!identificador || !senha){
+      throw new Error("Informe CPF ou e-mail e a senha")
+    }
 
     let res = await fetch(API + "/login", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ login, senha })
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        identificador,
+        senha
+      })
     })
 
     let dados = await res.json()
@@ -628,26 +669,58 @@ async function fazerLogin(){
       throw new Error(dados.erro || "Erro no login")
     }
 
-    // 🔥 🔥 🔥 PRIMEIRO ACESSO (AQUI ESTÁ A CORREÇÃO)
+    // 🔥 PRIMEIRO ACESSO
     if(dados.primeiroAcesso){
 
       localStorage.removeItem("usuarioLogado")
-      localStorage.setItem("usuarioTemp", dados.usuarioId)
+
+      localStorage.setItem(
+        "usuarioTemp",
+        dados.usuarioId
+      )
 
       mostrarTelaCriarSenha()
 
       return
     }
 
-    // 🔥 LOGIN NORMAL
-    localStorage.setItem("usuarioLogado", JSON.stringify(dados.usuario))
-    localStorage.setItem("token", dados.token)
+    // 🔥 SALVA USUÁRIO
+    localStorage.setItem(
+      "usuarioLogado",
+      JSON.stringify(dados.usuario)
+    )
+
+    // 🔐 SALVA TOKEN
+    localStorage.setItem(
+      "token",
+      dados.token
+    )
+
+    // 🏠 SALVA AS TURMAS DO USUÁRIO
+    localStorage.setItem(
+      "turmasUsuario",
+      JSON.stringify(dados.turmas || [])
+    )
+
+    // 🔥 SE POSSUI APENAS UMA TURMA,
+    // podemos selecioná-la automaticamente
+    if(dados.turmas && dados.turmas.length === 1){
+
+      localStorage.setItem(
+        "turmaSelecionada",
+        JSON.stringify(dados.turmas[0])
+      )
+
+    }
 
     iniciarSistema()
 
   } catch (err){
 
-    mostrarToast(err.message || "Login inválido", "error")
+    mostrarToast(
+      err.message || "Login inválido",
+      "error"
+    )
 
   } finally {
 
@@ -688,23 +761,31 @@ async function salvarSenha(){
 
 function carregarNomeTurma(){
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
 
-  if(!usuario || !usuario.turma_id) return
+  if(!turmaSelecionada){
+    return
+  }
 
-  // 🔥 BUSCA DO BACKEND (CORRETO)
-  fetch(`https://sistema-futebol-1.onrender.com/turmas/${usuario.turma_id}`)
+  let turmaId = Number(turmaSelecionada.turma_id)
+
+  // 🔥 BUSCA DO BACKEND
+  fetch(`https://sistema-futebol-1.onrender.com/turmas/${turmaId}`)
     .then(res => res.json())
     .then(turma => {
 
       // 🔥 PREENCHE INPUT
       let input = document.getElementById("nomeSistema")
+
       if(input){
         input.value = turma.nome || ""
       }
 
       // 🔥 ATUALIZA TÍTULO
       let titulo = document.getElementById("tituloSistema")
+
       if(titulo){
         titulo.innerText = "⚽ " + (turma.nome || "Sistema")
       }
@@ -715,19 +796,59 @@ function carregarNomeTurma(){
 async function iniciarSistema(){
 
   let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+
   let turmaSelecionada = localStorage.getItem("turmaSelecionada")
+
+  if(turmaSelecionada){
+    turmaSelecionada = JSON.parse(turmaSelecionada)
+  }
 
   document.getElementById("telaLogin").style.display = "none"
   document.getElementById("sistema").style.display = "flex"
 
-  // 🔥 ADMIN SEM TURMA
-  if(usuario.tipo === "admin" && !turmaSelecionada){
+  // 🔥 USUÁRIO AINDA NÃO SELECIONOU UMA TURMA
+  if(!turmaSelecionada){
 
-    await selecionarTurmaAdmin()
+    await selecionarTurma()
     return
   }
 
-  // 🔥 CARREGA SISTEMA NORMAL
+// 🔐 CONTROLE DE MENUS POR PERFIL
+if(turmaSelecionada.perfil === "JOGADOR"){
+
+  document.getElementById("menuPainel").style.display = "none"
+  document.getElementById("menuFinanceiro").style.display = "none"
+  document.getElementById("btnConfiguracoes").style.display = "none"
+
+  document.getElementById("menuJogadores").style.display = ""
+  document.getElementById("menuJogos").style.display = ""
+  document.getElementById("menuRanking").style.display = ""
+  document.getElementById("menuHistorico").style.display = ""
+
+  document.getElementById("cadastroJogador").style.display = "none"
+
+  await carregarJogadores()
+  mostrarSecao("jogadores")
+
+  return
+
+}else{
+
+  // ADMIN
+  document.getElementById("menuPainel").style.display = ""
+  document.getElementById("menuFinanceiro").style.display = ""
+  document.getElementById("btnConfiguracoes").style.display = ""
+
+  document.getElementById("menuJogadores").style.display = ""
+  document.getElementById("menuJogos").style.display = ""
+  document.getElementById("menuRanking").style.display = ""
+  document.getElementById("menuHistorico").style.display = ""
+
+  document.getElementById("cadastroJogador").style.display = ""
+
+}
+
+// 🔥 CARREGA DASHBOARD NORMAL PARA ADMIN
 let dashboard = await carregarDashboard()
 
   document.getElementById("totalJogadores").innerText = dashboard.totalJogadores
@@ -1317,79 +1438,226 @@ function abrirConfiguracoes(){
 
 }
 
-async function cadastrarUsuario(){
+function preencherDadosUsuario(){
 
-  let nome = document.getElementById("nomeUsuario").value
-  let login = document.getElementById("loginUsuario").value
-  let senha = document.getElementById("senhaUsuario").value
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-  let turma_id = usuario.turma_id
+  const jogadorId = document.getElementById("jogadorUsuario").value
 
- if(!nome || !login){
-  mostrarToast("Preencha nome e login")
-  return
+  // Se nenhum jogador foi selecionado, limpa os campos
+  if(!jogadorId){
+
+    document.getElementById("nomeUsuario").value = ""
+    document.getElementById("emailUsuario").value = ""
+    document.getElementById("cpfUsuario").value = ""
+
+    return
+  }
+
+  // Procura o jogador selecionado
+  const jogador = jogadores.find(
+    j => Number(j.id) === Number(jogadorId)
+  )
+
+  if(!jogador){
+    console.warn("Jogador não encontrado:", jogadorId)
+    return
+  }
+
+  // Preenche os dados automaticamente
+  document.getElementById("nomeUsuario").value = jogador.nome || ""
+  document.getElementById("emailUsuario").value = jogador.email || ""
+  document.getElementById("cpfUsuario").value = jogador.cpf || ""
+
 }
 
-  // 🔥 EDITAR
-  if(usuarioEditando){
+async function cadastrarUsuario(){
 
-    await fetch("https://sistema-futebol-1.onrender.com/usuarios/" + usuarioEditando, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome, login, senha, turma_id })
-    })
+  const nome = document.getElementById("nomeUsuario").value.trim()
+  const email = document.getElementById("emailUsuario").value.trim()
+  const cpf = document.getElementById("cpfUsuario").value.trim()
+  const perfil = document.getElementById("perfilUsuario").value
+  const jogadorId = document.getElementById("jogadorUsuario").value
 
-    mostrarToast("Usuário atualizado")
+  const turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
 
-    usuarioEditando = null
+  if(!turmaSelecionada){
+    mostrarToast("Nenhuma turma selecionada")
+    return
+  }
+
+  const turmaId = Number(turmaSelecionada.turma_id)
+
+  if(!nome){
+    mostrarToast("Preencha o nome")
+    return
+  }
+
+  if(!email && !cpf){
+    mostrarToast("Informe o e-mail ou CPF")
+    return
+  }
+
+  if(perfil === "JOGADOR" && !jogadorId){
+    mostrarToast("Selecione o jogador")
+    return
+  }
+
+  try {
+
+    const token = localStorage.getItem("token")
+
+    const resposta = await fetch(
+      `${API}/usuarios/${turmaId}`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+
+        body: JSON.stringify({
+          nome,
+          email: email || null,
+          cpf: cpf || null,
+          perfil,
+          jogador_id: jogadorId ? Number(jogadorId) : null
+        })
+      }
+    )
+
+    const dados = await resposta.json()
+
+    if(!resposta.ok){
+      mostrarToast(dados.erro || "Erro ao cadastrar usuário")
+      return
+    }
+
+    mostrarToast("Usuário cadastrado")
+
+    carregarUsuarios()
+
+    // Limpar campos
+    document.getElementById("nomeUsuario").value = ""
+    document.getElementById("emailUsuario").value = ""
+    document.getElementById("cpfUsuario").value = ""
+    document.getElementById("perfilUsuario").value = "JOGADOR"
+    document.getElementById("jogadorUsuario").value = ""
+
+  } catch(err) {
+
+    console.error("ERRO AO CADASTRAR USUÁRIO:", err)
+
+    mostrarToast("Erro ao cadastrar usuário")
+  }
+}
+
+function alterarPerfilUsuario(){
+
+  const perfil = document.getElementById("perfilUsuario").value
+
+  const campoJogador = document.getElementById("jogadorUsuario")
+
+  const campoNome = document.getElementById("nomeUsuario")
+  const campoEmail = document.getElementById("emailUsuario")
+  const campoCpf = document.getElementById("cpfUsuario")
+
+  if(perfil === "JOGADOR"){
+
+    // Jogador é obrigatório
+    campoJogador.disabled = false
+
+    // Dados vêm automaticamente do jogador
+    campoNome.readOnly = true
+    campoEmail.readOnly = true
+    campoCpf.readOnly = true
+
+    preencherDadosUsuario()
 
   } else {
 
-    // 🔥 NOVO
-    await fetch("https://sistema-futebol-1.onrender.com/usuarios/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome, login, senha, turma_id })
-    })
+    // Administrador não precisa estar vinculado a um jogador
+    campoJogador.value = ""
+    campoJogador.disabled = true
 
-    mostrarToast("Usuário cadastrado")
+    // Administrador pode informar seus próprios dados
+    campoNome.readOnly = false
+    campoEmail.readOnly = false
+    campoCpf.readOnly = false
+
   }
 
-  carregarUsuarios()
-
-  // limpar campos
-  document.getElementById("nomeUsuario").value = ""
-  document.getElementById("loginUsuario").value = ""
-  document.getElementById("senhaUsuario").value = ""
 }
 
 async function carregarUsuarios(){
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  const turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
 
-  let res = await fetch(`https://sistema-futebol-1.onrender.com/usuarios/${usuario.turma_id}`)
-  let dados = await res.json()
+  if(!turmaSelecionada){
+    console.warn("Nenhuma turma selecionada")
+    return
+  }
 
-  let lista = document.getElementById("listaUsuarios")
+  const turmaId = Number(turmaSelecionada.turma_id)
+  const token = localStorage.getItem("token")
 
-  lista.innerHTML = ""
+  try {
 
-for(let i=0;i<dados.length;i++){
+    const res = await fetch(
+      `${API}/usuarios/${turmaId}`,
+      {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      }
+    )
 
-  // 🚫 ESCONDE ADMIN
-  if(dados[i].login === "Admin") continue
+    const dados = await res.json()
 
-  lista.innerHTML += `
-    <tr>
-      <td>${dados[i].nome}</td>
-      <td>${dados[i].login}</td>
-      <td>
-  <button class="btn-editar" onclick="editarUsuario(${dados[i].id})">✏️ Editar</button>
-  <button class="btn-excluir" onclick="excluirUsuario(${dados[i].id})">🗑️ Excluir</button>
-      </td>
-    </tr>
-  `
-}
+    if(!res.ok){
+      console.error("Erro ao carregar usuários:", dados)
+      mostrarToast(dados.erro || "Erro ao carregar usuários")
+      return
+    }
+
+    const lista = document.getElementById("listaUsuarios")
+
+    lista.innerHTML = ""
+
+    dados.forEach(usuario => {
+
+      lista.innerHTML += `
+        <tr>
+          <td>${usuario.nome || ""}</td>
+          <td>${usuario.email || ""}</td>
+          <td>${usuario.cpf || ""}</td>
+          <td>${usuario.perfil || ""}</td>
+          <td>
+            <button
+              class="btn-editar"
+              onclick="editarUsuario(${usuario.id})">
+              ✏️ Editar
+            </button>
+
+            <button
+              class="btn-excluir"
+              onclick="excluirUsuario(${usuario.id})">
+              🗑️ Excluir
+            </button>
+          </td>
+        </tr>
+      `
+    })
+
+  } catch(err) {
+
+    console.error("ERRO AO CARREGAR USUÁRIOS:", err)
+
+    mostrarToast("Erro ao carregar usuários")
+  }
 }
 
 async function excluirUsuario(id){
@@ -1464,65 +1732,127 @@ function abrirAbaConfig(aba){
 }
 }
 
-async function selecionarTurmaAdmin(){
+async function selecionarTurma(){
 
-  console.log("🔥 entrou na função")
+  console.log("🔥 entrou na função de seleção de turma")
 
   let turmas = []
 
   try {
-    turmas = await apiGet("/turmas")
-    console.log("✅ turmas carregadas:", turmas)
+
+    const turmasSalvas = localStorage.getItem("turmasUsuario")
+
+    if(turmasSalvas){
+      turmas = JSON.parse(turmasSalvas)
+    }
+
+    console.log("✅ turmas do usuário:", turmas)
+
   } catch (err) {
-    console.error("❌ erro ao buscar turmas:", err)
-    mostrarToast("Erro ao carregar turmas")
+
+    console.error("❌ erro ao carregar turmas:", err)
+
+    mostrarToast("Erro ao carregar suas turmas")
+
+    return
   }
 
-  // 🔥 GARANTE QUE O MODAL SEMPRE ABRE
+  if(!turmas || turmas.length === 0){
+
+    mostrarToast("Você não possui nenhuma turma vinculada")
+
+    return
+  }
+
+  // 🔥 GARANTE QUE O MODAL ABRE
   document.getElementById("modalTurma").style.display = "flex"
 
   let select = document.getElementById("selectTurma")
-  select.innerHTML = "<option value=''>Selecione uma turma</option>"
+
+  select.innerHTML =
+    "<option value=''>Selecione uma turma</option>"
 
   turmas.forEach(t => {
-    select.innerHTML += `<option value="${t.id}">${t.nome}</option>`
+
+    select.innerHTML += `
+      <option value="${t.turma_id}">
+        ${t.turma_nome} - ${t.perfil}
+      </option>
+    `
+
   })
 
-  console.log("🔥 modal aberto")
+  console.log("🔥 modal de seleção aberto")
 }
 
 function confirmarTurma(){
 
   let select = document.getElementById("selectTurma")
-  let turmaId = select.value
+
+  let turmaId = Number(select.value)
 
   if(!turmaId){
+
     mostrarToast("Selecione uma turma")
+
     return
   }
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  // 🔥 Recupera as turmas que vieram no login
+  let turmas = JSON.parse(
+    localStorage.getItem("turmasUsuario") || "[]"
+  )
 
-  usuario.turma_id = Number(turmaId)
+  // 🔎 Encontra a turma selecionada
+  let turma = turmas.find(
+    t => Number(t.turma_id) === turmaId
+  )
 
-  localStorage.setItem("usuarioLogado", JSON.stringify(usuario))
+  if(!turma){
 
-  // 🔥 CONTROLE DO MODAL (ESSA É A CHAVE)
-  localStorage.setItem("turmaSelecionada", "true")
+    mostrarToast("Turma inválida")
+
+    return
+  }
+
+  // 🔥 Guarda a turma completa selecionada
+  localStorage.setItem(
+    "turmaSelecionada",
+    JSON.stringify(turma)
+  )
+
+  // 🔐 Ajusta os menus conforme o perfil
+const menuPainel = document.getElementById("menuPainel")
+const menuFinanceiro = document.getElementById("menuFinanceiro")
+const btnConfiguracoes = document.getElementById("btnConfiguracoes")
+
+if(turma.perfil === "JOGADOR"){
+
+  menuPainel.style.display = "none"
+  menuFinanceiro.style.display = "none"
+  btnConfiguracoes.style.display = "none"
+
+}else{
+
+  menuPainel.style.display = ""
+  menuFinanceiro.style.display = ""
+  btnConfiguracoes.style.display = ""
+
+}
+
+  console.log("✅ Turma selecionada:", turma)
 
   document.getElementById("modalTurma").style.display = "none"
 
-  document.getElementById("modalTurma").style.display = "none"
-
-// carregar sistema manualmente
-carregarJogadores()
-carregarPagamentos()
-carregarDespesas()
-carregarReceitas()
-carregarRanking()
-atualizarPainel()
-renderPagamentos()
-mostrarDespesas()
+  // 🔥 Carrega o sistema
+  carregarJogadores()
+  carregarPagamentos()
+  carregarDespesas()
+  carregarReceitas()
+  carregarRanking()
+  atualizarPainel()
+  renderPagamentos()
+  mostrarDespesas()
 }
 
 async function salvarConfiguracoesSistema(){
@@ -1559,11 +1889,20 @@ async function salvarConfiguracoesSistema(){
 
 async function atualizarTituloSistema(){
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
 
-  if(!usuario || !usuario.turma_id) return
+  if(!turmaSelecionada){
+    return
+  }
 
-  let res = await fetch(`https://sistema-futebol-1.onrender.com/turmas/${usuario.turma_id}`)
+  let turmaId = Number(turmaSelecionada.turma_id)
+
+  let res = await fetch(
+    `https://sistema-futebol-1.onrender.com/turmas/${turmaId}`
+  )
+
   let turma = await res.json()
 
   let titulo = document.getElementById("tituloSistema")
@@ -1577,11 +1916,20 @@ async function atualizarTituloSistema(){
 
 async function salvarModalidade(){
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
+
+  if(!turmaSelecionada){
+    mostrarToast("Selecione uma turma primeiro", "error")
+    return
+  }
+
+  let turmaId = Number(turmaSelecionada.turma_id)
 
   let modalidade = document.getElementById("modalidadeTurma").value
 
-  await apiPut(`/turmas/${usuario.turma_id}`, {
+  await apiPut(`/turmas/${turmaId}`, {
     modalidade: modalidade
   })
 
@@ -1592,9 +1940,18 @@ async function salvarModalidade(){
 
 async function carregarModalidade(){
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
 
-  let turma = await apiGet(`/turmas/${usuario.turma_id}`)
+  if(!turmaSelecionada){
+    console.warn("Nenhuma turma selecionada")
+    return
+  }
+
+  let turmaId = Number(turmaSelecionada.turma_id)
+
+  let turma = await apiGet(`/turmas/${turmaId}`)
 
   document.getElementById("modalidadeTurma").value = turma.modalidade
 
@@ -1718,6 +2075,7 @@ console.log("Permissão config:", podeConfig)
 if(!podeConfig){
   document.getElementById("btnConfiguracoes").style.display = "none"
 }
+
 
 try{  
   let podeCriar = await usuarioTemPermissao("jogos", "criar")  

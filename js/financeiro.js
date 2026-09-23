@@ -37,8 +37,16 @@ async function registrarPagamento(){
 
   let dataPagamento = new Date().toISOString()
 
- let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-let turmaId = usuario.turma_id
+ let turmaSelecionada = JSON.parse(
+  localStorage.getItem("turmaSelecionada")
+)
+
+if(!turmaSelecionada){
+  mostrarToast("Nenhuma turma selecionada")
+  return
+}
+
+let turmaId = Number(turmaSelecionada.turma_id)
 
 console.log(jogador)
 
@@ -61,8 +69,16 @@ renderizarPainelCompleto()
 
 async function carregarPagamentos(){
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-  let turmaId = usuario.turma_id
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
+
+  if(!turmaSelecionada){
+    console.warn("Nenhuma turma selecionada")
+    return
+  }
+
+  let turmaId = Number(turmaSelecionada.turma_id)
 
   pagamentos = await apiGet(`/pagamentos/${turmaId}`)
 
@@ -205,8 +221,16 @@ async function registrarDespesa(){
 
   let data = new Date().toISOString()
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-  let turmaId = usuario.turma_id
+  let turmaSelecionada = JSON.parse(
+  localStorage.getItem("turmaSelecionada")
+)
+
+if(!turmaSelecionada){
+  mostrarToast("Nenhuma turma selecionada")
+  return
+}
+
+let turmaId = Number(turmaSelecionada.turma_id)
 
   let despesa = {
     descricao,
@@ -229,8 +253,16 @@ async function registrarDespesa(){
 
 async function carregarDespesas(){
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-  let turmaId = usuario.turma_id
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
+
+  if(!turmaSelecionada){
+    console.warn("Nenhuma turma selecionada")
+    return
+  }
+
+  let turmaId = Number(turmaSelecionada.turma_id)
 
   despesas = await apiGet(`/despesas/${turmaId}`)
 
@@ -484,13 +516,22 @@ async function registrarReceita(){
     return
   }
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaSelecionada = JSON.parse(
+  localStorage.getItem("turmaSelecionada")
+)
 
-  await apiPost("/receitas", {
-    descricao,
-    valor,
-    turma_id: usuario.turma_id
-  })
+if(!turmaSelecionada){
+  mostrarToast("Nenhuma turma selecionada", "error")
+  return
+}
+
+let turmaId = Number(turmaSelecionada.turma_id)
+
+await apiPost("/receitas", {
+  descricao,
+  valor,
+  turma_id: turmaId
+})
 
   mostrarToast("Entrada registrada!")
 
@@ -502,9 +543,18 @@ async function registrarReceita(){
 
 async function carregarReceitas(){
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaSelecionada = JSON.parse(
+  localStorage.getItem("turmaSelecionada")
+)
 
-  receitas = await apiGet(`/receitas/${usuario.turma_id}`)
+if(!turmaSelecionada){
+  console.warn("Nenhuma turma selecionada")
+  return
+}
+
+let turmaId = Number(turmaSelecionada.turma_id)
+
+receitas = await apiGet(`/receitas/${turmaId}`)
 
   let lista = document.getElementById("listaReceitas")
   lista.innerHTML = ""
