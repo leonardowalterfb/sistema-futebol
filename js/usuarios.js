@@ -1,18 +1,27 @@
 async function carregarUsuariosPermissoes(){  
   
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))  
-  
-  let usuarios = await apiGet(`/usuarios/${usuario.turma_id}`)  
-  
-  let select = document.getElementById("selectUsuario")  
-  
-  select.innerHTML = ""  
-  
-  usuarios.forEach(u => {  
-    select.innerHTML += `<option value="${u.id}">${u.nome}</option>`  
-  })  
-  
-  carregarPermissoes()  
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
+
+  if(!turmaSelecionada){
+    mostrarToast("Selecione uma turma primeiro", "error")
+    return
+  }
+
+  let turmaId = Number(turmaSelecionada.turma_id)
+
+  let usuarios = await apiGet(`/usuarios/${turmaId}`)
+
+  let select = document.getElementById("selectUsuario")
+
+  select.innerHTML = ""
+
+  usuarios.forEach(u => {
+    select.innerHTML += `<option value="${u.id}">${u.nome}</option>`
+  })
+
+  carregarPermissoes()
 }
 
 async function carregarPermissoes(){

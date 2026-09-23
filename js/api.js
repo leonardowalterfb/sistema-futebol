@@ -1,5 +1,6 @@
 const API =
-  window.location.hostname === "localhost"
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1"
     ? "http://localhost:3000"
     : "https://sistema-futebol-1.onrender.com";
 
@@ -183,8 +184,23 @@ if(!res.ok){
 //DASHBOARD
 
 async function carregarDashboard(){
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-  let turmaId = usuario.turma_id
+
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
+
+  if(!turmaSelecionada){
+    console.warn("Nenhuma turma selecionada")
+    return
+  }
+
+  // Jogador não pode acessar o painel
+  if(turmaSelecionada.perfil === "JOGADOR"){
+    console.warn("Jogador não pode acessar o painel")
+    return
+  }
+
+  let turmaId = Number(turmaSelecionada.turma_id)
 
   return await apiGet(`/dashboard/${turmaId}`)
 }

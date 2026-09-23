@@ -14,6 +14,7 @@ async function cadastrar(){
   let nome=document.getElementById("nome").value
   let telefone=document.getElementById("telefone").value
   let cpf=document.getElementById("cpf").value
+  let email=document.getElementById("email").value
   let nascimento=document.getElementById("nascimento").value
   let posicao=document.getElementById("posicao").value
   let nivel = document.getElementById("nivel").value
@@ -34,6 +35,7 @@ async function cadastrar(){
     nome:nome,
     telefone:telefone,
     cpf:cpf,
+    email:email,
     nascimento:nascimento,
     posicao:posicao,
     nivel:nivel,
@@ -41,14 +43,16 @@ async function cadastrar(){
     status:"ativo"
   }
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
+  let turmaSelecionada = JSON.parse(
+  localStorage.getItem("turmaSelecionada")
+)
 
-  if(!usuario || !usuario.turma_id){
+if(!turmaSelecionada){
   mostrarToast("Selecione uma turma primeiro")
   return
 }
 
-let turmaId = usuario.turma_id
+let turmaId = Number(turmaSelecionada.turma_id)
 
 jogador.turma_id = turmaId
 
@@ -120,8 +124,16 @@ jogador.turma_id = turmaId
 
 async function carregarJogadores(){
 
-  let usuario = JSON.parse(localStorage.getItem("usuarioLogado"))
-  let turmaId = usuario.turma_id
+  let turmaSelecionada = JSON.parse(
+  localStorage.getItem("turmaSelecionada")
+)
+
+if(!turmaSelecionada){
+  console.warn("Nenhuma turma selecionada")
+  return
+}
+
+let turmaId = Number(turmaSelecionada.turma_id)
 
   jogadores = await apiGet(`/jogadores/${turmaId}`)
 
@@ -191,74 +203,158 @@ function mostrarJogadores(){
 
   console.log("lista:", document.getElementById("listaJogadores"))
 
-  // 🔥 ORDENA ALFABETICAMENTE
-  jogadores.sort((a, b) => 
-  (a.nome || "").localeCompare(b.nome || "")
-)
+  let lista = document.getElementById("listaJogadores")
+  let listaInativos = document.getElementById("listaInativos")
 
-  let lista=document.getElementById("listaJogadores")
-  let listaInativos=document.getElementById("listaInativos")
-
-  if(!lista || !listaInativos){
-    console.error("Tabela não encontrada")
+  if(!lista){
+    console.error("Tabela de jogadores não encontrada")
     return
   }
 
-  lista.innerHTML=""
-  listaInativos.innerHTML=""
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
 
-  //let contador = 1
+  // =========================
+  // 👤 JOGADOR
+  // =========================
 
-  for(let i=0;i<jogadores.length;i++){
+ if(turmaSelecionada?.perfil === "JOGADOR"){
+
+    // Ajusta o cabeçalho da tabela para o jogador
+    let tabela = document.getElementById("tabelaJogadores")
+
+    if(tabela){
+
+      let cabecalho = tabela.querySelector("thead")
+
+      if(cabecalho){
+        cabecalho.innerHTML = `
+          <tr>
+            <th>N°</th>
+            <th>Nome</th>
+            <th>Posição</th>
+          </tr>
+        `
+      }
+
+    }
+
+    lista.innerHTML = ""
+
+    if(listaInativos){
+      listaInativos.innerHTML = ""
+    }
+
+    jogadores.sort((a, b) =>
+      (a.nome || "").localeCompare(b.nome || "")
+    )
+
+    jogadores.forEach((j, i) => {
+
+      lista.innerHTML += `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${j.nome || "-"}</td>
+          <td>${j.posicao || "-"}</td>
+        </tr>
+      `
+
+    })
+
+    return
+}
+
+  // =========================
+  // 👑 ADMIN
+  // =========================
+let tabela = document.getElementById("tabelaJogadores")
+
+if(tabela){
+
+  let cabecalho = tabela.querySelector("thead")
+
+  if(cabecalho){
+    cabecalho.innerHTML = `
+      <tr>
+        <th>N°</th>
+        <th>Nome</th>
+        <th>CPF</th>
+        <th>Telefone</th>
+        <th>Posição</th>
+        <th>Nascimento</th>
+        <th>Idade</th>
+        <th>Cadastro</th>
+        <th>Ações</th>
+      </tr>
+    `
+  }
+
+}
+  if(!listaInativos){
+    console.error("Tabela de jogadores inativos não encontrada")
+    return
+  }
+
+  jogadores.sort((a, b) =>
+    (a.nome || "").localeCompare(b.nome || "")
+  )
+
+  lista.innerHTML = ""
+  listaInativos.innerHTML = ""
+
+  for(let i = 0; i < jogadores.length; i++){
 
     let j = jogadores[i]
 
-    let idade = j.nascimento ? calcularIdade(j.nascimento) : "-"
+    let idade = j.nascimento
+      ? calcularIdade(j.nascimento)
+      : "-"
 
     let status = j.status || "ativo"
 
-     let numero = i + 1
+    let numero = i + 1
 
-let linhaAtivo = `
-<tr>
-<td>${numero}</td>
-<td>${getMedalha(j.nivel)} ${j.nome || "-"}</td>
-<td>${j.cpf || "-"}</td>
-<td>${j.telefone || "-"}</td>
-<td>${j.posicao || "-"}</td>
-<td>${formatarDataBR(j.nascimento) || "-"}</td> <!-- 👈 NOVO -->
-<td>${idade}</td>
-<td>${formatarDataBR(j.dataCadastro || j.data_cadastro)}</td>
-<td>
-<button onclick="editarJogador(${j.id})">✏️ Editar</button>
-<button onclick="inativarJogador(${j.id})">🚫 Inativar</button>
-<button onclick="excluirJogador(${j.id})">🗑️ Excluir</button>
-</td>
-</tr>
-`
+    let linhaAtivo = `
+      <tr>
+        <td>${numero}</td>
+        <td>${getMedalha(j.nivel)} ${j.nome || "-"}</td>
+        <td>${j.cpf || "-"}</td>
+        <td>${j.telefone || "-"}</td>
+        <td>${j.posicao || "-"}</td>
+        <td>${formatarDataBR(j.nascimento) || "-"}</td>
+        <td>${idade}</td>
+        <td>${formatarDataBR(j.dataCadastro || j.data_cadastro)}</td>
+        <td>
+          <button onclick="editarJogador(${j.id})">✏️ Editar</button>
+          <button onclick="inativarJogador(${j.id})">🚫 Inativar</button>
+          <button onclick="excluirJogador(${j.id})">🗑️ Excluir</button>
+        </td>
+      </tr>
+    `
 
-let linhaInativo = `
-<tr>
-<td>${numero}</td>
-<td>${getMedalha(j.nivel)} ${j.nome || "-"}</td>
-<td>${j.cpf || "-"}</td>
-<td>${j.telefone || "-"}</td>
-<td>${j.posicao || "-"}</td>
-<td>${formatarDataBR(j.nascimento) || "-"}</td> <!-- 👈 NOVO -->
-<td>${idade}</td>
-<td>${formatarDataBR(j.dataCadastro || j.data_cadastro)}</td>
-<td>
-<button onclick="ativarJogador(${j.id})">✅ Ativar</button>
-<button onclick="excluirJogador(${j.id})">🗑️ Excluir</button>
-</td>
-</tr>
-`
+    let linhaInativo = `
+      <tr>
+        <td>${numero}</td>
+        <td>${getMedalha(j.nivel)} ${j.nome || "-"}</td>
+        <td>${j.cpf || "-"}</td>
+        <td>${j.telefone || "-"}</td>
+        <td>${j.posicao || "-"}</td>
+        <td>${formatarDataBR(j.nascimento) || "-"}</td>
+        <td>${idade}</td>
+        <td>${formatarDataBR(j.dataCadastro || j.data_cadastro)}</td>
+        <td>
+          <button onclick="ativarJogador(${j.id})">✅ Ativar</button>
+          <button onclick="excluirJogador(${j.id})">🗑️ Excluir</button>
+        </td>
+      </tr>
+    `
 
- if(status === "ativo"){
-  lista.innerHTML += linhaAtivo
-}else{
-  listaInativos.innerHTML += linhaInativo
-}
+    if(status === "ativo"){
+      lista.innerHTML += linhaAtivo
+    }else{
+      listaInativos.innerHTML += linhaInativo
+    }
 
   }
 
@@ -269,7 +365,38 @@ function mostrarJogadoresMobile(){
   let container = document.getElementById("listaJogadoresMobile")
   if(!container) return
 
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
+
   let ativos = jogadores.filter(j => j.status === "ativo")
+
+  // =========================
+  // 👤 JOGADOR
+  // =========================
+
+  if(turmaSelecionada?.perfil === "JOGADOR"){
+
+    container.innerHTML = ativos.map(j => `
+      <div class="card-jogador">
+
+        👤 ${j.nome}
+
+        <div>
+          ⚽ ${j.posicao || "-"} <br>
+          📞 ${j.telefone || "-"} <br>
+          🎂 ${j.nascimento ? formatarDataBR(j.nascimento) : "-"}
+        </div>
+
+      </div>
+    `).join("")
+
+    return
+  }
+
+  // =========================
+  // 👑 ADMIN
+  // =========================
 
   container.innerHTML = ativos.map(j => `
     <div class="card-jogador" onclick="toggleJogador(${j.id})">
@@ -277,16 +404,18 @@ function mostrarJogadoresMobile(){
     </div>
 
     <div id="detalhe_${j.id}" class="detalhe-jogador" style="display:none">
-  📞 ${j.telefone || "-"} <br>
-  📄 ${j.cpf || "-"} <br>
-  ⚽ ${j.posicao || "-"} <br>
-  🎂 ${j.nascimento ? formatarDataBR(j.nascimento) : "-"} <br>
-  👤 ${j.nascimento ? calcularIdade(j.nascimento) + " anos" : "-"} <br><br>
 
-  <button onclick="editarJogador(${j.id})">✏️</button>
-  <button onclick="inativarJogador(${j.id})">🚫</button>
-  <button onclick="excluirJogador(${j.id})">🗑️</button>
-</div>
+      📞 ${j.telefone || "-"} <br>
+      📄 ${j.cpf || "-"} <br>
+      ⚽ ${j.posicao || "-"} <br>
+      🎂 ${j.nascimento ? formatarDataBR(j.nascimento) : "-"} <br>
+      👤 ${j.nascimento ? calcularIdade(j.nascimento) + " anos" : "-"} <br><br>
+
+      <button onclick="editarJogador(${j.id})">✏️</button>
+      <button onclick="inativarJogador(${j.id})">🚫</button>
+      <button onclick="excluirJogador(${j.id})">🗑️</button>
+
+    </div>
   `).join("")
 }
   
@@ -295,7 +424,38 @@ function mostrarJogadoresInativosMobile(){
   let container = document.getElementById("listaJogadoresInativosMobile")
   if(!container) return
 
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
+
   let inativos = jogadores.filter(j => j.status !== "ativo")
+
+  // =========================
+  // 👤 JOGADOR
+  // =========================
+
+  if(turmaSelecionada?.perfil === "JOGADOR"){
+
+    container.innerHTML = inativos.map(j => `
+      <div class="card-jogador">
+
+        👤 ${j.nome}
+
+        <div>
+          ⚽ ${j.posicao || "-"} <br>
+          📞 ${j.telefone || "-"} <br>
+          🎂 ${j.nascimento ? formatarDataBR(j.nascimento) : "-"}
+        </div>
+
+      </div>
+    `).join("")
+
+    return
+  }
+
+  // =========================
+  // 👑 ADMIN
+  // =========================
 
   container.innerHTML = inativos.map(j => `
     <div class="card-jogador" onclick="toggleJogador(${j.id})">
@@ -303,37 +463,81 @@ function mostrarJogadoresInativosMobile(){
     </div>
 
     <div id="detalhe_${j.id}" class="detalhe-jogador" style="display:none">
-  📞 ${j.telefone || "-"} <br>
-  📄 ${j.cpf || "-"} <br>
-  ⚽ ${j.posicao || "-"} <br>
-  🎂 ${j.nascimento ? formatarDataBR(j.nascimento) : "-"} <br>
-  👤 ${j.nascimento ? calcularIdade(j.nascimento) + " anos" : "-"} <br><br>
 
-  <button onclick="ativarJogador(${j.id})">✅</button>
-  <button onclick="excluirJogador(${j.id})">🗑️</button>
-</div>
+      📞 ${j.telefone || "-"} <br>
+      📄 ${j.cpf || "-"} <br>
+      ⚽ ${j.posicao || "-"} <br>
+      🎂 ${j.nascimento ? formatarDataBR(j.nascimento) : "-"} <br>
+      👤 ${j.nascimento ? calcularIdade(j.nascimento) + " anos" : "-"} <br><br>
+
+      <button onclick="ativarJogador(${j.id})">✅</button>
+      <button onclick="excluirJogador(${j.id})">🗑️</button>
+
+    </div>
   `).join("")
 }
 
 function atualizarSelectJogadores(){
 
-let select=document.getElementById("jogadorPagamento")
+  let selectPagamento = document.getElementById("jogadorPagamento")
+  let selectUsuario = document.getElementById("jogadorUsuario")
 
-select.innerHTML=""
+  // =========================
+  // SELECT DE PAGAMENTOS
+  // =========================
 
-for(let i=0;i<jogadores.length;i++){
+  if(selectPagamento){
 
-if(jogadores[i].status==="ativo"){
+    selectPagamento.innerHTML = ""
 
-let option=document.createElement("option")
-option.value = jogadores[i].id
-option.text = jogadores[i].nome
+    for(let i = 0; i < jogadores.length; i++){
 
-select.appendChild(option)
+      if(jogadores[i].status === "ativo"){
 
-}
+        let option = document.createElement("option")
 
-}
+        option.value = jogadores[i].id
+        option.text = jogadores[i].nome
+
+        selectPagamento.appendChild(option)
+
+      }
+
+    }
+
+  }
+
+  // =========================
+  // SELECT DE USUÁRIOS
+  // =========================
+
+  if(selectUsuario){
+
+    selectUsuario.innerHTML = ""
+
+    let opcaoInicial = document.createElement("option")
+    opcaoInicial.value = ""
+    opcaoInicial.text = "Selecione o jogador"
+
+    selectUsuario.appendChild(opcaoInicial)
+
+    for(let i = 0; i < jogadores.length; i++){
+
+      if(jogadores[i].status === "ativo"){
+
+        let option = document.createElement("option")
+
+        option.value = jogadores[i].id
+        option.text = jogadores[i].nome
+
+        selectUsuario.appendChild(option)
+
+      }
+
+    }
+
+  }
+
 }
 
 // ATIVAR INATIVAR JOGADOR //
@@ -389,14 +593,19 @@ function editarJogador(id){
   let jogador = jogadores.find(j => j.id == id)
 
   if(!jogador){
+
     console.error("Jogador não encontrado:", id)
+
     return
   }
 
   document.getElementById("nome").value = jogador.nome || ""
   document.getElementById("telefone").value = jogador.telefone || ""
   document.getElementById("cpf").value = jogador.cpf || ""
-  document.getElementById("nascimento").value = jogador.nascimento ? jogador.nascimento.split("T")[0] : ""
+  document.getElementById("email").value = jogador.email || ""
+  document.getElementById("nascimento").value = jogador.nascimento
+    ? jogador.nascimento.split("T")[0]
+    : ""
   document.getElementById("posicao").value = jogador.posicao || ""
 }
 
