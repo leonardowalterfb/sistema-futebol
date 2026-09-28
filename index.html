@@ -2130,12 +2130,41 @@ if ("serviceWorker" in navigator) {
 
 <div class="bottom-nav">
 
-  <button onclick="mostrarSecao('painel')">🏠</button>
-  <button onclick="mostrarSecao('jogadores')">👥</button>
-  <button onclick="mostrarSecao('financeiro')">💰</button>
-  <button onclick="mostrarSecao('jogos')">⚽</button>
-  <button onclick="mostrarSecao('config')">⚙️</button>
-  <button onclick="logout()">🚪</button>
+  <button onclick="mostrarSecao('painel')">
+    <span>🏠</span>
+    <small>Painel</small>
+  </button>
+
+  <button onclick="mostrarSecao('jogadores')">
+    <span>👥</span>
+    <small>Jogadores</small>
+  </button>
+
+  <button onclick="mostrarSecao('financeiro')">
+    <span>💰</span>
+    <small>Financeiro</small>
+  </button>
+
+  <button onclick="mostrarSecao('jogos')">
+    <span>⚽</span>
+    <small>Jogos</small>
+  </button>
+
+  <button onclick="mostrarSecao('ranking')">
+    <span>🏆</span>
+    <small>Ranking</small>
+  </button>
+
+  <button onclick="mostrarSecao('historico')">
+    <span>📜</span>
+    <small>Histórico</small>
+  </button>
+
+  <button onclick="logout()">
+    <span>🚪</span>
+    <small>Sair</small>
+  </button>
+
 </div>
 
 </body>
