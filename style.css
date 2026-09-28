@@ -1064,3 +1064,13 @@ hr{
 .card:nth-child(2) .btn-expandir {
   background: linear-gradient(90deg, #dc2626, #b91c1c); /* despesa vermelho */
 }
+
+@media (max-width: 768px){
+
+  .bottom-nav button span,
+  .bottom-nav button small,
+  .bottom-nav button label{
+    display: none !important;
+  }
+
+}
