@@ -228,46 +228,134 @@ app.post("/jogadores", verificarToken, async (req, res) => {
 
     // VALIDA PERMISSÃO
     const usuarioId = req.usuario.id
-const pode = await temPermissao(usuarioId, j.turma_id, "jogadores", "cadastrar")
+
+    const pode = await temPermissao(
+      usuarioId,
+      j.turma_id,
+      "jogadores",
+      "cadastrar"
+    )
 
     if(!pode){
-      return res.status(403).json({ erro: "Sem permissão" })
+      return res.status(403).json({
+        erro: "Sem permissão"
+      })
     }
 
     const cpfLimpo = j.cpf.replace(/\D/g, "")
 
-    const existe = await pool.query(
-      `SELECT id FROM jogadores 
-       WHERE (cpf = $1 OR LOWER(nome) = LOWER($2)) 
-       AND turma_id = $3`,
-      [cpfLimpo, j.nome, j.turma_id]
-    )
+    // Número da camiseta é opcional
+    let numeroCamisa = null
 
-    if (existe.rows.length > 0) {
-      return res.status(400).json({ erro: "Jogador já existe" })
+    if(
+      j.numero_camisa !== undefined &&
+      j.numero_camisa !== null &&
+      String(j.numero_camisa).trim() !== ""
+    ){
+
+      numeroCamisa = Number(j.numero_camisa)
+
+      if(
+        !Number.isInteger(numeroCamisa) ||
+        numeroCamisa < 0 ||
+        numeroCamisa > 99
+      ){
+        return res.status(400).json({
+          erro: "Número da camiseta inválido"
+        })
+      }
+
+      // Verifica se o número já está sendo usado na turma
+      const existeNumero = await pool.query(
+        `SELECT id
+         FROM jogadores
+         WHERE turma_id = $1
+           AND numero_camisa = $2`,
+        [
+          j.turma_id,
+          numeroCamisa
+        ]
+      )
+
+      if(existeNumero.rows.length > 0){
+        return res.status(400).json({
+          erro: `O número ${numeroCamisa} já está sendo usado por outro jogador nesta turma.`
+        })
+      }
     }
 
-const result = await pool.query(
-  `INSERT INTO jogadores
-   (nome, telefone, cpf, email, nascimento, posicao, nivel, turma_id, data_cadastro, status)
-   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,NOW(),'ativo')
-   RETURNING id`,
-  [
-    j.nome,
-    j.telefone,
-    cpfLimpo,
-    j.email || null,
-    j.nascimento,
-    j.posicao,
-    j.nivel || "prata",
-    j.turma_id
-  ]
-)
+    // Verifica CPF ou nome duplicado
+    const existe = await pool.query(
+      `SELECT id
+       FROM jogadores
+       WHERE (cpf = $1 OR LOWER(nome) = LOWER($2))
+         AND turma_id = $3`,
+      [
+        cpfLimpo,
+        j.nome,
+        j.turma_id
+      ]
+    )
 
-    res.json({ ok: true, id: result.rows[0].id })
+    if(existe.rows.length > 0){
+      return res.status(400).json({
+        erro: "Jogador já existe"
+      })
+    }
 
-  } catch (err) {
-    res.status(500).json({ erro: err.message })
+    const result = await pool.query(
+      `INSERT INTO jogadores (
+        nome,
+        telefone,
+        cpf,
+        email,
+        nascimento,
+        posicao,
+        nivel,
+        numero_camisa,
+        turma_id,
+        data_cadastro,
+        status
+      )
+      VALUES (
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,NOW(),'ativo'
+      )
+      RETURNING id`,
+      [
+        j.nome,
+        j.telefone,
+        cpfLimpo,
+        j.email || null,
+        j.nascimento,
+        j.posicao,
+        j.nivel || "prata",
+        numeroCamisa,
+        j.turma_id
+      ]
+    )
+
+    res.json({
+      ok: true,
+      id: result.rows[0].id
+    })
+
+  } catch(err){
+
+    console.error(
+      "ERRO AO CADASTRAR JOGADOR:",
+      err
+    )
+
+    // Segurança extra caso a restrição UNIQUE do banco seja acionada
+    if(err.code === "23505"){
+      return res.status(400).json({
+        erro: "Este número de camiseta já está sendo usado nesta turma."
+      })
+    }
+
+    res.status(500).json({
+      erro: err.message
+    })
   }
 })
 
@@ -1081,60 +1169,1101 @@ app.get("/ranking/:turmaId", verificarToken, verificarAcessoTurma, async (req, r
 //JOGOS
 
 app.get("/jogos/:turmaId", verificarToken, verificarAcessoTurma, async (req, res) => {
+
   try {
+
     const { turmaId } = req.params
 
     const result = await pool.query(
-      "SELECT * FROM jogos WHERE turma_id = $1 ORDER BY data DESC",
+      `SELECT
+         j.*,
+
+         COALESCE(
+           (
+             SELECT json_agg(
+               json_build_object(
+                 'jogador_id', c.jogador_id,
+                 'jogador_nome', c.jogador_nome,
+                 'posicao', c.posicao,
+                 'equipe', c.equipe,
+                 'ordem', c.ordem
+               )
+               ORDER BY c.equipe, c.ordem
+             )
+             FROM composicoes_jogos c
+             WHERE c.jogo_id = j.id
+           ),
+           '[]'::json
+         ) AS composicao
+
+       FROM jogos j
+
+       WHERE j.turma_id = $1
+
+       ORDER BY j.data DESC, j.hora DESC`,
       [turmaId]
     )
 
     res.json(result.rows)
 
   } catch (err) {
+
     console.error("ERRO JOGOS:", err)
-    res.status(500).json({ erro: "Erro ao buscar jogos" })
+
+    res.status(500).json({
+      erro: "Erro ao buscar jogos"
+    })
+
+  }
+
+})
+
+app.get("/jogos/:id/presencas", verificarToken, async (req, res) => {
+  try {
+
+    const jogoId = Number(req.params.id)
+    const usuarioId = req.usuario.id
+
+    if(!Number.isInteger(jogoId)){
+      return res.status(400).json({
+        erro: "ID do jogo inválido"
+      })
+    }
+
+    const jogo = await pool.query(
+  `SELECT
+     id,
+     turma_id,
+     data,
+     hora,
+     local,
+     tipo_jogo,
+     status
+   FROM jogos
+   WHERE id = $1`,
+  [jogoId]
+)
+
+    if(jogo.rows.length === 0){
+      return res.status(404).json({
+        erro: "Jogo não encontrado"
+      })
+    }
+
+    const turmaId = jogo.rows[0].turma_id
+
+    // Verifica acesso à turma
+    const acesso = await pool.query(
+      `SELECT perfil, jogador_id
+       FROM usuarios_turmas
+       WHERE usuario_id = $1
+         AND turma_id = $2`,
+      [usuarioId, turmaId]
+    )
+
+    const usuario = await pool.query(
+      `SELECT is_master
+       FROM usuarios
+       WHERE id = $1`,
+      [usuarioId]
+    )
+
+    if(usuario.rows.length === 0){
+      return res.status(401).json({
+        erro: "Usuário não encontrado"
+      })
+    }
+
+    const isMaster = usuario.rows[0].is_master === true
+
+    if(!isMaster && acesso.rows.length === 0){
+      return res.status(403).json({
+        erro: "Você não tem acesso a esta turma"
+      })
+    }
+
+    // ADMIN vê todos
+    if(isMaster || acesso.rows[0].perfil === "ADMIN"){
+
+      const presencas = await pool.query(
+  `SELECT
+     p.id,
+     p.jogador_id,
+     j.nome,
+     j.posicao,
+     j.nivel,
+     p.resposta,
+     p.resposta_em,
+     p.presente_real
+   FROM presencas p
+   INNER JOIN jogadores j
+     ON j.id = p.jogador_id
+   WHERE p.jogo_id = $1
+   ORDER BY j.nome`,
+  [jogoId]
+)
+
+      return res.json({
+        jogo: jogo.rows[0],
+        presencas: presencas.rows
+      })
+    }
+
+    // JOGADOR vê somente sua própria resposta
+    const jogadorId = acesso.rows[0].jogador_id
+
+    if(!jogadorId){
+      return res.status(403).json({
+        erro: "Jogador não vinculado à conta"
+      })
+    }
+
+    const presenca = await pool.query(
+      `SELECT
+         p.id,
+         p.jogador_id,
+         j.nome,
+         p.resposta,
+         p.resposta_em,
+         p.presente_real
+       FROM presencas p
+       INNER JOIN jogadores j
+         ON j.id = p.jogador_id
+       WHERE p.jogo_id = $1
+         AND p.jogador_id = $2`,
+      [jogoId, jogadorId]
+    )
+
+    res.json({
+      jogo: jogo.rows[0],
+      presencas: presenca.rows
+    })
+
+  } catch(err){
+
+    console.error("ERRO AO BUSCAR PRESENÇAS DO JOGO:", err)
+
+    res.status(500).json({
+      erro: "Erro ao buscar presença do jogo"
+    })
+
+  }
+})
+
+app.put("/jogos/:jogoId/presenca", verificarToken, async (req, res) => {
+
+  try {
+
+    const jogoId = Number(req.params.jogoId)
+    const { resposta, jogador_id } = req.body
+    const usuarioId = req.usuario.id
+
+    if(!Number.isInteger(jogoId)){
+      return res.status(400).json({
+        erro: "ID do jogo inválido"
+      })
+    }
+
+    if(!["CONFIRMADO", "RECUSADO", "PENDENTE"].includes(resposta)){
+  return res.status(400).json({
+    erro: "Resposta inválida"
+  })
+}
+
+    // ---------------------------------------------
+    // BUSCA O JOGO
+    // ---------------------------------------------
+
+    const jogoResult = await pool.query(
+      `SELECT
+         id,
+         data,
+         hora,
+         turma_id,
+         status
+       FROM jogos
+       WHERE id = $1`,
+      [jogoId]
+    )
+
+    if(jogoResult.rows.length === 0){
+      return res.status(404).json({
+        erro: "Jogo não encontrado"
+      })
+    }
+
+    const jogo = jogoResult.rows[0]
+
+    // Jogo precisa estar agendado
+    if(jogo.status !== "AGENDADO"){
+      return res.status(403).json({
+        erro: "Este jogo já foi finalizado"
+      })
+    }
+
+    // ---------------------------------------------
+    // BUSCA USUÁRIO
+    // ---------------------------------------------
+
+    const usuarioResult = await pool.query(
+      `SELECT is_master
+       FROM usuarios
+       WHERE id = $1`,
+      [usuarioId]
+    )
+
+    if(usuarioResult.rows.length === 0){
+      return res.status(401).json({
+        erro: "Usuário não encontrado"
+      })
+    }
+
+    const isMaster =
+      usuarioResult.rows[0].is_master === true
+
+    // ---------------------------------------------
+    // BUSCA ACESSO À TURMA
+    // ---------------------------------------------
+
+    const acesso = await pool.query(
+      `SELECT
+         perfil,
+         jogador_id
+       FROM usuarios_turmas
+       WHERE usuario_id = $1
+         AND turma_id = $2`,
+      [usuarioId, jogo.turma_id]
+    )
+
+    if(!isMaster && acesso.rows.length === 0){
+      return res.status(403).json({
+        erro: "Você não tem acesso a esta turma"
+      })
+    }
+
+    const ehAdmin =
+      isMaster ||
+      acesso.rows[0]?.perfil === "ADMIN"
+
+    let jogadorId
+
+    // ---------------------------------------------
+    // ADMIN
+    // ---------------------------------------------
+
+    if(ehAdmin){
+
+      if(!jogador_id){
+        return res.status(400).json({
+          erro: "jogador_id é obrigatório para o administrador"
+        })
+      }
+
+      jogadorId = Number(jogador_id)
+
+      if(!Number.isInteger(jogadorId)){
+        return res.status(400).json({
+          erro: "jogador_id inválido"
+        })
+      }
+
+      // Garante que o jogador pertence à turma do jogo
+      const jogadorResult = await pool.query(
+        `SELECT id
+         FROM jogadores
+         WHERE id = $1
+           AND turma_id = $2`,
+        [
+          jogadorId,
+          jogo.turma_id
+        ]
+      )
+
+      if(jogadorResult.rows.length === 0){
+        return res.status(403).json({
+          erro: "Este jogador não pertence à turma do jogo"
+        })
+      }
+
+    }
+
+    // ---------------------------------------------
+    // JOGADOR
+    // ---------------------------------------------
+
+    else {
+
+      if(acesso.rows[0].perfil !== "JOGADOR"){
+        return res.status(403).json({
+          erro: "Somente jogadores podem responder ao convite"
+        })
+      }
+
+        if(resposta === "PENDENTE"){
+    return res.status(403).json({
+      erro: "Somente administradores podem voltar uma resposta para pendente"
+    })
+  }
+
+      jogadorId = acesso.rows[0].jogador_id
+
+      if(!jogadorId){
+        return res.status(403).json({
+          erro: "Jogador não vinculado à conta"
+        })
+      }
+
+    }
+
+    // ---------------------------------------------
+    // VERIFICA PRAZO
+    // ---------------------------------------------
+
+    const agoraPartes = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false
+    }).formatToParts(new Date())
+
+    const partes = {}
+
+    for(const parte of agoraPartes){
+
+      if(parte.type !== "literal"){
+        partes[parte.type] = parte.value
+      }
+
+    }
+
+    const agoraComparacao = Date.UTC(
+      Number(partes.year),
+      Number(partes.month) - 1,
+      Number(partes.day),
+      Number(partes.hour),
+      Number(partes.minute),
+      Number(partes.second)
+    )
+
+    const horaJogo = jogo.hora
+      ? String(jogo.hora).substring(0, 8)
+      : "00:00:00"
+
+    const [ano, mes, dia] = String(jogo.data)
+      .substring(0, 10)
+      .split("-")
+      .map(Number)
+
+    const [hora, minuto, segundo] = horaJogo
+      .split(":")
+      .map(Number)
+
+    const jogoComparacao = Date.UTC(
+      ano,
+      mes - 1,
+      dia,
+      hora || 0,
+      minuto || 0,
+      segundo || 0
+    )
+
+    if(!ehAdmin && agoraComparacao >= jogoComparacao){
+
+  return res.status(403).json({
+    erro: "O prazo para responder este jogo já terminou"
+  })
+
+}
+
+    // ---------------------------------------------
+    // ATUALIZA PRESENÇA
+    // ---------------------------------------------
+
+    const resultado = await pool.query(
+  `UPDATE presencas
+   SET resposta = $1,
+       resposta_em = CASE
+         WHEN $1 = 'PENDENTE' THEN NULL
+         ELSE CURRENT_TIMESTAMP
+       END
+   WHERE jogo_id = $2
+     AND jogador_id = $3
+   RETURNING
+     id,
+     jogo_id,
+     jogador_id,
+     resposta,
+     resposta_em`,
+  [
+    resposta,
+    jogoId,
+    jogadorId
+  ]
+)
+
+    if(resultado.rows.length === 0){
+      return res.status(404).json({
+        erro: "Presença deste jogador não encontrada"
+      })
+    }
+
+    res.json({
+      ok: true,
+      presenca: resultado.rows[0]
+    })
+
+  } catch(err){
+
+    console.error(
+      "ERRO AO RESPONDER PRESENÇA:",
+      err
+    )
+
+    res.status(500).json({
+      erro: "Erro ao registrar resposta"
+    })
+
+  }
+
+})
+
+app.put("/jogos/:jogoId/finalizar", verificarToken, async (req, res) => {
+  const client = await pool.connect()
+
+  try {
+
+    const jogoId = Number(req.params.jogoId)
+    const {
+  presentesReais, composicao} = req.body
+    const usuarioId = req.usuario.id
+
+    if(!Number.isInteger(jogoId)){
+      return res.status(400).json({
+        erro: "ID do jogo inválido"
+      })
+    }
+
+    if(!Array.isArray(presentesReais)){
+      return res.status(400).json({
+        erro: "Lista de presentes inválida"
+      })
+    }
+
+    if(
+  !composicao ||
+  typeof composicao !== "object" ||
+  !composicao.equipes ||
+  typeof composicao.equipes !== "object"
+){
+  return res.status(400).json({
+    erro: "Composição dos times inválida"
+  })
+}
+
+    // Busca o jogo
+    const jogoResult = await client.query(
+      `SELECT
+         id,
+         data,
+         hora,
+         turma_id,
+         status
+       FROM jogos
+       WHERE id = $1`,
+      [jogoId]
+    )
+
+    if(jogoResult.rows.length === 0){
+      return res.status(404).json({
+        erro: "Jogo não encontrado"
+      })
+    }
+
+    const jogo = jogoResult.rows[0]
+
+    if(jogo.status !== "AGENDADO"){
+      return res.status(403).json({
+        erro: "Este jogo já foi finalizado"
+      })
+    }
+
+    // Verifica usuário
+    const usuario = await client.query(
+      `SELECT is_master
+       FROM usuarios
+       WHERE id = $1`,
+      [usuarioId]
+    )
+
+    if(usuario.rows.length === 0){
+      return res.status(401).json({
+        erro: "Usuário não encontrado"
+      })
+    }
+
+    const isMaster = usuario.rows[0].is_master === true
+
+    // Verifica acesso à turma
+    const acesso = await client.query(
+      `SELECT perfil
+       FROM usuarios_turmas
+       WHERE usuario_id = $1
+         AND turma_id = $2`,
+      [usuarioId, jogo.turma_id]
+    )
+
+    if(!isMaster && acesso.rows.length === 0){
+      return res.status(403).json({
+        erro: "Você não tem acesso a esta turma"
+      })
+    }
+
+    // Somente ADMIN pode finalizar
+    if(!isMaster && acesso.rows[0].perfil !== "ADMIN"){
+      return res.status(403).json({
+        erro: "Somente administradores podem finalizar jogos"
+      })
+    }
+
+    // Verifica permissão Salvar Jogo
+    const pode = await temPermissao(
+      usuarioId,
+      jogo.turma_id,
+      "jogos",
+      "salvar"
+    )
+
+    if(!pode){
+      return res.status(403).json({
+        erro: "Sem permissão para salvar o jogo"
+      })
+    }
+
+    // --------------------------------------------------
+    // Verifica se a data/hora do jogo já passou
+    // --------------------------------------------------
+
+    const agoraPartes = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false
+    }).formatToParts(new Date())
+
+    const partes = {}
+
+    for(const parte of agoraPartes){
+      if(parte.type !== "literal"){
+        partes[parte.type] = parte.value
+      }
+    }
+
+    const agoraComparacao = Date.UTC(
+      Number(partes.year),
+      Number(partes.month) - 1,
+      Number(partes.day),
+      Number(partes.hour),
+      Number(partes.minute),
+      Number(partes.second)
+    )
+
+    const horaJogo = jogo.hora
+      ? String(jogo.hora).substring(0, 8)
+      : "00:00:00"
+
+    const [ano, mes, dia] = String(jogo.data)
+      .substring(0, 10)
+      .split("-")
+      .map(Number)
+
+    const [hora, minuto, segundo] = horaJogo
+      .split(":")
+      .map(Number)
+
+    const jogoComparacao = Date.UTC(
+      ano,
+      mes - 1,
+      dia,
+      hora || 0,
+      minuto || 0,
+      segundo || 0
+    )
+
+    if(agoraComparacao < jogoComparacao){
+      return res.status(403).json({
+        erro: "O jogo ainda não ocorreu"
+      })
+    }
+
+    // --------------------------------------------------
+    // Busca todas as presenças do jogo
+    // --------------------------------------------------
+
+    const presencasResult = await client.query(
+  `SELECT
+     p.jogador_id,
+     j.nome,
+     j.posicao
+   FROM presencas p
+   INNER JOIN jogadores j
+     ON j.id = p.jogador_id
+   WHERE p.jogo_id = $1
+   ORDER BY j.nome`,
+  [jogoId]
+)
+
+    const pendentesResult = await client.query(
+  `SELECT COUNT(*) AS total
+   FROM presencas
+   WHERE jogo_id = $1
+     AND resposta = 'PENDENTE'`,
+  [jogoId]
+)
+
+const totalPendentes =
+  Number(pendentesResult.rows[0].total)
+
+if(totalPendentes > 0){
+  return res.status(400).json({
+    erro: `Ainda existem ${totalPendentes} jogador(es) pendente(s). Todos precisam confirmar ou recusar antes de finalizar o jogo.`
+  })
+}
+
+    // Garante que os jogadores informados pertencem ao jogo
+    const jogadorIdsDoJogo = new Set(
+      presencasResult.rows.map(p => Number(p.jogador_id))
+    )
+
+    for(const jogadorId of presentesReais){
+
+      const id = Number(jogadorId)
+
+      if(!jogadorIdsDoJogo.has(id)){
+        return res.status(400).json({
+          erro: `Jogador ${id} não pertence a este jogo`
+        })
+      }
+    }
+
+    const presentesIds = new Set(
+      presentesReais.map(id => Number(id))
+    )
+
+    const nomesPresentes = []
+    const nomesFaltaram = []
+
+    await client.query("BEGIN")
+
+    // Atualiza presença real de cada jogador
+    for(const presenca of presencasResult.rows){
+
+      const jogadorId = Number(presenca.jogador_id)
+      const foi = presentesIds.has(jogadorId)
+
+      await client.query(
+        `UPDATE presencas
+         SET presente_real = $1
+         WHERE jogo_id = $2
+           AND jogador_id = $3`,
+        [
+          foi,
+          jogoId,
+          jogadorId
+        ]
+      )
+
+      if(foi){
+        nomesPresentes.push(presenca.nome)
+      } else {
+        nomesFaltaram.push(presenca.nome)
+      }
+    }
+
+    // Finaliza o jogo
+    await client.query(
+      `UPDATE jogos
+       SET status = 'FINALIZADO',
+           presentes = $1,
+           faltaram = $2
+       WHERE id = $3`,
+      [
+        JSON.stringify(nomesPresentes),
+        JSON.stringify(nomesFaltaram),
+        jogoId
+      ]
+    )
+
+    // --------------------------------------------------
+// Salva a composição final do jogo
+// --------------------------------------------------
+
+await client.query(
+  `DELETE FROM composicoes_jogos
+   WHERE jogo_id = $1`,
+  [jogoId]
+)
+
+for(const equipe of Object.keys(composicao.equipes)){
+
+  const equipeNumero = Number(equipe)
+  const jogadoresEquipe = composicao.equipes[equipe]
+
+  if(
+    !Number.isInteger(equipeNumero) ||
+    equipeNumero < 1 ||
+    !Array.isArray(jogadoresEquipe)
+  ){
+    throw new Error("Composição de equipe inválida")
+  }
+
+  for(let i = 0; i < jogadoresEquipe.length; i++){
+
+    const jogadorId = Number(jogadoresEquipe[i])
+
+    if(!Number.isInteger(jogadorId)){
+      throw new Error("Jogador inválido na composição")
+    }
+
+    if(!presentesIds.has(jogadorId)){
+      throw new Error(
+        `Jogador ${jogadorId} não está entre os presentes`
+      )
+    }
+
+    const jogadorFinal =
+  presencasResult.rows.find(
+    p => Number(p.jogador_id) === jogadorId
+  )
+
+if(!jogadorFinal){
+  throw new Error(
+    `Jogador ${jogadorId} não encontrado nas presenças`
+  )
+}
+
+await client.query(
+  `INSERT INTO composicoes_jogos (
+    jogo_id,
+    jogador_id,
+    jogador_nome,
+    posicao,
+    equipe,
+    ordem
+  )
+  VALUES ($1,$2,$3,$4,$5,$6)`,
+  [
+    jogoId,
+    jogadorId,
+    jogadorFinal.nome,
+    jogadorFinal.posicao || null,
+    equipeNumero,
+    i + 1
+  ]
+)
+
+  }
+}
+
+    await client.query("COMMIT")
+
+    res.json({
+      ok: true,
+      id: jogoId,
+      status: "FINALIZADO",
+      presentes: nomesPresentes,
+      faltaram: nomesFaltaram
+    })
+
+  } catch(err){
+
+    await client.query("ROLLBACK")
+
+    console.error(
+      "ERRO AO FINALIZAR JOGO:",
+      err
+    )
+
+    res.status(500).json({
+      erro: "Erro ao finalizar jogo"
+    })
+
+  } finally {
+
+    client.release()
+
   }
 })
 
 app.post("/jogos", verificarToken, async (req, res) => {
+  const client = await pool.connect()
+
   try {
-    const { data, local, presentes, faltaram, turma_id } = req.body
 
-const usuarioId = req.usuario.id
+    const {
+      data,
+      hora,
+      local,
+      turma_id,
+      tipo_jogo
+    } = req.body
 
-const pode = await temPermissao(
-  usuarioId,
-  turma_id,
-  "jogos",
-  "salvar"
-)
+    const usuarioId = req.usuario.id
+    const turmaId = Number(turma_id)
 
-if(!pode){
-  return res.status(403).json({
-    erro: "Sem permissão"
-  })
-}
+    const tipoJogo = tipo_jogo || "rachao"
 
-    const result = await pool.query(
-      `INSERT INTO jogos (data, local, presentes, faltaram, turma_id)
-       VALUES ($1,$2,$3,$4,$5)
-       RETURNING id`,
-       [data,
-        local,
-        JSON.stringify(presentes),
-        JSON.stringify(faltaram),
-        turma_id]
+    if(!Number.isInteger(turmaId)){
+      return res.status(400).json({
+        erro: "Turma inválida"
+      })
+    }
+
+    if(!data || !hora || !local){
+      return res.status(400).json({
+        erro: "Data, hora e local são obrigatórios"
+      })
+    }
+
+    if(!["rachao", "desafio"].includes(tipoJogo)){
+      return res.status(400).json({
+        erro: "Tipo de jogo inválido"
+      })
+    }
+
+    // Verifica se o usuário realmente pertence à turma
+    const acesso = await client.query(
+      `SELECT perfil
+       FROM usuarios_turmas
+       WHERE usuario_id = $1
+         AND turma_id = $2`,
+      [usuarioId, turmaId]
     )
 
-    res.json({ ok: true, id: result.rows[0].id })
+    // MASTER pode acessar qualquer turma
+    const usuario = await client.query(
+      `SELECT is_master
+       FROM usuarios
+       WHERE id = $1`,
+      [usuarioId]
+    )
+
+    if(usuario.rows.length === 0){
+      return res.status(401).json({
+        erro: "Usuário não encontrado"
+      })
+    }
+
+    const isMaster = usuario.rows[0].is_master === true
+
+    if(!isMaster && acesso.rows.length === 0){
+      return res.status(403).json({
+        erro: "Você não tem acesso a esta turma"
+      })
+    }
+
+    // Somente ADMIN pode criar jogo
+    if(!isMaster && acesso.rows[0].perfil !== "ADMIN"){
+      return res.status(403).json({
+        erro: "Somente administradores podem criar jogos"
+      })
+    }
+
+    // Verifica a permissão específica
+    const pode = await temPermissao(
+      usuarioId,
+      turmaId,
+      "jogos",
+      "criar"
+    )
+
+    if(!pode){
+      return res.status(403).json({
+        erro: "Sem permissão"
+      })
+    }
+
+    await client.query("BEGIN")
+
+    // Cria o jogo
+    const result = await client.query(
+      `INSERT INTO jogos (
+        data,
+        hora,
+        local,
+        turma_id,
+        tipo_jogo,
+        status
+      )
+      VALUES ($1,$2,$3,$4,$5,'AGENDADO')
+      RETURNING id`,
+      [
+        data,
+        hora,
+        local.trim(),
+        turmaId,
+        tipoJogo
+      ]
+    )
+
+    const jogoId = result.rows[0].id
+
+    // Cria uma presença pendente para cada jogador ativo da turma
+    await client.query(
+      `INSERT INTO presencas (
+        jogo_id,
+        jogador_id,
+        resposta
+      )
+      SELECT
+        $1,
+        j.id,
+        'PENDENTE'
+      FROM jogadores j
+      WHERE j.turma_id = $2
+        AND j.status = 'ativo'`,
+      [
+        jogoId,
+        turmaId
+      ]
+    )
+
+    await client.query("COMMIT")
+
+    res.status(201).json({
+      ok: true,
+      id: jogoId
+    })
 
   } catch (err) {
-    console.error("ERRO AO SALVAR JOGO:", err)
-    res.status(500).json({ erro: err.message })
+
+    await client.query("ROLLBACK")
+
+    console.error("ERRO AO CRIAR JOGO:", err)
+
+    res.status(500).json({
+      erro: err.message
+    })
+
+  } finally {
+
+    client.release()
+
   }
 })
 
+// EXCLUIR JOGO
+app.delete("/jogos/:id", verificarToken, async (req, res) => {
+
+  try {
+
+    const jogoId = Number(req.params.id)
+    const usuarioId = req.usuario.id
+
+    if(!Number.isInteger(jogoId)){
+      return res.status(400).json({
+        erro: "ID do jogo inválido"
+      })
+    }
+
+    // Busca o jogo e identifica a turma dele
+    const jogo = await pool.query(
+      `SELECT id, turma_id
+       FROM jogos
+       WHERE id = $1`,
+      [jogoId]
+    )
+
+    if(jogo.rows.length === 0){
+      return res.status(404).json({
+        erro: "Jogo não encontrado"
+      })
+    }
+
+    const turmaId = jogo.rows[0].turma_id
+
+    // Verifica se o usuário é master
+    const usuario = await pool.query(
+      `SELECT is_master
+       FROM usuarios
+       WHERE id = $1`,
+      [usuarioId]
+    )
+
+    if(usuario.rows.length === 0){
+      return res.status(401).json({
+        erro: "Usuário não encontrado"
+      })
+    }
+
+    const isMaster = usuario.rows[0].is_master === true
+
+    // Verifica acesso do usuário à turma
+    const acesso = await pool.query(
+      `SELECT perfil
+       FROM usuarios_turmas
+       WHERE usuario_id = $1
+         AND turma_id = $2`,
+      [usuarioId, turmaId]
+    )
+
+    if(!isMaster && acesso.rows.length === 0){
+      return res.status(403).json({
+        erro: "Você não tem acesso a esta turma"
+      })
+    }
+
+    // Somente ADMIN pode excluir
+    if(!isMaster && acesso.rows[0].perfil !== "ADMIN"){
+      return res.status(403).json({
+        erro: "Somente administradores podem excluir jogos"
+      })
+    }
+
+    // Verifica permissão específica
+    const pode = await temPermissao(
+      usuarioId,
+      turmaId,
+      "jogos",
+      "excluir"
+    )
+
+    if(!pode){
+      return res.status(403).json({
+        erro: "Sem permissão"
+      })
+    }
+
+    // Exclui o jogo
+    await pool.query(
+      `DELETE FROM jogos
+       WHERE id = $1
+         AND turma_id = $2`,
+      [jogoId, turmaId]
+    )
+
+    res.json({
+      ok: true
+    })
+
+  } catch(err) {
+
+    console.error("ERRO AO EXCLUIR JOGO:", err)
+
+    res.status(500).json({
+      erro: err.message
+    })
+
+  }
+
+})
 // TURMAS
 
 app.get("/turmas", async (req, res) => {

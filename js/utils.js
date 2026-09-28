@@ -66,7 +66,7 @@ function mostrarToast(mensagem, tipo = "success"){
 
   setTimeout(() => {
     toast.classList.remove("show")
-  }, 3000)
+  }, 8000)
 }
 
 // LOGOUT

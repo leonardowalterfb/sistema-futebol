@@ -283,6 +283,7 @@
 
 <select id="modalidadeTurma">
   <option value="futebol">Futebol</option>
+  <option value="futebol7">Futebol 7</option>
   <option value="futsal">Futsal</option>
   <option value="volei">Vôlei</option>
   <option value="basquete">Basquete</option>
@@ -319,6 +320,14 @@
     <option>Meia</option>
     <option>Atacante</option>
   </select>
+
+  <input
+  type="number"
+  id="numeroCamisa"
+  placeholder="Número da camiseta"
+  min="0"
+  max="999"
+>
 
   <select id="nivel">
     <option value="ouro">🥇 Ouro</option>
@@ -509,65 +518,20 @@
 <h2>⚽ Presença no Jogo</h2>
 
 <input type="date" id="dataJogo">
+<input type="time" id="horaJogo">
 <input type="text" id="localJogo" placeholder="Local do jogo">
+<select id="tipoJogo">
+  <option value="rachao">Rachão</option>
+  <option value="desafio">Desafio</option>
+</select>
 
-<button id="btnCriarJogo" onclick="criarJogo()">⚽Criar Jogo</button>
-<button id="btnSalvarJogo" onclick="salvarHistorico()">⚽Salvar Jogo</button>
-<button id="btnLimparJogo" onclick="limparJogo()">🧹Limpar Jogo</button>
-<button id="btnGerarLink" onclick="gerarLinks()">📲 Gerar links para WhatsApp</button>
+<button id="btnCriarJogo" onclick="criarJogo()">⚽ Criar Jogo</button>
 
-<h3 id="tituloJogadores">Jogadores (0)</h3>
+<h3>⚽ Jogos Agendados</h3>
 
-<table style="width:100%; border-collapse:collapse;">
-<thead>
-<tr style="background:#2d7cc1;color:white;">
-<th style="text-align:left;padding:8px;">Jogador</th>
-<th style="padding:8px;">Ação</th>
-</tr>
-</thead>
-
-<tbody id="listaPresenca"></tbody>
-</table>
-
-<h3 id="tituloConfirmados">Confirmados (0)</h3>
-
-<table style="width:100%;border-collapse:collapse;">
-<thead>
-<tr style="background:#2d7cc1;color:white;">
-<th style="text-align:left;padding:8px;">Jogador</th>
-<th style="padding:8px;">Ação</th>
-</tr>
-</thead>
-
-<tbody id="confirmados"></tbody>
-</table>
-
-<h3 id="tituloNaoConfirmados">Não Confirmados (0)</h3>
-
-<table style="width:100%;border-collapse:collapse;">
-<thead>
-<tr style="background:#2d7cc1;color:white;">
-<th style="text-align:left;padding:8px;">Jogador</th>
-<th style="padding:8px;">Ação</th>
-</tr>
-</thead>
-
-<tbody id="naoConfirmados"></tbody>
-</table>
-
-<h2>🎲 Sorteio de Times</h2>
-
-<button onclick="sortearTimes()">Sortear Times</button>
-<button onclick="limparSorteio()">Limpar Sorteio</button>
-
-<h3>Time A</h3>
-<ul id="timeA"></ul>
-
-<h3>Time B</h3>
-<ul id="timeB"></ul>
+<div id="listaJogosAgendados"></div>
 
 </div>
-
 
 <!-- ======================= -->
 <!-- RANKING -->
@@ -580,7 +544,6 @@
 <ul id="rankingPresenca"></ul>
 
 </div>
-
 
 <!-- ======================= -->
 <!-- HISTÓRICO -->
@@ -1968,6 +1931,10 @@ function montarPosicoes(modalidade){
     opcoes = ["Goleiro","Zagueiro","Lateral","Meia","Atacante"]
   }
 
+  if(modalidade === "futebol7"){
+  opcoes = ["Goleiro","Zagueiro","Lateral","Meia","Atacante"]
+}
+
   if(modalidade === "futsal"){
     opcoes = ["Goleiro","Fixo","Ala","Pivô"]
   }
@@ -2028,6 +1995,10 @@ async function mostrarSecao(id){
     atualizarPainel()
     atualizarBotaoPagamento()
   }
+
+  if(id === "jogos"){
+  await carregarJogosAgendados()
+}
 }
 
 function logout(){
@@ -2077,25 +2048,28 @@ if(!podeConfig){
 }
 
 
-try{  
-  let podeCriar = await usuarioTemPermissao("jogos", "criar")  
-  let podeLimpar = await usuarioTemPermissao("jogos", "limpar")  
-  let podeLink = await usuarioTemPermissao("jogos", "gerar_link")  
+try{
+
+  let podeCriar = await usuarioTemPermissao(
+    "jogos",
+    "criar"
+  )
 
   if(!podeCriar){
-    document.getElementById("btnCriarJogo")?.remove()
-  }
 
-  if(!podeLimpar){
-    document.getElementById("btnLimparJogo")?.remove()
-  }
+    document.getElementById(
+      "btnCriarJogo"
+    )?.remove()
 
-  if(!podeLink){
-    document.getElementById("btnGerarLink")?.remove()
   }
 
 }catch(err){
-  console.log("Erro permissões jogos:", err)
+
+  console.log(
+    "Erro permissões jogos:",
+    err
+  )
+
 }
 
   await iniciarSistema()

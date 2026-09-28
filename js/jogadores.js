@@ -18,6 +18,7 @@ async function cadastrar(){
   let nascimento=document.getElementById("nascimento").value
   let posicao=document.getElementById("posicao").value
   let nivel = document.getElementById("nivel").value
+  let numeroCamisa = document.getElementById("numeroCamisa").value
 
   if(nome===""){
     mostrarToast("Digite o nome do jogador")
@@ -32,16 +33,17 @@ async function cadastrar(){
   hoje.getFullYear()
 
   let jogador={
-    nome:nome,
-    telefone:telefone,
-    cpf:cpf,
-    email:email,
-    nascimento:nascimento,
-    posicao:posicao,
-    nivel:nivel,
-    dataCadastro:dataCadastro,
-    status:"ativo"
-  }
+  nome:nome,
+  telefone:telefone,
+  cpf:cpf,
+  email:email,
+  nascimento:nascimento,
+  posicao:posicao,
+  nivel:nivel,
+  numero_camisa: numeroCamisa,
+  dataCadastro:dataCadastro,
+  status:"ativo"
+}
 
   let turmaSelecionada = JSON.parse(
   localStorage.getItem("turmaSelecionada")
