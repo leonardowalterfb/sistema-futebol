@@ -735,25 +735,22 @@ function carregarNomeTurma(){
   let turmaId = Number(turmaSelecionada.turma_id)
 
   // 🔥 BUSCA DO BACKEND
-  fetch(`https://sistema-futebol-1.onrender.com/turmas/${turmaId}`)
-    .then(res => res.json())
-    .then(turma => {
+  apiGet(`/turmas/${turmaId}`)
+  .then(turma => {
 
-      // 🔥 PREENCHE INPUT
-      let input = document.getElementById("nomeSistema")
+    let input = document.getElementById("nomeSistema")
 
-      if(input){
-        input.value = turma.nome || ""
-      }
+    if(input){
+      input.value = turma.nome || ""
+    }
 
-      // 🔥 ATUALIZA TÍTULO
-      let titulo = document.getElementById("tituloSistema")
+    let titulo = document.getElementById("tituloSistema")
 
-      if(titulo){
-        titulo.innerText = "⚽ " + (turma.nome || "Sistema")
-      }
+    if(titulo){
+      titulo.innerText = "⚽ " + (turma.nome || "Sistema")
+    }
 
-    })
+  })
 }
 
 async function iniciarSistema(){
@@ -879,38 +876,175 @@ function salvarNomeTurma(){
   mostrarToast("Nome atualizado!")
 }
 
-// Link Para WhatsApp//
+async function gerarRelacaoJogadoresPDF(jogoId){
 
-function verificarConfirmacaoLink(){
+  try {
 
-let params = new URLSearchParams(window.location.search)
+    const resultado = await apiGet(
+      `/jogos/${jogoId}/presencas`
+    )
 
-let jogador = params.get("jogador")
-let presenca = params.get("presenca")
+    const jogo = resultado.jogo
+    const presencas = resultado.presencas || []
 
-if(!jogador || !presenca) return
+    // Apenas jogadores que confirmaram presença
+    const jogadores = presencas
+      .filter(p => p.resposta === "CONFIRMADO")
+      .sort((a, b) =>
+        a.nome.localeCompare(b.nome, "pt-BR")
+      )
 
-for(let i=0;i<presencas.length;i++){
+    const { jsPDF } = window.jspdf
 
-  if(!presencas) return
+    const doc = new jsPDF()
 
-if(presencas[i].nome === jogador){
+    // =========================
+    // TÍTULO
+    // =========================
 
-presencas[i].respondido = true
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(18)
 
-if(presenca === "sim"){
-presencas[i].confirmado = true
-}
+    doc.text(
+      "RELAÇÃO DE JOGADORES",
+      105,
+      20,
+      { align: "center" }
+    )
 
-if(presenca === "nao"){
-presencas[i].confirmado = false
-}
+    // =========================
+    // DADOS DO JOGO
+    // =========================
 
-mostrarToast("Presença registrada!")
+    const tipoJogo =
+      jogo.tipo_jogo === "desafio"
+        ? "DESAFIO"
+        : "RACHÃO"
 
-}
+    const dataJogo = jogo.data
+      ? formatarDataBR(jogo.data)
+      : "-"
 
-}
+    const localJogo =
+      jogo.local || "-"
+
+    doc.setFontSize(11)
+    doc.setFont("helvetica", "normal")
+
+    doc.text(`Tipo do jogo: ${tipoJogo}`, 20, 35)
+    doc.text(`Data do jogo: ${dataJogo}`, 20, 43)
+    doc.text(`Local do jogo: ${localJogo}`, 20, 51)
+
+    // =========================
+    // CABEÇALHO DA TABELA
+    // =========================
+
+    let y = 68
+
+    doc.setFont("helvetica", "bold")
+
+    doc.text("Nome do Jogador", 20, y)
+    doc.text("Posição", 120, y)
+    doc.text("Nº Camiseta", 165, y)
+
+    doc.line(20, y + 3, 190, y + 3)
+
+    y += 12
+
+    // =========================
+    // JOGADORES
+    // =========================
+
+    doc.setFont("helvetica", "normal")
+
+    if(jogadores.length === 0){
+
+      doc.text(
+        "Nenhum jogador confirmou presença.",
+        20,
+        y
+      )
+
+    } else {
+
+      jogadores.forEach(jogador => {
+
+        if(y > 275){
+
+          doc.addPage()
+
+          y = 20
+
+          doc.setFont("helvetica", "bold")
+
+          doc.text("Nome do Jogador", 20, y)
+          doc.text("Posição", 120, y)
+          doc.text("Nº Camiseta", 165, y)
+
+          doc.line(20, y + 3, 190, y + 3)
+
+          y += 12
+
+          doc.setFont("helvetica", "normal")
+        }
+
+        const nome =
+          jogador.nome || "-"
+
+        const posicao =
+          jogador.posicao || "-"
+
+        const numero =
+          jogador.numero_camisa !== null &&
+          jogador.numero_camisa !== undefined
+            ? jogador.numero_camisa
+            : "-"
+
+        doc.text(
+          String(nome),
+          20,
+          y
+        )
+
+        doc.text(
+          String(posicao),
+          120,
+          y
+        )
+
+        doc.text(
+          String(numero),
+          170,
+          y
+        )
+
+        y += 9
+
+      })
+
+    }
+
+    // =========================
+    // GERAR PDF
+    // =========================
+
+    doc.save(
+      `relacao-jogadores-${jogoId}.pdf`
+    )
+
+  } catch(err){
+
+    console.error(
+      "Erro ao gerar relação de jogadores:",
+      err
+    )
+
+    mostrarToast(
+      "Erro ao gerar PDF",
+      "error"
+    )
+
+  }
 
 }
 
@@ -1629,9 +1763,7 @@ async function excluirUsuario(id){
 
   if(!confirmar) return
 
-  await fetch("https://sistema-futebol-1.onrender.com/usuarios/" + id, {
-    method: "DELETE"
-  })
+  await apiDelete(`/usuarios/${id}`)
 
   mostrarToast("Usuário excluído")
 
@@ -1649,19 +1781,18 @@ function editarUsuario(id){
 
   let usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"))
 
-  fetch(`https://sistema-futebol-1.onrender.com/usuarios/${usuarioLogado.turma_id}`)
-    .then(res => res.json())
-    .then(dados => {
+  apiGet(`/usuarios/${usuarioLogado.turma_id}`)
+  .then(dados => {
 
-      let u = dados.find(u => u.id === id)
+    let u = dados.find(u => u.id === id)
 
-      if(!u) return
+    if(!u) return
 
-      document.getElementById("nomeUsuario").value = u.nome
-      document.getElementById("loginUsuario").value = u.login
-      document.getElementById("senhaUsuario").value = ""
+    document.getElementById("nomeUsuario").value = u.nome
+    document.getElementById("loginUsuario").value = u.login
+    document.getElementById("senhaUsuario").value = ""
 
-    })
+  })
 }
 
 function abrirAbaConfig(aba){
@@ -1835,15 +1966,9 @@ async function salvarConfiguracoesSistema(){
   }
 
   // 🔥 AQUI ESTÁ A CHAVE
-  await fetch(`https://sistema-futebol-1.onrender.com/turmas/${usuario.turma_id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      nome: nome
-    })
-  })
+  await apiPut(`/turmas/${usuario.turma_id}`, {
+  nome: nome
+})
 
   mostrarToast("Nome salvo com sucesso!")
 
@@ -1863,7 +1988,7 @@ async function atualizarTituloSistema(){
   let turmaId = Number(turmaSelecionada.turma_id)
 
   let res = await fetch(
-    `https://sistema-futebol-1.onrender.com/turmas/${turmaId}`
+    apiGet(`/turmas/${turmaId}`)
   )
 
   let turma = await res.json()
@@ -2139,6 +2264,8 @@ if ("serviceWorker" in navigator) {
   <button onclick="logout()">🚪</button>
 
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </body>
 </html>

@@ -3,8 +3,6 @@ dns.setDefaultResultOrder('ipv4first')
 
 require("dotenv").config()
 
-console.log("DATABASE_URL:", process.env.DATABASE_URL)
-
 if (!process.env.DATABASE_URL) {
   console.error("❌ DATABASE_URL NÃO DEFINIDA")
 } else {
@@ -42,9 +40,9 @@ function verificarToken(req, res, next){
   try {
 
     const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || "segredo_super_forte"
-    )
+  token,
+  process.env.JWT_SECRET
+)
 
     req.usuario = decoded
 
@@ -149,28 +147,6 @@ async function temPermissao(usuarioId, turmaId, modulo, acao){
          result.rows[0].permitido === true
 }
 
-//const db = require("./config/db")
-
-// ================= TESTE =================
-app.get("/teste-db", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT NOW()")
-    res.json(result.rows)
-  } catch (err) {
-    console.error("ERRO REAL:", err) // 👈 ISSO AQUI
-    res.status(500).json({ erro: err.message })
-  }
-})
-
-app.get("/teste-jogadores", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT * FROM jogadores LIMIT 10")
-    res.json(result.rows)
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ erro: err.message })
-  }
-})
 // ================= JOGADORES =================
 app.get(
   "/jogadores/:turmaId",
@@ -875,69 +851,250 @@ if (jogador_id) {
 
 // ===============PERMISSÕES================
 
-app.get("/permissoes/:turmaId", verificarToken, verificarAcessoTurma, async (req, res) => {
+app.get(
+  "/permissoes/:turmaId/:usuarioId",
+  verificarToken,
+  async (req, res) => {
+
+    try {
+
+      const turmaId = Number(req.params.turmaId)
+      const usuarioId = Number(req.params.usuarioId)
+
+      if(
+        !Number.isInteger(turmaId) ||
+        !Number.isInteger(usuarioId)
+      ){
+        return res.status(400).json({
+          erro: "Turma ou usuário inválidos"
+        })
+      }
+
+      // Verifica se o usuário logado é master
+      const usuarioLogado = await pool.query(
+        `SELECT is_master
+         FROM usuarios
+         WHERE id = $1`,
+        [req.usuario.id]
+      )
+
+      if(usuarioLogado.rows.length === 0){
+        return res.status(401).json({
+          erro: "Usuário não encontrado"
+        })
+      }
+
+      const isMaster =
+        usuarioLogado.rows[0].is_master === true
+
+      // Se não for master, precisa ser ADMIN da turma
+      if(!isMaster){
+
+        const acesso = await pool.query(
+          `SELECT id
+           FROM usuarios_turmas
+           WHERE usuario_id = $1
+             AND turma_id = $2
+             AND perfil = 'ADMIN'`,
+          [
+            req.usuario.id,
+            turmaId
+          ]
+        )
+
+        if(acesso.rows.length === 0){
+          return res.status(403).json({
+            erro: "Somente administradores podem consultar permissões"
+          })
+        }
+      }
+
+      // Verifica se o usuário selecionado pertence à turma
+      const usuarioTurma = await pool.query(
+        `SELECT id
+         FROM usuarios_turmas
+         WHERE usuario_id = $1
+           AND turma_id = $2`,
+        [
+          usuarioId,
+          turmaId
+        ]
+      )
+
+      if(usuarioTurma.rows.length === 0){
+        return res.status(404).json({
+          erro: "Usuário não possui vínculo com esta turma"
+        })
+      }
+
+      const usuarioTurmaId =
+        usuarioTurma.rows[0].id
+
+      const result = await pool.query(
+        `SELECT
+           modulo,
+           acao,
+           permitido
+         FROM permissoes
+         WHERE usuario_turma_id = $1
+         ORDER BY modulo, acao`,
+        [usuarioTurmaId]
+      )
+
+      res.json(result.rows)
+
+    } catch(err) {
+
+      console.error(
+        "ERRO AO BUSCAR PERMISSÕES:",
+        err
+      )
+
+      res.status(500).json({
+        erro: "Erro ao buscar permissões"
+      })
+    }
+  }
+)
+
+app.post("/permissoes", verificarToken, async (req, res) => {
   try {
 
-    const turmaId = Number(req.params.turmaId)
-    const usuarioId = req.usuario.id
+    const {
+      usuario_id,
+      turma_id,
+      permissoes
+    } = req.body
 
-    if(!Number.isInteger(turmaId)){
+    const usuarioId = Number(usuario_id)
+    const turmaId = Number(turma_id)
+
+    if(
+      !Number.isInteger(usuarioId) ||
+      !Number.isInteger(turmaId)
+    ){
       return res.status(400).json({
-        erro: "Turma inválida"
+        erro: "Usuário ou turma inválidos"
       })
     }
 
-    const result = await pool.query(
-      `SELECT
-          p.id,
+    if(!Array.isArray(permissoes)){
+      return res.status(400).json({
+        erro: "Lista de permissões inválida"
+      })
+    }
+
+    // Verifica acesso do usuário logado à turma
+    const acesso = await pool.query(
+      `SELECT id, perfil
+       FROM usuarios_turmas
+       WHERE usuario_id = $1
+         AND turma_id = $2`,
+      [
+        req.usuario.id,
+        turmaId
+      ]
+    )
+
+    // Master pode acessar qualquer turma
+    const usuarioMaster = await pool.query(
+      `SELECT is_master
+       FROM usuarios
+       WHERE id = $1`,
+      [req.usuario.id]
+    )
+
+    if(usuarioMaster.rows.length === 0){
+      return res.status(401).json({
+        erro: "Usuário não encontrado"
+      })
+    }
+
+    const isMaster =
+      usuarioMaster.rows[0].is_master === true
+
+    if(
+      !isMaster &&
+      (
+        acesso.rows.length === 0 ||
+        acesso.rows[0].perfil !== "ADMIN"
+      )
+    ){
+      return res.status(403).json({
+        erro: "Somente administradores podem alterar permissões"
+      })
+    }
+
+    // Busca o vínculo do usuário que terá as permissões
+    const usuarioTurma = await pool.query(
+      `SELECT id
+       FROM usuarios_turmas
+       WHERE usuario_id = $1
+         AND turma_id = $2`,
+      [
+        usuarioId,
+        turmaId
+      ]
+    )
+
+    if(usuarioTurma.rows.length === 0){
+      return res.status(404).json({
+        erro: "Usuário não possui vínculo com esta turma"
+      })
+    }
+
+    const usuarioTurmaId =
+      usuarioTurma.rows[0].id
+
+    // Remove as permissões antigas
+    await pool.query(
+      `DELETE FROM permissoes
+       WHERE usuario_turma_id = $1`,
+      [usuarioTurmaId]
+    )
+
+    // Insere as novas permissões
+    for(const p of permissoes){
+
+      if(
+        !p ||
+        !p.modulo ||
+        !p.acao
+      ){
+        continue
+      }
+
+      await pool.query(
+        `INSERT INTO permissoes (
+          usuario_turma_id,
+          modulo,
+          acao,
+          permitido
+        )
+        VALUES ($1,$2,$3,$4)`,
+        [
+          usuarioTurmaId,
           p.modulo,
           p.acao,
-          p.permitido
-       FROM permissoes p
-       INNER JOIN usuarios_turmas ut
-         ON ut.id = p.usuario_turma_id
-       WHERE ut.usuario_id = $1
-         AND ut.turma_id = $2
-       ORDER BY p.modulo, p.acao`,
-      [usuarioId, turmaId]
-    )
-
-    res.json(result.rows)
-
-  } catch (err) {
-
-    console.error("ERRO AO CARREGAR PERMISSÕES:", err)
-
-    res.status(500).json({
-      erro: err.message
-    })
-  }
-})
-
-app.post("/permissoes", async (req, res) => {
-  try {
-
-    const { usuario_id, permissoes } = req.body
-
-    // 🔥 apaga antigas
-    await pool.query(
-      "DELETE FROM permissoes WHERE usuario_id = $1",
-      [usuario_id]
-    )
-
-    // 🔥 insere novas
-    for(let p of permissoes){
-      await pool.query(
-        `INSERT INTO permissoes (usuario_id, modulo, acao, permitido)
-         VALUES ($1,$2,$3,$4)`,
-        [usuario_id, p.modulo, p.acao, p.permitido]
+          p.permitido === true
+        ]
       )
     }
 
-    res.json({ ok: true })
+    res.json({
+      ok: true
+    })
 
-  } catch (err) {
-    res.status(500).json({ erro: err.message })
+  } catch(err){
+
+    console.error(
+      "ERRO AO SALVAR PERMISSÕES:",
+      err
+    )
+
+    res.status(500).json({
+      erro: "Erro ao salvar permissões"
+    })
   }
 })
 
@@ -1008,13 +1165,13 @@ app.post("/login", async (req, res) => {
 
     // 🔐 TOKEN
     const token = jwt.sign(
-      {
-        id: user.id,
-        is_master: user.is_master
-      },
-      process.env.JWT_SECRET || "segredo_super_forte",
-      { expiresIn: "7d" }
-    )
+  {
+    id: user.id,
+    is_master: user.is_master
+  },
+  process.env.JWT_SECRET,
+  { expiresIn: "7d" }
+)
 
     // 🔥 SALVAR ACEITE LGPD
     await pool.query(
@@ -1292,6 +1449,7 @@ app.get("/jogos/:id/presencas", verificarToken, async (req, res) => {
      j.nome,
      j.posicao,
      j.nivel,
+     j.numero_camisa,
      p.resposta,
      p.resposta_em,
      p.presente_real
@@ -1309,35 +1467,50 @@ app.get("/jogos/:id/presencas", verificarToken, async (req, res) => {
       })
     }
 
-    // JOGADOR vê somente sua própria resposta
-    const jogadorId = acesso.rows[0].jogador_id
+    // JOGADOR vê sua própria resposta
+// e também quem já confirmou presença
+const jogadorId = acesso.rows[0].jogador_id
 
-    if(!jogadorId){
-      return res.status(403).json({
-        erro: "Jogador não vinculado à conta"
-      })
-    }
+if(!jogadorId){
+  return res.status(403).json({
+    erro: "Jogador não vinculado à conta"
+  })
+}
 
-    const presenca = await pool.query(
-      `SELECT
-         p.id,
-         p.jogador_id,
-         j.nome,
-         p.resposta,
-         p.resposta_em,
-         p.presente_real
-       FROM presencas p
-       INNER JOIN jogadores j
-         ON j.id = p.jogador_id
-       WHERE p.jogo_id = $1
-         AND p.jogador_id = $2`,
-      [jogoId, jogadorId]
-    )
+const presenca = await pool.query(
+  `SELECT
+     p.id,
+     p.jogador_id,
+     j.nome,
+     p.resposta,
+     p.resposta_em,
+     p.presente_real
+   FROM presencas p
+   INNER JOIN jogadores j
+     ON j.id = p.jogador_id
+   WHERE p.jogo_id = $1
+     AND p.jogador_id = $2`,
+  [jogoId, jogadorId]
+)
 
-    res.json({
-      jogo: jogo.rows[0],
-      presencas: presenca.rows
-    })
+const confirmados = await pool.query(
+  `SELECT
+     j.id,
+     j.nome
+   FROM presencas p
+   INNER JOIN jogadores j
+     ON j.id = p.jogador_id
+   WHERE p.jogo_id = $1
+     AND p.resposta = 'CONFIRMADO'
+   ORDER BY j.nome`,
+  [jogoId]
+)
+
+res.json({
+  jogo: jogo.rows[0],
+  presencas: presenca.rows,
+  confirmados: confirmados.rows
+})
 
   } catch(err){
 

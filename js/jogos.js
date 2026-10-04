@@ -204,6 +204,7 @@ async function abrirJogo(jogoId){
 
     const jogo = resultado.jogo
     const presencasJogo = resultado.presencas || []
+    const jogadoresConfirmados = resultado.confirmados || []
 
     const turmaSelecionada = JSON.parse(
       localStorage.getItem("turmaSelecionada")
@@ -255,6 +256,47 @@ async function abrirJogo(jogoId){
         respostaTexto = "❌ Você recusou o convite"
 
       }
+      let listaConfirmados = ""
+
+if(jogadoresConfirmados.length > 0){
+
+  listaConfirmados = `
+    <div style="
+      margin-top:15px;
+      padding:12px;
+      background:#f0fdf4;
+      border-radius:8px;
+    ">
+
+      <strong>✅ Já confirmaram presença:</strong>
+
+      <div style="
+        margin-top:8px;
+        display:flex;
+        flex-direction:column;
+        gap:4px;
+      ">
+
+        ${jogadoresConfirmados.map(p => `
+          <div>• ${p.nome}</div>
+        `).join("")}
+
+      </div>
+
+    </div>
+  `
+
+} else {
+
+  listaConfirmados = `
+    <div style="
+      margin-top:15px;
+      color:#666;
+    ">
+      Ainda ninguém confirmou presença.
+    </div>
+  `
+}
 
       // Verifica se o prazo ainda está aberto
       let prazoAberto = true
@@ -361,6 +403,8 @@ async function abrirJogo(jogoId){
           <div style="margin-top:8px;">
             ${respostaTexto}
           </div>
+
+          ${listaConfirmados}
 
           ${botoes}
 
@@ -650,6 +694,20 @@ if(tipoJogo === "desafio"){
     "
   >
     🗑️ Excluir Jogo
+  </button>
+
+    <button
+    onclick="event.stopPropagation(); gerarRelacaoJogadoresPDF(${jogoId})"
+    style="
+      background:#2563eb;
+      color:white;
+      border:none;
+      padding:10px 16px;
+      border-radius:8px;
+      cursor:pointer;
+    "
+  >
+    📄 Imprimir relação
   </button>
 
 </div>
