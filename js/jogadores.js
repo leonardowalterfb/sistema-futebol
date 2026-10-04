@@ -232,11 +232,11 @@ function mostrarJogadores(){
 
       if(cabecalho){
         cabecalho.innerHTML = `
-          <tr>
-            <th>N°</th>
-            <th>Nome</th>
-            <th>Posição</th>
-          </tr>
+         <tr>
+  <th>N°</th>
+  <th>Nome</th>
+  <th>Posição</th>
+         </tr>
         `
       }
 
@@ -279,16 +279,17 @@ if(tabela){
   if(cabecalho){
     cabecalho.innerHTML = `
       <tr>
-        <th>N°</th>
-        <th>Nome</th>
-        <th>CPF</th>
-        <th>Telefone</th>
-        <th>Posição</th>
-        <th>Nascimento</th>
-        <th>Idade</th>
-        <th>Cadastro</th>
-        <th>Ações</th>
-      </tr>
+  <th>N°</th>
+  <th>Nome</th>
+  <th>Nº Camiseta</th>
+  <th>CPF</th>
+  <th>Telefone</th>
+  <th>Posição</th>
+  <th>Nascimento</th>
+  <th>Idade</th>
+  <th>Cadastro</th>
+  <th>Ações</th>
+  </tr>
     `
   }
 
@@ -321,6 +322,7 @@ if(tabela){
       <tr>
         <td>${numero}</td>
         <td>${getMedalha(j.nivel)} ${j.nome || "-"}</td>
+        <td>${j.numero_camisa || "-"}</td>
         <td>${j.cpf || "-"}</td>
         <td>${j.telefone || "-"}</td>
         <td>${j.posicao || "-"}</td>
@@ -339,6 +341,7 @@ if(tabela){
       <tr>
         <td>${numero}</td>
         <td>${getMedalha(j.nivel)} ${j.nome || "-"}</td>
+        <td>${j.numero_camisa || "-"}</td>
         <td>${j.cpf || "-"}</td>
         <td>${j.telefone || "-"}</td>
         <td>${j.posicao || "-"}</td>
@@ -609,6 +612,7 @@ function editarJogador(id){
     ? jogador.nascimento.split("T")[0]
     : ""
   document.getElementById("posicao").value = jogador.posicao || ""
+  document.getElementById("numeroCamisa").value = jogador.numero_camisa || ""
 }
 
 function criarCardJogador(j){

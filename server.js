@@ -384,17 +384,19 @@ await pool.query(
   email=$4,
   nascimento=$5,
   posicao=$6,
-  nivel=$7
-  WHERE id=$8`,
+  nivel=$7,
+  numero_camisa=$8
+  WHERE id=$9`,
   [
     d.nome,
-    d.telefone,
-    cpfLimpo,
-    d.email || null,
-    d.nascimento,
-    d.posicao,
-    d.nivel || "prata",
-    id
+d.telefone,
+cpfLimpo,
+d.email || null,
+d.nascimento,
+d.posicao,
+d.nivel || "prata",
+d.numero_camisa || null,
+id
   ]
 )
 
