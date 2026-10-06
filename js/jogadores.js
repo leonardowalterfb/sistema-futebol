@@ -122,6 +122,22 @@ jogador.turma_id = turmaId
   mostrarAniversarios()
 }
 
+function toggleCadastroJogador(){
+
+  let formulario = document.getElementById("formularioCadastroJogador")
+  let titulo = document.getElementById("tituloCadastroJogador")
+
+  if(!formulario || !titulo) return
+
+  let aberto = formulario.style.display === "block"
+
+  formulario.style.display = aberto ? "none" : "block"
+
+  titulo.textContent = aberto
+    ? "▶ Cadastrar Jogador"
+    : "▼ Cadastrar Jogador"
+}
+
 // Mostrar Lista de Jogadores na Tabela: //
 
 async function carregarJogadores(){
@@ -319,41 +335,86 @@ if(tabela){
     let numero = i + 1
 
     let linhaAtivo = `
-      <tr>
-        <td>${numero}</td>
-        <td>${getMedalha(j.nivel)} ${j.nome || "-"}</td>
-        <td>${j.numero_camisa || "-"}</td>
-        <td>${j.cpf || "-"}</td>
-        <td>${j.telefone || "-"}</td>
-        <td>${j.posicao || "-"}</td>
-        <td>${formatarDataBR(j.nascimento) || "-"}</td>
-        <td>${idade}</td>
-        <td>${formatarDataBR(j.dataCadastro || j.data_cadastro)}</td>
-        <td>
-          <button onclick="editarJogador(${j.id})">✏️ Editar</button>
-          <button onclick="inativarJogador(${j.id})">🚫 Inativar</button>
-          <button onclick="excluirJogador(${j.id})">🗑️ Excluir</button>
-        </td>
-      </tr>
-    `
+  <tr class="jogador-linha" onclick="toggleJogador(${j.id})">
+    <td colspan="10">
+
+      <div class="jogador-resumo">
+        <span>
+          ${getMedalha(j.nivel)} ${j.nome || "-"}
+        </span>
+        <span class="jogador-seta">›</span>
+      </div>
+
+      <div id="detalhe_${j.id}" class="detalhe-jogador-desktop" style="display:none">
+
+        <div class="jogador-info">
+          <div><strong>Nº Camiseta:</strong> ${j.numero_camisa || "-"}</div>
+          <div><strong>CPF:</strong> ${j.cpf || "-"}</div>
+          <div><strong>Telefone:</strong> ${j.telefone || "-"}</div>
+          <div><strong>Posição:</strong> ${j.posicao || "-"}</div>
+          <div><strong>Nascimento:</strong> ${formatarDataBR(j.nascimento) || "-"}</div>
+          <div><strong>Idade:</strong> ${idade}</div>
+          <div><strong>Cadastro:</strong> ${formatarDataBR(j.dataCadastro || j.data_cadastro)}</div>
+        </div>
+
+        <div class="jogador-acoes">
+          <button onclick="event.stopPropagation(); editarJogador(${j.id})">
+            ✏️ Editar
+          </button>
+
+          <button onclick="event.stopPropagation(); inativarJogador(${j.id})">
+            🚫 Inativar
+          </button>
+
+          <button onclick="event.stopPropagation(); excluirJogador(${j.id})">
+            🗑️ Excluir
+          </button>
+        </div>
+
+      </div>
+
+    </td>
+  </tr>
+`
 
     let linhaInativo = `
-      <tr>
-        <td>${numero}</td>
-        <td>${getMedalha(j.nivel)} ${j.nome || "-"}</td>
-        <td>${j.numero_camisa || "-"}</td>
-        <td>${j.cpf || "-"}</td>
-        <td>${j.telefone || "-"}</td>
-        <td>${j.posicao || "-"}</td>
-        <td>${formatarDataBR(j.nascimento) || "-"}</td>
-        <td>${idade}</td>
-        <td>${formatarDataBR(j.dataCadastro || j.data_cadastro)}</td>
-        <td>
-          <button onclick="ativarJogador(${j.id})">✅ Ativar</button>
-          <button onclick="excluirJogador(${j.id})">🗑️ Excluir</button>
-        </td>
-      </tr>
-    `
+  <tr class="jogador-linha" onclick="toggleJogador(${j.id})">
+    <td colspan="10">
+
+      <div class="jogador-resumo">
+        <span>
+          ${getMedalha(j.nivel)} ${j.nome || "-"}
+        </span>
+        <span class="jogador-seta">⌄</span>
+      </div>
+
+      <div id="detalhe_${j.id}" class="detalhe-jogador-desktop" style="display:none">
+
+        <div class="jogador-info">
+          <div><strong>Nº Camiseta:</strong> ${j.numero_camisa || "-"}</div>
+          <div><strong>CPF:</strong> ${j.cpf || "-"}</div>
+          <div><strong>Telefone:</strong> ${j.telefone || "-"}</div>
+          <div><strong>Posição:</strong> ${j.posicao || "-"}</div>
+          <div><strong>Nascimento:</strong> ${formatarDataBR(j.nascimento) || "-"}</div>
+          <div><strong>Idade:</strong> ${idade}</div>
+          <div><strong>Cadastro:</strong> ${formatarDataBR(j.dataCadastro || j.data_cadastro)}</div>
+        </div>
+
+        <div class="jogador-acoes">
+          <button onclick="event.stopPropagation(); ativarJogador(${j.id})">
+            ✅ Ativar
+          </button>
+
+          <button onclick="event.stopPropagation(); excluirJogador(${j.id})">
+            🗑️ Excluir
+          </button>
+        </div>
+
+      </div>
+
+    </td>
+  </tr>
+`
 
     if(status === "ativo"){
       lista.innerHTML += linhaAtivo
@@ -404,11 +465,11 @@ function mostrarJogadoresMobile(){
   // =========================
 
   container.innerHTML = ativos.map(j => `
-    <div class="card-jogador" onclick="toggleJogador(${j.id})">
+    <div class="card-jogador" onclick="toggleJogadorMobile(${j.id})">
       👤 ${getMedalha(j.nivel)} ${j.nome}
     </div>
 
-    <div id="detalhe_${j.id}" class="detalhe-jogador" style="display:none">
+    <div id="detalhe_mobile_${j.id}" class="detalhe-jogador" style="display:none">
 
       📞 ${j.telefone || "-"} <br>
       📄 ${j.cpf || "-"} <br>
@@ -416,12 +477,192 @@ function mostrarJogadoresMobile(){
       🎂 ${j.nascimento ? formatarDataBR(j.nascimento) : "-"} <br>
       👤 ${j.nascimento ? calcularIdade(j.nascimento) + " anos" : "-"} <br><br>
 
-      <button onclick="editarJogador(${j.id})">✏️</button>
+      <button onclick="editarJogadorMobile(${j.id})">✏️</button>
       <button onclick="inativarJogador(${j.id})">🚫</button>
       <button onclick="excluirJogador(${j.id})">🗑️</button>
 
     </div>
   `).join("")
+}
+
+function editarJogadorMobile(id){
+
+  let jogador = jogadores.find(j => j.id == id)
+
+  if(!jogador){
+
+    console.error("Jogador não encontrado:", id)
+
+    return
+  }
+
+  let detalhe = document.getElementById("detalhe_mobile_" + id)
+
+  if(!detalhe){
+
+    console.error("Detalhe do jogador não encontrado:", id)
+
+    return
+  }
+
+  detalhe.style.display = "block"
+
+  detalhe.onclick = function(event){
+    event.stopPropagation()
+  }
+
+  detalhe.innerHTML = `
+
+    <div class="edicao-jogador-mobile">
+
+      <label>Nome</label>
+      <input
+        type="text"
+        id="editar_mobile_nome_${id}"
+        value="${jogador.nome || ""}"
+      >
+
+      <label>Telefone</label>
+      <input
+        type="text"
+        id="editar_mobile_telefone_${id}"
+        value="${jogador.telefone || ""}"
+      >
+
+      <label>CPF</label>
+      <input
+        type="text"
+        id="editar_mobile_cpf_${id}"
+        value="${jogador.cpf || ""}"
+      >
+
+      <label>E-mail</label>
+      <input
+        type="email"
+        id="editar_mobile_email_${id}"
+        value="${jogador.email || ""}"
+      >
+
+      <label>Nascimento</label>
+      <input
+        type="date"
+        id="editar_mobile_nascimento_${id}"
+        value="${jogador.nascimento ? jogador.nascimento.split("T")[0] : ""}"
+      >
+
+      <label>Posição</label>
+      <select id="editar_mobile_posicao_${id}">
+        <option value="">Posição</option>
+        <option ${jogador.posicao === "Goleiro" ? "selected" : ""}>Goleiro</option>
+        <option ${jogador.posicao === "Zagueiro" ? "selected" : ""}>Zagueiro</option>
+        <option ${jogador.posicao === "Lateral" ? "selected" : ""}>Lateral</option>
+        <option ${jogador.posicao === "Meia" ? "selected" : ""}>Meia</option>
+        <option ${jogador.posicao === "Atacante" ? "selected" : ""}>Atacante</option>
+      </select>
+
+      <label>Nº Camiseta</label>
+      <input
+        type="number"
+        id="editar_mobile_numeroCamisa_${id}"
+        value="${jogador.numero_camisa || ""}"
+        min="0"
+        max="999"
+      >
+
+      <label>Nível</label>
+      <select id="editar_mobile_nivel_${id}">
+        <option value="ouro" ${jogador.nivel === "ouro" ? "selected" : ""}>
+          🥇 Ouro
+        </option>
+        <option value="prata" ${jogador.nivel === "prata" ? "selected" : ""}>
+          🥈 Prata
+        </option>
+        <option value="bronze" ${jogador.nivel === "bronze" ? "selected" : ""}>
+          🥉 Bronze
+        </option>
+      </select>
+
+    </div>
+
+    <div class="jogador-acoes-mobile">
+
+      <button
+        onclick="event.stopPropagation(); salvarEdicaoJogadorMobile(${id})"
+      >
+        💾 Salvar
+      </button>
+
+      <button
+        onclick="event.stopPropagation(); cancelarEdicaoJogadorMobile(${id})"
+      >
+        ✕ Cancelar
+      </button>
+
+    </div>
+
+  `
+}
+
+async function salvarEdicaoJogadorMobile(id){
+
+  let jogador = jogadores.find(j => j.id == id)
+
+  if(!jogador){
+    mostrarToast("Jogador não encontrado")
+    return
+  }
+
+  let dados = {
+
+    nome: document.getElementById(`editar_mobile_nome_${id}`).value,
+    telefone: document.getElementById(`editar_mobile_telefone_${id}`).value,
+    cpf: document.getElementById(`editar_mobile_cpf_${id}`).value,
+    email: document.getElementById(`editar_mobile_email_${id}`).value,
+    nascimento: document.getElementById(`editar_mobile_nascimento_${id}`).value,
+    posicao: document.getElementById(`editar_mobile_posicao_${id}`).value,
+    numero_camisa: document.getElementById(`editar_mobile_numeroCamisa_${id}`).value,
+    nivel: document.getElementById(`editar_mobile_nivel_${id}`).value,
+    status: jogador.status,
+    turma_id: jogador.turma_id
+
+  }
+
+  if(dados.nome.trim() === ""){
+    mostrarToast("Digite o nome do jogador")
+    return
+  }
+
+  try {
+
+    await apiPut(`/jogadores/${id}`, dados)
+
+    mostrarToast("Jogador atualizado com sucesso!")
+
+    await carregarJogadores()
+
+  } catch(erro) {
+
+    console.error("Erro ao atualizar jogador:", erro)
+
+    mostrarToast(
+      erro.erro || "Erro ao atualizar jogador"
+    )
+
+  }
+
+}
+
+function cancelarEdicaoJogadorMobile(id){
+
+  let detalhe = document.getElementById("detalhe_mobile_" + id)
+
+  if(detalhe){
+
+    detalhe.style.display = "none"
+    detalhe.onclick = null
+
+  }
+
 }
   
 function mostrarJogadoresInativosMobile(){
@@ -463,11 +704,11 @@ function mostrarJogadoresInativosMobile(){
   // =========================
 
   container.innerHTML = inativos.map(j => `
-    <div class="card-jogador" onclick="toggleJogador(${j.id})">
+    <div class="card-jogador" onclick="toggleJogadorMobile(${j.id})">
       👤 ${getMedalha(j.nivel)} ${j.nome}
     </div>
 
-    <div id="detalhe_${j.id}" class="detalhe-jogador" style="display:none">
+    <div id="detalhe_mobile_${j.id}" class="detalhe-jogador" style="display:none">
 
       📞 ${j.telefone || "-"} <br>
       📄 ${j.cpf || "-"} <br>
@@ -475,6 +716,7 @@ function mostrarJogadoresInativosMobile(){
       🎂 ${j.nascimento ? formatarDataBR(j.nascimento) : "-"} <br>
       👤 ${j.nascimento ? calcularIdade(j.nascimento) + " anos" : "-"} <br><br>
 
+      <button onclick="editarJogadorMobile(${j.id})">✏️</button>
       <button onclick="ativarJogador(${j.id})">✅</button>
       <button onclick="excluirJogador(${j.id})">🗑️</button>
 
@@ -593,8 +835,6 @@ async function excluirJogador(id){
 
 function editarJogador(id){
 
-  idEditando = id
-
   let jogador = jogadores.find(j => j.id == id)
 
   if(!jogador){
@@ -604,15 +844,194 @@ function editarJogador(id){
     return
   }
 
-  document.getElementById("nome").value = jogador.nome || ""
-  document.getElementById("telefone").value = jogador.telefone || ""
-  document.getElementById("cpf").value = jogador.cpf || ""
-  document.getElementById("email").value = jogador.email || ""
-  document.getElementById("nascimento").value = jogador.nascimento
-    ? jogador.nascimento.split("T")[0]
-    : ""
-  document.getElementById("posicao").value = jogador.posicao || ""
-  document.getElementById("numeroCamisa").value = jogador.numero_camisa || ""
+  let detalhe = document.getElementById("detalhe_" + id)
+
+  if(!detalhe){
+
+    console.error("Área de edição do jogador não encontrada:", id)
+
+    return
+  }
+
+  detalhe.style.display = "block"
+  detalhe.onclick = function(event){
+  event.stopPropagation()
+}
+
+  detalhe.innerHTML = `
+
+    <div class="edicao-jogador">
+
+      <div class="campo-edicao">
+        <label>Nome</label>
+        <input
+          type="text"
+          id="editar_nome_${id}"
+          value="${jogador.nome || ""}"
+        >
+      </div>
+
+      <div class="campo-edicao">
+        <label>Telefone</label>
+        <input
+          type="text"
+          id="editar_telefone_${id}"
+          value="${jogador.telefone || ""}"
+        >
+      </div>
+
+      <div class="campo-edicao">
+        <label>CPF</label>
+        <input
+          type="text"
+          id="editar_cpf_${id}"
+          value="${jogador.cpf || ""}"
+        >
+      </div>
+
+      <div class="campo-edicao">
+        <label>E-mail</label>
+        <input
+          type="email"
+          id="editar_email_${id}"
+          value="${jogador.email || ""}"
+        >
+      </div>
+
+      <div class="campo-edicao">
+        <label>Nascimento</label>
+        <input
+          type="date"
+          id="editar_nascimento_${id}"
+          value="${jogador.nascimento ? jogador.nascimento.split("T")[0] : ""}"
+        >
+      </div>
+
+      <div class="campo-edicao">
+        <label>Posição</label>
+        <select id="editar_posicao_${id}">
+          <option value="">Posição</option>
+          <option ${jogador.posicao === "Goleiro" ? "selected" : ""}>Goleiro</option>
+          <option ${jogador.posicao === "Zagueiro" ? "selected" : ""}>Zagueiro</option>
+          <option ${jogador.posicao === "Lateral" ? "selected" : ""}>Lateral</option>
+          <option ${jogador.posicao === "Meia" ? "selected" : ""}>Meia</option>
+          <option ${jogador.posicao === "Atacante" ? "selected" : ""}>Atacante</option>
+        </select>
+      </div>
+
+      <div class="campo-edicao">
+        <label>Nº Camiseta</label>
+        <input
+          type="number"
+          id="editar_numeroCamisa_${id}"
+          value="${jogador.numero_camisa || ""}"
+          min="0"
+          max="999"
+        >
+      </div>
+
+      <div class="campo-edicao">
+        <label>Nível</label>
+        <select id="editar_nivel_${id}">
+
+          <option value="ouro" ${jogador.nivel === "ouro" ? "selected" : ""}>
+            🥇 Ouro
+          </option>
+
+          <option value="prata" ${jogador.nivel === "prata" ? "selected" : ""}>
+            🥈 Prata
+          </option>
+
+          <option value="bronze" ${jogador.nivel === "bronze" ? "selected" : ""}>
+            🥉 Bronze
+          </option>
+
+        </select>
+      </div>
+
+    </div>
+
+    <div class="jogador-acoes">
+
+      <button
+        onclick="event.stopPropagation(); salvarEdicaoJogador(${id})"
+      >
+        💾 Salvar alterações
+      </button>
+
+      <button
+        onclick="event.stopPropagation(); cancelarEdicaoJogador(${id})"
+      >
+        ✕ Cancelar
+      </button>
+
+    </div>
+
+  `
+}
+
+async function salvarEdicaoJogador(id){
+
+  let jogador = jogadores.find(j => j.id == id)
+
+  if(!jogador){
+    mostrarToast("Jogador não encontrado")
+    return
+  }
+
+  let dados = {
+
+    nome: document.getElementById(`editar_nome_${id}`).value,
+    telefone: document.getElementById(`editar_telefone_${id}`).value,
+    cpf: document.getElementById(`editar_cpf_${id}`).value,
+    email: document.getElementById(`editar_email_${id}`).value,
+    nascimento: document.getElementById(`editar_nascimento_${id}`).value,
+    posicao: document.getElementById(`editar_posicao_${id}`).value,
+    numero_camisa: document.getElementById(`editar_numeroCamisa_${id}`).value,
+    nivel: document.getElementById(`editar_nivel_${id}`).value,
+    status: jogador.status,
+    turma_id: jogador.turma_id
+
+  }
+
+  if(dados.nome.trim() === ""){
+    mostrarToast("Digite o nome do jogador")
+    return
+  }
+
+  try {
+
+    await apiPut(`/jogadores/${id}`, dados)
+
+    mostrarToast("Jogador atualizado com sucesso!")
+
+    await carregarJogadores()
+
+  } catch(erro) {
+
+    console.error("Erro ao atualizar jogador:", erro)
+
+    mostrarToast(
+      erro.erro || "Erro ao atualizar jogador"
+    )
+
+  }
+
+}
+
+function cancelarEdicaoJogador(id){
+
+  let jogador = jogadores.find(j => j.id == id)
+
+  if(!jogador) return
+
+  // Fecha a edição
+  let detalhe = document.getElementById("detalhe_" + id)
+
+  if(detalhe){
+    detalhe.style.display = "none"
+    detalhe.onclick = null
+  }
 }
 
 function criarCardJogador(j){
@@ -621,28 +1040,79 @@ function criarCardJogador(j){
   <div class="card-jogador">
 
     <div class="card-header" onclick="toggleDetalhe(${j.id})">
-      👤 ${getMedalha(j.nivel)} ${j.nome}
+
+      <div class="jogador-nome">
+        ${getMedalha(j.nivel)}
+        <span>${j.nome || "-"}</span>
+      </div>
+
+      <div class="jogador-seta" id="seta_${j.id}">
+        ▾
+      </div>
+
     </div>
 
     <div id="detalhe_${j.id}" class="card-detalhe" style="display:none">
 
-      <p>📄 CPF: ${j.cpf}</p>
-      <p>📞 Tel: ${j.telefone}</p>
-      <p>⚽ ${j.posicao}</p>
-      <p>🎂 ${formatarDataBR(j.nascimento)}</p>
-      <p>📅 Cadastro: ${formatarDataBR(j.dataCadastro)}</p>
+      <div class="dados-jogador">
+
+        <div class="dado-jogador">
+          <span>CPF</span>
+          <strong>${j.cpf || "-"}</strong>
+        </div>
+
+        <div class="dado-jogador">
+          <span>Telefone</span>
+          <strong>${j.telefone || "-"}</strong>
+        </div>
+
+        <div class="dado-jogador">
+          <span>Posição</span>
+          <strong>${j.posicao || "-"}</strong>
+        </div>
+
+        <div class="dado-jogador">
+          <span>Nº Camiseta</span>
+          <strong>${j.numero_camisa || "-"}</strong>
+        </div>
+
+        <div class="dado-jogador">
+          <span>Nascimento</span>
+          <strong>${formatarDataBR(j.nascimento) || "-"}</strong>
+        </div>
+
+        <div class="dado-jogador">
+          <span>Idade</span>
+          <strong>${j.nascimento ? calcularIdade(j.nascimento) + " anos" : "-"}</strong>
+        </div>
+
+        <div class="dado-jogador">
+          <span>Cadastro</span>
+          <strong>${formatarDataBR(j.dataCadastro || j.data_cadastro) || "-"}</strong>
+        </div>
+
+      </div>
 
       <div class="acoes">
-        <button onclick="editar(${j.id})">✏️</button>
-        <button onclick="inativar(${j.id})">🚫</button>
-        <button onclick="excluir(${j.id})">🗑️</button>
+
+        <button onclick="editarJogador(${j.id})">
+          ✏️ Editar
+        </button>
+
+        <button onclick="inativarJogador(${j.id})">
+          🚫 Inativar
+        </button>
+
+        <button onclick="excluirJogador(${j.id})">
+          🗑️ Excluir
+        </button>
+
       </div>
 
     </div>
 
   </div>
   `
-  
 }
 
 function renderJogadores(){
@@ -661,7 +1131,7 @@ function renderJogadores(){
     document.getElementById("listaJogadoresInativosMobile").style.display = "block"
     mostrarJogadoresInativosMobile()
 
-  } else {
+   } else {
 
     document.getElementById("tabelaJogadores").style.display = "table"
     document.getElementById("listaJogadoresMobile").style.display = "none"
@@ -669,8 +1139,8 @@ function renderJogadores(){
     document.getElementById("tabelaJogadoresInativos").style.display = "table"
     document.getElementById("listaJogadoresInativosMobile").style.display = "none"
 
-    mostrarJogadores()
-  }
+  mostrarJogadores()
+   }
 }
 
 function toggleJogador(id){
@@ -682,6 +1152,12 @@ function toggleJogador(id){
   let aberto = el.style.display === "block"
 
   el.style.display = aberto ? "none" : "block"
+
+  let seta = el.closest("tr")?.querySelector(".jogador-seta")
+
+  if(seta){
+    seta.textContent = aberto ? "›" : "⌄"
+  }
 }
 
 function getMedalha(nivel){
@@ -690,3 +1166,15 @@ function getMedalha(nivel){
   if(nivel === "bronze") return "🥉"
   return ""
 }
+
+function toggleJogadorMobile(id){
+
+  let el = document.getElementById("detalhe_mobile_" + id)
+
+  if(!el) return
+
+  let aberto = el.style.display === "block"
+
+  el.style.display = aberto ? "none" : "block"
+}
+

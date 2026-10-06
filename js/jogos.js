@@ -2173,22 +2173,34 @@ async function mostrarSecao(secao){
     }
   }
 
-  // esconde todas
+  // 🔥 ESCONDE TODAS AS SEÇÕES
   document.querySelectorAll(".secao").forEach(s => {
     s.style.display = "none"
   })
 
-  // mostra a correta
-  let ativa = document.getElementById(secao)
+  // 🔥 MOSTRA A SEÇÃO SELECIONADA
+  const ativa = document.getElementById(secao)
 
-  if(ativa){
-    ativa.style.display = "block"
+  if(!ativa){
+    console.error("Seção não encontrada:", secao)
+    return
   }
 
-if(secao === "jogos"){
+  ativa.style.display = "block"
 
-  await carregarJogosAgendados()
-}
+  // 🔥 CARREGAMENTOS ESPECÍFICOS
+  if(secao === "jogos"){
+    await carregarJogosAgendados()
+  }
+
+  if(secao === "ranking"){
+    await carregarRanking()
+  }
+
+  if(secao === "historico"){
+    await carregarHistorico()
+  }
+
 }
 
 function toggleJogo(index){
@@ -2205,4 +2217,36 @@ function toggleJogo(index){
 function toggleRankingLista(){
   mostrarTodosRanking = !mostrarTodosRanking
   mostrarRanking()
+}
+
+function toggleCadastroJogo(){
+
+  let formulario = document.getElementById("formularioCadastroJogo")
+  let titulo = document.getElementById("tituloCadastroJogo")
+
+  if(!formulario || !titulo) return
+
+  let aberto = formulario.style.display === "block"
+
+  formulario.style.display = aberto ? "none" : "block"
+
+  titulo.textContent = aberto
+    ? "▶ Cadastrar novo jogo"
+    : "▼ Cadastrar novo jogo"
+}
+
+function toggleJogosAgendados(){
+
+  let lista = document.getElementById("listaJogosAgendados")
+  let titulo = document.getElementById("tituloJogosAgendados")
+
+  if(!lista || !titulo) return
+
+  let aberto = lista.style.display === "block"
+
+  lista.style.display = aberto ? "none" : "block"
+
+  titulo.textContent = aberto
+    ? "▶ Jogos Agendados"
+    : "▼ Jogos Agendados"
 }

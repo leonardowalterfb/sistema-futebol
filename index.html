@@ -304,42 +304,50 @@
 
 <div id="cadastroJogador">
 
-  <h2>Cadastrar Jogador</h2>
+  <div class="cadastro-jogador-header" onclick="toggleCadastroJogador()">
+  <span id="tituloCadastroJogador" class="titulo-secao">
+    ▶ Cadastrar Jogador
+  </span>
+</div>
 
-  <input type="text" id="nome" placeholder="Nome do jogador">
-  <input type="text" id="telefone" placeholder="Telefone">
-  <input type="text" id="cpf" placeholder="CPF">
-  <input type="email" id="email" placeholder="E-mail">
-  <input type="date" id="nascimento">
+  <div id="formularioCadastroJogador" class="formulario-cadastro-jogador">
 
-  <select id="posicao">
-    <option value="">Posição</option>
-    <option>Goleiro</option>
-    <option>Zagueiro</option>
-    <option>Lateral</option>
-    <option>Meia</option>
-    <option>Atacante</option>
-  </select>
+    <input type="text" id="nome" placeholder="Nome do jogador">
+    <input type="text" id="telefone" placeholder="Telefone">
+    <input type="text" id="cpf" placeholder="CPF">
+    <input type="email" id="email" placeholder="E-mail">
+    <input type="date" id="nascimento">
 
-  <input
-  type="number"
-  id="numeroCamisa"
-  placeholder="Número da camiseta"
-  min="0"
-  max="999"
->
+    <select id="posicao">
+      <option value="">Posição</option>
+      <option>Goleiro</option>
+      <option>Zagueiro</option>
+      <option>Lateral</option>
+      <option>Meia</option>
+      <option>Atacante</option>
+    </select>
 
-  <select id="nivel">
-    <option value="ouro">🥇 Ouro</option>
-    <option value="prata">🥈 Prata</option>
-    <option value="bronze">🥉 Bronze</option>
-  </select>
+    <input
+      type="number"
+      id="numeroCamisa"
+      placeholder="Número da camiseta"
+      min="0"
+      max="999"
+    >
 
-  <button onclick="cadastrar()">
-    Salvar
-  </button>
+    <select id="nivel">
+      <option value="ouro">🥇 Ouro</option>
+      <option value="prata">🥈 Prata</option>
+      <option value="bronze">🥉 Bronze</option>
+    </select>
+
+    <button onclick="cadastrar()">
+      Salvar
+    </button>
 
   </div>
+
+</div>
 
 <h2 class="toggle-title" onclick="toggleSecao('ativos')">
   ▶ Jogadores Ativos
@@ -515,21 +523,62 @@
 
 <div id="jogos" class="secao">
 
-<h2>⚽ Presença no Jogo</h2>
+<h2>⚽ Controle de Jogo</h2>
 
-<input type="date" id="dataJogo">
-<input type="time" id="horaJogo">
-<input type="text" id="localJogo" placeholder="Local do jogo">
-<select id="tipoJogo">
-  <option value="rachao">Rachão</option>
-  <option value="desafio">Desafio</option>
-</select>
+<div
+  class="cadastro-jogo-header"
+  onclick="toggleCadastroJogo()"
+>
+  <span id="tituloCadastroJogo">
+    ▶ Cadastrar novo jogo
+  </span>
+</div>
 
-<button id="btnCriarJogo" onclick="criarJogo()">⚽ Criar Jogo</button>
+<div
+  id="formularioCadastroJogo"
+  class="formulario-cadastro-jogo"
+  style="display:none"
+>
 
-<h3>⚽ Jogos Agendados</h3>
+  <input type="date" id="dataJogo">
 
-<div id="listaJogosAgendados"></div>
+  <input type="time" id="horaJogo">
+
+  <input
+    type="text"
+    id="localJogo"
+    placeholder="Local do jogo"
+  >
+
+  <select id="tipoJogo">
+    <option value="rachao">Rachão</option>
+    <option value="desafio">Desafio</option>
+  </select>
+
+  <button
+    id="btnCriarJogo"
+    onclick="criarJogo()"
+  >
+    ⚽ Criar Jogo
+  </button>
+
+</div>
+
+
+<div
+  class="jogos-agendados-header"
+  onclick="toggleJogosAgendados()"
+>
+  <span id="tituloJogosAgendados">
+    ▶ Jogos Agendados
+  </span>
+</div>
+
+<div
+  id="listaJogosAgendados"
+  class="lista-jogos-agendados"
+  style="display:none"
+></div>
 
 </div>
 
@@ -2098,15 +2147,18 @@ async function mostrarSecao(id){
 
   document.querySelectorAll(".secao").forEach(sec => {
     sec.classList.remove("ativa")
-    sec.style.display = "none" // 🔥 GARANTE
+    sec.style.display = "none"
   })
 
   const el = document.getElementById(id)
 
-  if(el){
-    el.classList.add("ativa")
-    el.style.display = "block" // 🔥 GARANTE VISUAL
+  if(!el){
+    console.error("Seção não encontrada:", id)
+    return
   }
+
+  el.classList.add("ativa")
+  el.style.display = "block"
 
   if(id === "financeiro"){
     await carregarPagamentos()
@@ -2122,8 +2174,9 @@ async function mostrarSecao(id){
   }
 
   if(id === "jogos"){
-  await carregarJogosAgendados()
-}
+    await carregarJogosAgendados()
+  }
+
 }
 
 function logout(){

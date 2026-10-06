@@ -171,7 +171,7 @@ a:hover{ text-decoration: underline; }
   flex: 1;
   padding: 26px 30px 90px;
   overflow-y: auto;
-  height: auto;
+  min-height: 100vh;
   min-width: 0;
 }
 
@@ -184,6 +184,7 @@ a:hover{ text-decoration: underline; }
   padding: 24px 26px;
   box-shadow: var(--shadow-sm);
   animation: fadeUp .3s ease;
+  height: fit-content;
 }
 .secao.ativa{ display: block !important; }
 @keyframes fadeUp{
@@ -843,6 +844,234 @@ button[onclick*="remover"]:hover,
 
 #secao_ativos, #secao_inativos{ transition: all .3s ease; }
 
+/* =========================================
+   EDIÇÃO DE JOGADOR — MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .edicao-jogador-mobile {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    box-sizing: border-box;
+  }
+
+  .edicao-jogador-mobile label {
+    margin-top: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-2);
+  }
+
+  .edicao-jogador-mobile input,
+  .edicao-jogador-mobile select {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    margin: 0;
+  }
+
+  .jogador-acoes-mobile {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .jogador-acoes-mobile button {
+    flex: 1;
+    min-width: 0;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .detalhe-jogador {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+}
+
+/* =========================================
+   LISTA DESKTOP - JOGADORES
+========================================= */
+
+.jogador-linha {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.jogador-linha > td {
+  padding: 0 !important;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.jogador-linha:last-child > td {
+  border-bottom: none;
+}
+
+.jogador-linha:hover {
+  background: var(--surface-hover);
+}
+
+.jogador-resumo {
+  min-height: 54px;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--surface);
+  transition: background 0.2s ease;
+}
+
+.jogador-resumo:hover {
+  background: var(--surface-soft);
+}
+
+.jogador-seta {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--text-2);
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.detalhe-jogador-desktop {
+  padding: 18px 22px 18px;
+  background: var(--surface-soft);
+  border-top: 1px solid var(--border-soft);
+  cursor: default;
+}
+
+.jogador-info {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 28px;
+  font-size: 0.88rem;
+  color: var(--text-2);
+}
+
+.jogador-info > div {
+  line-height: 1.4;
+  padding: 2px 0;
+}
+
+.jogador-info strong {
+  display: block;
+  color: var(--text-2);
+  font-size: 0.76rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.jogador-acoes {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.jogador-acoes button {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.jogador-acoes button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-xs);
+}
+
+@media (min-width: 769px) {
+
+  #tabelaJogadores thead,
+  #tabelaJogadoresInativos thead {
+    display: none;
+  }
+
+}
+
+/* =========================================
+   CADASTRO DE JOGADOR - MENU EXPANSÍVEL
+========================================= */
+
+#cadastroJogador {
+  margin-bottom: 18px;
+}
+
+.cadastro-jogador-header {
+  min-height: 54px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.cadastro-jogador-header:hover {
+  background: var(--surface-hover);
+}
+
+#formularioCadastroJogador {
+  display: none;
+  margin-top: 10px;
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.formulario-cadastro-jogador {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.formulario-cadastro-jogador input,
+.formulario-cadastro-jogador select {
+  width: 100%;
+}
+
+.formulario-cadastro-jogador button {
+  width: fit-content;
+  padding: 9px 18px;
+}
+
+.cadastro-jogador-header .titulo-secao {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: var(--text);
+}
+
 /* =========================
    UTILIDADES
 ========================= */
@@ -853,7 +1082,15 @@ hr{
   background: var(--border);
 }
 
-#jogos{ color: var(--text); }
+#jogos{
+  color: var(--text);
+  width: calc(100% + 60px) !important;
+  max-width: none !important;
+  min-height: 100vh;
+  margin-left: -30px !important;
+  margin-right: -30px !important;
+  box-sizing: border-box;
+}
 
 /* Receita por mês */
 #receitaPorMes{
@@ -1073,4 +1310,65 @@ hr{
     display: none !important;
   }
 
+}
+
+/* =========================================
+   CADASTRO DE JOGO
+========================================= */
+
+.cadastro-jogo-header {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  cursor: pointer;
+}
+
+.cadastro-jogo-header:hover {
+  background: var(--surface);
+}
+
+.formulario-cadastro-jogo {
+  padding: 18px;
+  margin-bottom: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.jogos-agendados-header {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 18px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  cursor: pointer;
+}
+
+.jogos-agendados-header:hover {
+  background: var(--surface);
+}
+
+#financeiro{
+  width: calc(100% + 60px) !important;
+  max-width: none !important;
+  min-height: 100vh;
+  margin-left: -30px !important;
+  margin-right: -30px !important;
+  margin-top: -26px !important;
+  box-sizing: border-box;
 }
