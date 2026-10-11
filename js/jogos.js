@@ -104,16 +104,17 @@ async function carregarJogosAgendados(){
     let jogos = await apiGet(`/jogos/${turmaId}`)
 
     jogosAgendados = jogos
-      .filter(jogo => jogo.status === "AGENDADO")
-      .sort((a, b) => {
+  .filter(jogo => jogo.status === "AGENDADO")
+  .sort((a, b) => {
 
-        let dataA = `${a.data}T${a.hora || "00:00:00"}`
-        let dataB = `${b.data}T${b.hora || "00:00:00"}`
+    let dataA = `${a.data}T${a.hora || "00:00:00"}`
+    let dataB = `${b.data}T${b.hora || "00:00:00"}`
 
-        return new Date(dataA) - new Date(dataB)
-      })
+    return new Date(dataA) - new Date(dataB)
+  })
 
-    mostrarJogosAgendados()
+mostrarJogosAgendados()
+mostrarProximosJogosPainel()
 
   } catch(err){
 
@@ -178,6 +179,67 @@ function mostrarJogosAgendados(){
   </div>
 `
   }
+}
+
+function mostrarProximosJogosPainel(){
+
+  const container = document.getElementById("painelProximosJogos")
+
+  if(!container) return
+
+  const hoje = new Date()
+  hoje.setHours(0, 0, 0, 0)
+
+const proximos = (jogosAgendados || [])
+  .filter(jogo => {
+    const dataJogo = new Date(jogo.data)
+    return dataJogo >= hoje
+  })
+  .slice(0, 3)
+
+  if(proximos.length === 0){
+
+    container.innerHTML = `
+      <div class="historico-card">
+        <div class="historico-header">
+          <span>📭 Nenhum próximo jogo agendado.</span>
+        </div>
+      </div>
+    `
+
+    return
+  }
+
+  container.innerHTML = proximos.map(jogo => {
+
+    const dataFormatada = formatarDataBR(jogo.data)
+    const horaFormatada = jogo.hora
+      ? jogo.hora.substring(0, 5)
+      : "--:--"
+
+    const tipoJogo =
+      String(jogo.tipo_jogo || "rachao").toLowerCase() === "desafio"
+        ? "🔵 Desafio"
+        : "🟢 Rachão"
+
+    return `
+      <div class="historico-card"
+           onclick="abrirJogo(${jogo.id})"
+           style="cursor:pointer;">
+
+        <div class="historico-header">
+          <div>
+            <strong>📅 ${dataFormatada}</strong>
+            <span>🕒 ${horaFormatada}</span>
+            <span>📍 ${jogo.local || "Local não informado"}</span>
+          </div>
+
+          <span>${tipoJogo}</span>
+        </div>
+
+      </div>
+    `
+  }).join("")
 }
 
 async function abrirJogo(jogoId){
@@ -419,6 +481,15 @@ if(jogadoresConfirmados.length > 0){
     // ==================================================
     // ADMIN
     // ==================================================
+    const mensalistasJogo = presencasJogo.filter(
+    p => p.tipo_participante !== "CONVIDADO" &&
+       p.convidado_id == null
+    )
+
+  const convidadosJogo = presencasJogo.filter(
+  p => p.tipo_participante === "CONVIDADO" ||
+       p.convidado_id != null
+  )
 
     const pendentes = presencasJogo.filter(
       p => p.resposta === "PENDENTE"
@@ -714,13 +785,107 @@ if(tipoJogo === "desafio"){
 
       </div>
 
-      ${blocoComposicao}
-
-      <h4>👥 Jogadores</h4>
+            <h4>👥 Jogadores</h4>
 
       <div>
 
-       ${presencasJogo.map(p => {
+            </div>
+
+      ${jogo.status === "AGENDADO" ? `
+        <div
+  onclick="event.stopPropagation()"
+  style="
+    margin:15px 0;
+    padding:15px;
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:10px;
+  "
+>
+          <h4 style="margin:0 0 12px;">➕ Adicionar convidado</h4>
+
+          <div style="
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+  gap:10px;
+  align-items:end;
+">
+            <div>
+              <label for="nomeConvidado-${jogoId}"
+                style="display:block; margin-bottom:5px; font-size:13px;">
+                Nome
+              </label>
+              <input
+                id="nomeConvidado-${jogoId}"
+                type="text"
+                maxlength="120"
+                placeholder="Nome do convidado"
+                style="width:100%; box-sizing:border-box; padding:10px; border:1px solid #cbd5e1; border-radius:7px;"
+              >
+            </div>
+
+            
+<div>
+  <label
+    for="posicaoConvidado-${jogoId}"
+    style="display:block; margin-bottom:5px; font-size:13px;"
+  >
+    Posição
+  </label>
+
+  <select
+    id="posicaoConvidado-${jogoId}"
+    style="width:100%; box-sizing:border-box; padding:10px; border:1px solid #cbd5e1; border-radius:7px; background:white;"
+  >
+    <option value="">Selecione a posição</option>
+    <option value="Goleiro">Goleiro</option>
+    <option value="Zagueiro">Zagueiro</option>
+    <option value="Lateral">Lateral</option>
+    <option value="Meia">Meia</option>
+    <option value="Atacante">Atacante</option>
+  </select>
+</div>
+
+
+            <button
+              type="button"
+              onclick="event.preventDefault(); event.stopPropagation(); adicionarConvidado(${jogoId})"
+  style="
+  background:#2563eb;
+  color:white;
+  border:none;
+  padding:10px 16px;
+  border-radius:7px;
+  cursor:pointer;
+  height:42px;
+  box-sizing:border-box;
+  margin:0;
+  position:relative;
+  top:-1px;
+  white-space:nowrap;
+  grid-column:1 / -1;
+  width:25%;
+  height:42px;
+  box-sizing:border-box;
+  margin-top:0;
+"
+            >
+              Adicionar convidado
+            </button>
+          </div>
+
+          <small style="display:block; margin-top:8px; color:#64748b;">
+            Atenção! O convidado será registrado somente neste jogo.
+          </small>
+        </div>
+      ` : ""}
+
+      ${blocoComposicao}
+
+
+<h4>👥 Mensalistas (${mensalistasJogo.length})</h4>
+
+${mensalistasJogo.map(p => {
 
   let statusTexto =
     p.resposta === "CONFIRMADO"
@@ -729,133 +894,126 @@ if(tipoJogo === "desafio"){
         ? "❌ Recusado"
         : "🟡 Pendente"
 
-  let horarioResposta = ""
+  let botoesAdmin = ""
 
-  if(p.resposta_em){
+  if(jogo.status === "AGENDADO"){
 
-    let dataResposta =
-      String(p.resposta_em).substring(0,10)
-
-    let horaResposta =
-      String(p.resposta_em).substring(11,16)
-
-    horarioResposta = `
-      <span style="
-        margin-left:10px;
-        color:#666;
-        font-size:13px;
+    botoesAdmin = `
+      <div style="
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+        margin-top:8px;
       ">
-        📅 ${formatarDataBR(dataResposta)}
-        🕒 ${horaResposta}
-      </span>
+
+        <button
+          onclick="event.stopPropagation(); responderPresenca(${jogoId}, 'CONFIRMADO', ${p.jogador_id})"
+          style="background:#16a34a;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;"
+        >✅ Confirmar</button>
+
+        <button
+          onclick="event.stopPropagation(); responderPresenca(${jogoId}, 'RECUSADO', ${p.jogador_id})"
+          style="background:#dc2626;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;"
+        >❌ Recusar</button>
+
+        ${
+          p.resposta !== "PENDENTE"
+          ? `
+            <button
+              onclick="event.stopPropagation(); responderPresenca(${jogoId}, 'PENDENTE', ${p.jogador_id})"
+              style="background:#6b7280;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;"
+            >↩ Pendente</button>
+          `
+          : ""
+        }
+
+      </div>
     `
   }
 
-  let botoesAdmin = ""
-
-if(jogo.status === "AGENDADO"){
-
-  botoesAdmin = `
-    <div style="
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin-top:8px;
-    ">
-
-      <button
-        onclick="event.stopPropagation(); responderPresenca(${jogoId}, 'CONFIRMADO', ${p.jogador_id})"
-        style="
-          background:#16a34a;
-          color:white;
-          border:none;
-          padding:6px 10px;
-          border-radius:6px;
-          cursor:pointer;
-        "
-      >
-        ✅ Confirmar
-      </button>
-
-      <button
-        onclick="event.stopPropagation(); responderPresenca(${jogoId}, 'RECUSADO', ${p.jogador_id})"
-        style="
-          background:#dc2626;
-          color:white;
-          border:none;
-          padding:6px 10px;
-          border-radius:6px;
-          cursor:pointer;
-        "
-      >
-        ❌ Recusar
-      </button>
-
-      ${
-        p.resposta !== "PENDENTE"
-        ? `
-          <button
-            onclick="event.stopPropagation(); responderPresenca(${jogoId}, 'PENDENTE', ${p.jogador_id})"
-            style="
-              background:#6b7280;
-              color:white;
-              border:none;
-              padding:6px 10px;
-              border-radius:6px;
-              cursor:pointer;
-            "
-          >
-            ↩ Pendente
-          </button>
-        `
-        : ""
-      }
-
+  return `
+    <div style="padding:10px 0;border-bottom:1px solid #eee;">
+      <div style="display:grid;grid-template-columns:380px 130px 170px;align-items:center;gap:10px;">
+        <strong>${p.nome}</strong>
+        <span>${statusTexto}</span>
+        <span style="color:#666;font-size:13px;">
+          ${p.resposta_em
+            ? `📅 ${formatarDataBR(String(p.resposta_em).substring(0,10))}
+               🕒 ${String(p.resposta_em).substring(11,16)}`
+            : ""}
+        </span>
+      </div>
+      ${botoesAdmin}
     </div>
   `
-}
-
-  return `
-
-  <div style="
-    padding:10px 0;
-    border-bottom:1px solid #eee;
-  ">
-
-    <div style="
-      display:grid;
-      grid-template-columns: 380px 130px 170px;
-      align-items:center;
-      gap:10px;
-    ">
-
-      <strong>
-        ${p.nome}
-      </strong>
-
-      <span>
-        ${statusTexto}
-      </span>
-
-      <span style="
-        color:#666;
-        font-size:13px;
-      ">
-        ${p.resposta_em
-          ? `📅 ${formatarDataBR(String(p.resposta_em).substring(0,10))}
-             🕒 ${String(p.resposta_em).substring(11,16)}`
-          : ""}
-      </span>
-
-    </div>
-
-    ${botoesAdmin}
-
-  </div>
-
-`
-
 }).join("")}
+
+<div style="margin-top:25px;padding-top:15px;border-top:2px solid #e5e7eb;">
+  <h4>👤 Convidados (${convidadosJogo.length})</h4>
+
+  ${
+    convidadosJogo.length > 0
+      ? convidadosJogo.map(p => {
+
+          let statusTexto =
+            p.resposta === "CONFIRMADO"
+              ? "✅ Confirmado"
+              : p.resposta === "RECUSADO"
+                ? "❌ Recusado"
+                : "🟡 Pendente"
+
+          let botoesAdmin = ""
+
+          if(jogo.status === "AGENDADO"){
+
+            botoesAdmin = `
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+
+                <button
+                  onclick="event.stopPropagation(); responderPresenca(${jogoId}, 'CONFIRMADO', null, ${p.convidado_id})"
+                  style="background:#16a34a;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;"
+                >✅ Confirmar</button>
+
+                <button
+                  onclick="event.stopPropagation(); responderPresenca(${jogoId}, 'RECUSADO', null, ${p.convidado_id})"
+                  style="background:#dc2626;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;"
+                >❌ Recusar</button>
+
+                ${
+                  p.resposta !== "PENDENTE"
+                  ? `
+                    <button
+                      onclick="event.stopPropagation(); responderPresenca(${jogoId}, 'PENDENTE', null, ${p.convidado_id})"
+                      style="background:#6b7280;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;"
+                    >↩ Pendente</button>
+                  `
+                  : ""
+                }
+
+              </div>
+            `
+          }
+
+          return `
+            <div style="padding:10px 0;border-bottom:1px solid #eee;">
+              <div style="display:grid;grid-template-columns:380px 130px 170px;align-items:center;gap:10px;">
+                <strong>${p.nome}</strong>
+                <span>${statusTexto}</span>
+                <span style="color:#666;font-size:13px;">
+                  ${p.resposta_em
+                    ? `📅 ${formatarDataBR(String(p.resposta_em).substring(0,10))}
+                       🕒 ${String(p.resposta_em).substring(11,16)}`
+                    : ""}
+                </span>
+              </div>
+              ${botoesAdmin}
+            </div>
+          `
+        }).join("")
+      : `<p style="color:#64748b;font-size:14px;">Nenhum convidado adicionado a este jogo.</p>`
+  }
+</div>
+
 
       </div>
     `
@@ -931,18 +1089,106 @@ async function excluirJogoAgendado(jogoId){
   }
 }
 
-async function responderPresenca(jogoId, resposta, jogadorId = null){
+async function adicionarConvidado(jogoId){
+
+  const campoNome = document.getElementById(
+    `nomeConvidado-${jogoId}`
+  )
+
+  const campoPosicao = document.getElementById(
+    `posicaoConvidado-${jogoId}`
+  )
+
+  const nome = campoNome?.value.trim() || ""
+  const posicao = campoPosicao?.value.trim() || ""
+
+  if(!nome){
+    mostrarToast("Informe o nome do convidado.", "error")
+    campoNome?.focus()
+    return
+  }
+
+  try {
+
+        console.log("Cadastrando convidado:", {
+      jogoId,
+      nome,
+      posicao
+    })
+
+    const resultado = await apiPost(
+      `/jogos/${jogoId}/convidados`,
+      {
+        nome,
+        posicao
+      }
+    )
+
+        console.log("Resposta do cadastro:", resultado)
+
+    if(!resultado || !resultado.ok){
+      mostrarToast(
+        resultado?.erro ||
+        "Não foi possível adicionar o convidado.",
+        "error"
+      )
+      return
+    }
+
+    mostrarToast(
+      "Convidado adicionado e confirmado com sucesso!"
+    )
+
+    const detalhe = document.getElementById(
+      `detalhe-jogo-${jogoId}`
+    )
+
+    // Fecha o detalhe atual antes de reabri-lo
+    if(detalhe){
+      detalhe.remove()
+    }
+
+    // Reabre o detalhe para atualizar a lista
+    await abrirJogo(jogoId)
+
+  } catch(err){
+
+    console.error(
+      "ERRO AO ADICIONAR CONVIDADO:",
+      err
+    )
+
+    mostrarToast(
+      "Erro ao adicionar convidado.",
+      "error"
+    )
+
+  }
+}
+
+async function responderPresenca(
+  jogoId,
+  resposta,
+  jogadorId = null,
+  convidadoId = null
+){
 
   try {
 
     const dados = {
       resposta: resposta
     }
-
+   
     // Quando o ADMIN estiver alterando a resposta
     // de um jogador específico
-    if(jogadorId){
+    if(jogadorId !== null && jogadorId !== undefined){
       dados.jogador_id = jogadorId
+    }
+
+    // Quando o ADMIN estiver alterando a resposta
+    // de um convidado específico
+    if(convidadoId !== null && convidadoId !== undefined){
+      dados.convidado_id = convidadoId
     }
 
     const resultado = await apiPut(
@@ -998,6 +1244,7 @@ async function responderPresenca(jogoId, resposta, jogadorId = null){
 // FINALIZAR JOGO
 // ==================================================
 
+
 async function finalizarJogo(jogoId){
 
   try {
@@ -1009,19 +1256,35 @@ async function finalizarJogo(jogoId){
     const jogo = resultado.jogo
     const presencasJogo = resultado.presencas || []
 
-    // Jogadores confirmados no momento da finalização
+    // Participantes que confirmaram presença
     const confirmados =
       presencasJogo.filter(
         p => p.resposta === "CONFIRMADO"
       )
 
+    // Identifica jogadores cadastrados e convidados
+    // Jogador cadastrado: envia o ID numérico
+    // Convidado: envia o tipo e o ID do convidado
+    const identificarParticipante = participante => {
+
+      if(participante.convidado_id !== null &&
+         participante.convidado_id !== undefined){
+
+        return {
+          tipo: "CONVIDADO",
+          id: Number(participante.convidado_id)
+        }
+
+      }
+
+      return Number(participante.jogador_id)
+
+    }
+
     const presentesReais =
-      confirmados.map(
-        p => Number(p.jogador_id)
-      )
+      confirmados.map(identificarParticipante)
 
     let composicaoFinal
-
 
     // ==============================================
     // DESAFIO
@@ -1039,7 +1302,6 @@ async function finalizarJogo(jogoId){
       }
 
     }
-
 
     // ==============================================
     // RACHÃO
@@ -1069,11 +1331,11 @@ async function finalizarJogo(jogoId){
           equipes: {
 
             1: composicao.timeA.map(
-              jogador => Number(jogador.jogador_id)
+              identificarParticipante
             ),
 
             2: composicao.timeB.map(
-              jogador => Number(jogador.jogador_id)
+              identificarParticipante
             )
 
           }
@@ -1083,7 +1345,6 @@ async function finalizarJogo(jogoId){
       }
 
     }
-
 
     // ==============================================
     // ENVIA PARA O BACKEND
@@ -1098,7 +1359,6 @@ async function finalizarJogo(jogoId){
         }
       )
 
-
     if(!resposta || !resposta.ok){
 
       mostrarToast(
@@ -1110,18 +1370,15 @@ async function finalizarJogo(jogoId){
       return
     }
 
-
     mostrarToast(
       "Jogo finalizado com sucesso!"
     )
-
 
     // Atualiza jogos agendados
     await carregarJogosAgendados()
 
     // Atualiza histórico
     await carregarHistorico()
-
 
   } catch(err){
 
@@ -1131,7 +1388,7 @@ async function finalizarJogo(jogoId){
     )
 
     mostrarToast(
-      "Erro: Existem jogadores Pendentes.",
+      "Erro ao finalizar o jogo. Verifique os dados e tente novamente.",
       "error"
     )
 
@@ -1154,7 +1411,6 @@ function pesoNivel(nivel){
   return 0
 }
 
-
 // --------------------------------------------------
 // EMBARALHAR
 // --------------------------------------------------
@@ -1175,7 +1431,6 @@ function embaralharJogadores(lista){
 
   return copia
 }
-
 
 // --------------------------------------------------
 // CONTAR POSIÇÕES
@@ -1207,7 +1462,6 @@ function contarPosicoes(time){
   return contagem
 }
 
-
 // --------------------------------------------------
 // CALCULAR DESEQUILÍBRIO
 // --------------------------------------------------
@@ -1227,7 +1481,6 @@ function calcularDesequilibrioTimes(timeA, timeB){
   if(diferencaQuantidade > 1){
     penalidadeQuantidade = 100000
   }
-
 
   // ----------------------------------------------
   // POSIÇÕES
@@ -1264,7 +1517,6 @@ function calcularDesequilibrioTimes(timeA, timeB){
       (diferenca * diferenca) * 20
 
   }
-
 
   // ----------------------------------------------
   // NÍVEL
@@ -1322,7 +1574,6 @@ function calcularDesequilibrioTimes(timeA, timeB){
   }
 
 }
-
 
 // --------------------------------------------------
 // CRIA DIVISÃO INICIAL

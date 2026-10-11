@@ -50,23 +50,49 @@ return idade
 
 }
 
+
 function mostrarToast(mensagem, tipo = "success"){
 
   let toast = document.getElementById("toast")
 
-  toast.innerText = mensagem
-  toast.className = ""
-  toast.classList.add("show")
+  // Cria o elemento caso ainda não exista na página
+  if(!toast){
 
-  if(tipo === "success"){
-    toast.classList.add("toast-success")
-  } else {
-    toast.classList.add("toast-error")
+    toast = document.createElement("div")
+    toast.id = "toast"
+
+    toast.style.position = "fixed"
+    toast.style.bottom = "20px"
+    toast.style.right = "20px"
+    toast.style.zIndex = "99999"
+    toast.style.padding = "12px 18px"
+    toast.style.borderRadius = "8px"
+    toast.style.color = "#fff"
+    toast.style.fontWeight = "600"
+    toast.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)"
+    toast.style.maxWidth = "90%"
+    toast.style.display = "none"
+
+    document.body.appendChild(toast)
+
   }
 
+  toast.innerText = mensagem
+  toast.className = ""
+
+  toast.style.background =
+    tipo === "success" ? "#16a34a" : "#dc2626"
+
+  toast.style.display = "block"
+  toast.classList.add("show")
+
   setTimeout(() => {
+
     toast.classList.remove("show")
+    toast.style.display = "none"
+
   }, 8000)
+
 }
 
 // LOGOUT

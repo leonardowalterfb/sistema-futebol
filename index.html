@@ -66,7 +66,7 @@
 <p id="nomeUsuarioLogado" style="margin-bottom:10px;font-weight:bold;"></p>
 
 <button id="menuPainel" onclick="mostrarSecao('painel')">📊 Painel</button>
-
+<button id="menuRelatorios" onclick="mostrarSecao('relatorios')">📈 Relatórios</button>
 <button id="btnConfiguracoes" onclick="mostrarSecao('configuracoes'); abrirAbaConfig('usuarios')">⚙️ Configurações</button>
 <button id="menuJogadores" onclick="mostrarSecao('jogadores')">👥 Jogadores</button>
 <button id="menuFinanceiro" onclick="mostrarSecao('financeiro')">💰 Financeiro</button>
@@ -82,84 +82,179 @@
 <div class="content">
 
 <!-- ======================= -->
-<!-- PAINEL -->
+<!-- PAINEL SYNGEST -->
 <!-- ======================= -->
 
 <div id="painel" class="secao">
 
-<h1 id="tituloSistema">⚽ Sistema</h1>
-
-<h2>📊 Painel </h2>
-
-<!-- 🔹 LINHA 1 -->
-<div class="cards">
-
-  <div class="card">
-    <h3>Elenco</h3>
-    <p id="totalJogadores"></p>
+  <div class="painel-cabecalho">
+    <div>
+      <h1 id="tituloSistema">⚽ SYNGEST</h1>
+      <h2>Visão geral</h2>
+      <p class="painel-descricao">
+        Acompanhe a situação da sua turma em um só lugar.
+      </p>
+    </div>
   </div>
 
-  <div class="card">
-    <h3>Pagamentos</h3>
-    <p id="totalPagamentos"></p>
+  <!-- INDICADORES PRINCIPAIS -->
+  <div class="cards painel-indicadores">
+
+    <div class="card">
+      <h3>Elenco</h3>
+      <p id="totalJogadores"></p>
+    </div>
+
+    <div class="card">
+      <h3>Pagamentos</h3>
+      <p id="totalPagamentos"></p>
+    </div>
+
+    <div class="card">
+      <h3>Receita do mês</h3>
+      <p id="totalMesAtual"></p>
+    </div>
+
+    <div class="card">
+      <h3>Total recebido</h3>
+      <p id="totalAno"></p>
+    </div>
+
+    <div class="card">
+      <h3>Despesas</h3>
+      <p id="totalDespesas"></p>
+    </div>
+
+    <div class="card">
+      <h3>Saldo da turma</h3>
+      <p id="saldoTurma"></p>
+    </div>
+
   </div>
 
-  <div class="card">
-    <h3>Mês Atual</h3>
-    <p id="totalMesAtual"></p>
+  <!-- ÁREA DE INFORMAÇÕES DO DASHBOARD -->
+
+  <div class="painel-conteudo">
+
+    <!-- ÁREA DE DESTAQUE E ALERTAS -->
+
+<!-- CARD DE SITUAÇÃO DAS MENSALIDADES -->
+<div class="card card-grande painel-destaques card-grafico-individual">
+
+  <div class="painel-destaques-cabecalho">
+    <div>
+      <h3>Situação das mensalidades</h3>
+      <p>Acompanhamento dos pagamentos do mês atual.</p>
+    </div>
   </div>
 
-  <div class="card">
-    <h3>Total Recebido</h3>
-    <p id="totalAno"></p>
+  <div class="grafico-mensalidade-info">
+    <div class="grafico-mensalidade-titulo">
+      <p id="mensalidadeDescricao">
+        Acompanhamento dos pagamentos do mês atual.
+      </p>
+    </div>
+
+    <div class="grafico-legenda">
+      <div class="grafico-legenda-item">
+        <div class="grafico-legenda-identificacao">
+          <span class="grafico-ponto grafico-pago"></span>
+          <span>Pagaram</span>
+        </div>
+        <strong id="mensalidadePagaram">0</strong>
+      </div>
+
+      <div class="grafico-legenda-item">
+        <div class="grafico-legenda-identificacao">
+          <span class="grafico-ponto grafico-nao-pago"></span>
+          <span>Não pagaram</span>
+        </div>
+        <strong id="mensalidadeNaoPagaram">0</strong>
+      </div>
+    </div>
   </div>
 
-  <div class="card">
-    <h3>Despesas</h3>
-    <p id="totalDespesas"></p>
-  </div>
-
-  <div class="card">
-    <h3>Saldo</h3>
-    <p id="saldoTurma"></p>
+  <div class="grafico-mensalidade-visual">
+    <div id="graficoMensalidades" class="grafico-circular">
+      <div class="grafico-circular-centro">
+        <strong id="mensalidadePercentual">0%</strong>
+        <span>pagaram</span>
+      </div>
+    </div>
   </div>
 
 </div>
 
-<!-- 🔹 LINHA 2 -->
-<div class="cards-abaixo">
-  <div class="card card-grande">
-    <h3>📊 Receita por Mês</h3>
-    <div id="receitaPorMes"></div>
+<!-- CARD DE PARTICIPAÇÕES NOS JOGOS -->
+<div class="card card-grande painel-destaques card-grafico-individual">
+
+  <div class="painel-destaques-cabecalho">
+    <div>
+      <h3>Participações nos jogos</h3>
+      <p>Mensalistas e convidados nos últimos 30 dias.</p>
+    </div>
+  </div>
+
+  <div class="grafico-mensalidade-info">
+    <div class="grafico-mensalidade-titulo">
+      <p id="participacoesDescricao">
+        Participações nos últimos 30 dias.
+      </p>
+    </div>
+
+    <div class="grafico-legenda">
+      <div class="grafico-legenda-item">
+        <div class="grafico-legenda-identificacao">
+          <span class="grafico-ponto grafico-pago"></span>
+          <span>Mensalistas</span>
+        </div>
+        <strong id="participacoesMensalistas">0</strong>
+      </div>
+
+      <div class="grafico-legenda-item">
+        <div class="grafico-legenda-identificacao">
+          <span class="grafico-ponto grafico-nao-pago"></span>
+          <span>Convidados</span>
+        </div>
+        <strong id="participacoesConvidados">0</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="grafico-mensalidade-visual">
+    <div id="graficoParticipacoes" class="grafico-circular">
+      <div class="grafico-circular-centro">
+        <strong id="participacoesPercentual">0%</strong>
+        <span>mensalistas</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- PRÓXIMOS JOGOS -->
+<div class="painel-proximos-jogos">
+  <div class="painel-bloco-titulo">
+    <h3>Próximos jogos</h3>
+    <p>Confira os próximos confrontos da sua turma.</p>
+  </div>
+
+  <div id="painelProximosJogos">
+    <p>Carregando próximos jogos...</p>
   </div>
 </div>
 
-<!-- 🔹 LINHA 3 -->
-<div class="cards-abaixo">
-  <div class="card card-grande">
-  <h3>📉 Despesas por Mês</h3>
-  <div id="despesasPorMes"></div>
-</div>
-</div>
 
-<!-- 🔹 LINHA 4 -->
-<div class="cards-abaixo">
-  <div class="card card-grande">
-    <h3>💰 Resultado por Mês</h3>
-    <div id="resultadoFinanceiroPorMes"></div>
+    <!-- PRÓXIMOS ANIVERSÁRIOS -->
+    <div class="card card-grande painel-aniversarios">
+      <h3>🎂 Próximos aniversários</h3>
+
+      <div id="listaAniversarios"></div>
+    </div>
+
   </div>
+
 </div>
-
-<!-- 🔹 LINHA 5 (ANIVERSÁRIOS) -->
-<div class="cards-abaixo">
-  <div class="card card-grande">
-    <h3>🎂 Próximos Aniversários</h3>
-    <div id="listaAniversarios"></div>
-  </div>
-</div>
-
-</div> <!-- ✅ FECHA PAINEL CORRETAMENTE -->
-
 <!-- ======================= -->
 <!-- CONFIGURAÇÕES -->
 <!-- ======================= -->
@@ -245,7 +340,6 @@
 <label><input type="checkbox" id="perm_jogos_criar"> Criar Jogo</label>
 <label><input type="checkbox" id="perm_jogos_salvar"> Salvar Jogo</label>
 <label><input type="checkbox" id="perm_jogos_limpar"> Limpar Jogo</label>
-<label><input type="checkbox" id="perm_jogos_gerar_link"> Gerar Links WhatsApp</label>
 
 <h4>Financeiro</h4>
 <label><input type="checkbox" id="perm_financeiro_registrar"> Registrar</label>
@@ -594,22 +688,315 @@
 
 </div>
 
+
 <!-- ======================= -->
 <!-- HISTÓRICO -->
 <!-- ======================= -->
 
 <div id="historico" class="secao">
 
-<h2>📜 Histórico de Jogos</h2>
+  <h2>📜 Histórico de Jogos</h2>
 
-<ul id="historicoJogos"></ul>
-
-</div>
+  <ul id="historicoJogos"></ul>
 
 </div>
-</div>
 
-<div id="toast"></div>
+
+<!-- ======================= -->
+<!-- RELATÓRIOS -->
+<!-- ======================= -->
+
+<div id="relatorios" class="secao" style="display:none">
+
+  <h2>📈 Relatórios</h2>
+
+  <!-- AVALIAÇÃO INDIVIDUAL -->
+  <div class="card relatorio-card">
+
+    <div
+      class="relatorio-cabecalho"
+      onclick="toggleFiltrosRelatorio('filtrosAvaliacao', 'setaAvaliacao')"
+    >
+      <div>
+        <h3>⭐ Avaliação dos jogos</h3>
+        <p>Consulte as notas e os comentários de uma partida.</p>
+      </div>
+
+      <span id="setaAvaliacao">▼</span>
+    </div>
+
+    <div id="filtrosAvaliacao" class="relatorio-filtros" style="display:none">
+
+      <label for="selectJogoAvaliacao">Selecione o jogo</label>
+
+      <select id="selectJogoAvaliacao">
+        <option value="">Selecione um jogo</option>
+      </select>
+
+      <button
+        type="button"
+        onclick="carregarRelatorioAvaliacao()"
+      >
+        Consultar avaliação
+      </button>
+
+    </div>
+
+    <div id="resultadoRelatorioAvaliacao" style="display:none"></div>
+
+  </div>
+
+
+  <!-- RANKING DOS JOGOS -->
+  <div class="card relatorio-card">
+
+    <div
+      class="relatorio-cabecalho"
+      onclick="toggleFiltrosRelatorio('filtrosRanking', 'setaRanking')"
+    >
+      <div>
+        <h3>🏆 Ranking dos jogos</h3>
+        <p>Compare as partidas pelas avaliações recebidas.</p>
+      </div>
+
+      <span id="setaRanking">▼</span>
+    </div>
+    <div id="conteudoRanking" style="display:none"></div>
+    <div id="filtrosRanking" class="relatorio-filtros" style="display:none">
+
+      <div class="filtros-relatorio">
+
+        <div>
+          <label for="dataInicialRelatorio">Data inicial</label>
+          <input type="date" id="dataInicialRelatorio">
+        </div>
+
+        <div>
+          <label for="dataFinalRelatorio">Data final</label>
+          <input type="date" id="dataFinalRelatorio">
+        </div>
+
+        <div>
+          <label for="ordenacaoRelatorio">Ordenar por</label>
+          <select id="ordenacaoRelatorio">
+            <option value="melhor">Melhor avaliação</option>
+            <option value="pior">Pior avaliação</option>
+            <option value="recente">Mais recentes</option>
+            <option value="antigo">Mais antigos</option>
+          </select>
+        </div>
+
+      </div>
+
+      <button
+        type="button"
+        onclick="carregarRankingAvaliacoes()"
+      >
+        Aplicar filtros
+      </button>
+
+    </div>
+
+    <div id="rankingAvaliacoes" style="display:none"></div>
+
+  </div>
+
+  <!-- RELATÓRIO FINANCEIRO: RECEITAS POR MÊS -->
+  <div class="card relatorio-card">
+
+    <div
+      class="relatorio-cabecalho"
+      onclick="toggleFiltrosRelatorio('filtrosReceitas', 'setaReceitas')"
+    >
+      <div>
+        <h3>💰 Receitas por periodo</h3>
+        <p>Consulte mensalidades recebidas e outras entradas.</p>
+      </div>
+
+      <span id="setaReceitas">▼</span>
+    </div>
+
+    <div id="filtrosReceitas" class="relatorio-filtros" style="display:none">
+
+      <div class="filtros-relatorio">
+
+        <div>
+          <label for="dataInicialReceitas">Data inicial</label>
+          <input type="date" id="dataInicialReceitas">
+        </div>
+
+        <div>
+          <label for="dataFinalReceitas">Data final</label>
+          <input type="date" id="dataFinalReceitas">
+        </div>
+
+      </div>
+
+      <button
+        type="button"
+        onclick="gerarRelatorioReceitas()"
+      >
+        Consultar receitas
+      </button>
+
+    </div>
+
+    <div id="resultadoRelatorioReceitas" style="display:none"></div>
+
+  </div>
+
+  
+  <!-- RELATÓRIO FINANCEIRO: DESPESAS POR MÊS -->
+  <div class="card relatorio-card">
+
+    <div
+      class="relatorio-cabecalho"
+      onclick="toggleFiltrosRelatorio('filtrosDespesasRelatorio', 'setaDespesasRelatorio')"
+    >
+      <div>
+        <h3>💸 Despesas por mês</h3>
+        <p>Consulte as despesas realizadas em um período.</p>
+      </div>
+
+      <span id="setaDespesasRelatorio">▼</span>
+    </div>
+
+    <div
+      id="filtrosDespesasRelatorio"
+      class="relatorio-filtros"
+      style="display:none"
+    >
+      <div class="filtros-relatorio">
+
+        <div>
+          <label for="dataInicialDespesasRelatorio">Data inicial</label>
+          <input type="date" id="dataInicialDespesasRelatorio">
+        </div>
+
+        <div>
+          <label for="dataFinalDespesasRelatorio">Data final</label>
+          <input type="date" id="dataFinalDespesasRelatorio">
+        </div>
+
+      </div>
+
+      <button
+        type="button"
+        onclick="gerarRelatorioDespesas()"
+      >
+        Consultar despesas
+      </button>
+    </div>
+
+    <div
+      id="resultadoRelatorioDespesas"
+      style="display:none"
+    ></div>
+
+  </div>
+
+    <!-- RESULTADO FINANCEIRO POR PERÍODO -->
+  <div class="card relatorio-card">
+
+    <div
+      class="relatorio-cabecalho"
+      onclick="toggleFiltrosRelatorio('filtrosResultadoPeriodo', 'setaResultadoPeriodo')"
+    >
+      <div>
+        <h3>📊 Resultado por período</h3>
+        <p>Compare receitas, despesas e saldo em um intervalo de datas.</p>
+      </div>
+
+      <span id="setaResultadoPeriodo">▼</span>
+    </div>
+
+    <div
+      id="filtrosResultadoPeriodo"
+      class="relatorio-filtros"
+      style="display:none"
+    >
+      <div class="filtros-relatorio">
+
+        <div>
+          <label for="dataInicialResultadoPeriodo">Data inicial</label>
+          <input type="date" id="dataInicialResultadoPeriodo">
+        </div>
+
+        <div>
+          <label for="dataFinalResultadoPeriodo">Data final</label>
+          <input type="date" id="dataFinalResultadoPeriodo">
+        </div>
+
+      </div>
+
+      <button
+        type="button"
+        onclick="gerarRelatorioResultadoPeriodo()"
+      >
+        Consultar resultado
+      </button>
+    </div>
+
+    <div
+      id="resultadoRelatorioPeriodo"
+      style="display:none"
+    ></div>
+
+  </div>
+
+  
+  <!-- RELATÓRIO DE PARTICIPAÇÕES -->
+  <div class="card relatorio-card">
+
+    <div
+      class="relatorio-cabecalho"
+      onclick="toggleFiltrosRelatorio('filtrosParticipacoes', 'setaParticipacoes')"
+    >
+      <div>
+        <h3>⚽ Relatório de Participações</h3>
+        <p>Consulte as participações de mensalistas e convidados em um período.</p>
+      </div>
+
+      <span id="setaParticipacoes">▼</span>
+    </div>
+
+    <div
+      id="filtrosParticipacoes"
+      class="relatorio-filtros"
+      style="display:none"
+    >
+
+      <div class="filtros-relatorio">
+
+        <div>
+          <label for="dataInicialParticipacoes">Data inicial</label>
+          <input type="date" id="dataInicialParticipacoes">
+        </div>
+
+        <div>
+          <label for="dataFinalParticipacoes">Data final</label>
+          <input type="date" id="dataFinalParticipacoes">
+        </div>
+
+      </div>
+
+      <button
+  type="button"
+  onclick="gerarRelatorioParticipacoes()"
+>
+  Consultar participações
+</button>
+
+    </div>
+
+    <div
+      id="resultadoRelatorioParticipacoes"
+      style="display:none"
+    ></div>
+
+  </div>
+
+</div>
 
 <script src="js/utils.js"></script>
 <script src="js/api.js"></script>
@@ -617,6 +1004,8 @@
 <script src="js/jogadores.js"></script>
 <script src="js/financeiro.js"></script>
 <script src="js/jogos.js"></script>
+<script src="js/relatorios.js"></script>
+<script src="js/dashboard.js"></script>
 
 <!-- ======================= -->
 <!-- JAVASCRIPT -->
@@ -826,9 +1215,9 @@ async function iniciarSistema(){
 if(turmaSelecionada.perfil === "JOGADOR"){
 
   document.getElementById("menuPainel").style.display = "none"
+  document.getElementById("menuRelatorios").style.display = "none"
   document.getElementById("menuFinanceiro").style.display = "none"
   document.getElementById("btnConfiguracoes").style.display = "none"
-
   document.getElementById("menuJogadores").style.display = ""
   document.getElementById("menuJogos").style.display = ""
   document.getElementById("menuRanking").style.display = ""
@@ -836,15 +1225,21 @@ if(turmaSelecionada.perfil === "JOGADOR"){
 
   document.getElementById("cadastroJogador").style.display = "none"
 
-  await carregarJogadores()
-  mostrarSecao("jogadores")
+  
+await carregarJogadores()
 
-  return
+mostrarSecao("jogadores")
+
+await verificarAvaliacoesPendentes()
+
+return
+
 
 }else{
 
   // ADMIN
   document.getElementById("menuPainel").style.display = ""
+  document.getElementById("menuRelatorios").style.display = ""
   document.getElementById("menuFinanceiro").style.display = ""
   document.getElementById("btnConfiguracoes").style.display = ""
 
@@ -880,13 +1275,12 @@ await Promise.all([
 mostrarSecao("painel")
 
 setTimeout(() => {
-  mostrarReceitaPorMes()
-  mostrarDespesasPorMes()
-  mostrarResultadoFinanceiroPorMes()
   mostrarInadimplentes()
   atualizarPainel()
   mostrarAniversarios()
   mostrarRanking()
+  carregarJogosAgendados()
+    .then(() => mostrarProximosJogosPainel())
 }, 50)
 
 let dataSalva = localStorage.getItem("dataJogo")
@@ -907,6 +1301,183 @@ document.getElementById("dataJogo").addEventListener("change", function(){
 
 document.getElementById("localJogo").addEventListener("input", function(){
 })
+
+}
+
+
+
+async function verificarAvaliacoesPendentes(){
+
+  try {
+
+    const turma = JSON.parse(
+      localStorage.getItem("turmaSelecionada")
+    )
+
+    if(!turma || !turma.turma_id){
+      return
+    }
+
+    const avaliacoes = await apiGet(
+      `/avaliacoes/pendentes/${turma.turma_id}`
+    )
+
+    if(!Array.isArray(avaliacoes) || avaliacoes.length === 0){
+      return
+    }
+
+    const jogo = avaliacoes[0]
+
+    window.jogoPendenteAvaliacao = jogo
+
+    const dataJogo = jogo.data
+      ? new Date(jogo.data).toLocaleDateString("pt-BR")
+      : ""
+
+    document.getElementById("textoJogoAvaliacao").textContent =
+      `Jogo de ${dataJogo}${jogo.local ? " — " + jogo.local : ""}. Queremos saber como foi!`
+
+    document.getElementById("modalAvaliacaoJogo").style.display = "flex"
+
+  } catch(err) {
+
+    console.error(
+      "Erro ao verificar avaliações pendentes:",
+      err
+    )
+
+  }
+
+}
+
+function fecharModalAvaliacao(){
+
+  document.getElementById("modalAvaliacaoJogo").style.display = "none"
+
+}
+
+
+function abrirFormularioAvaliacao(){
+
+  document.getElementById("introducaoAvaliacao").style.display = "none"
+
+  document.getElementById("formularioAvaliacao").style.display = "block"
+
+  inicializarEstrelasAvaliacao()
+
+}
+
+function inicializarEstrelasAvaliacao(){
+
+  document.querySelectorAll(".estrelas-avaliacao").forEach(container => {
+
+    if(container.dataset.inicializado === "true"){
+      return
+    }
+
+    container.dataset.inicializado = "true"
+    container.dataset.nota = "0"
+
+    for(let nota = 1; nota <= 5; nota++){
+
+      const estrela = document.createElement("button")
+
+      estrela.type = "button"
+      estrela.textContent = "★"
+      estrela.style.fontSize = "28px"
+      estrela.style.background = "none"
+      estrela.style.border = "none"
+      estrela.style.cursor = "pointer"
+      estrela.style.color = "#ccc"
+      estrela.setAttribute("aria-label", `${nota} estrelas`)
+
+      estrela.onclick = () => {
+
+        container.dataset.nota = String(nota)
+
+        container.querySelectorAll("button").forEach((botao, indice) => {
+          botao.style.color = indice < nota ? "#f5b301" : "#ccc"
+        })
+
+      }
+
+      container.appendChild(estrela)
+
+    }
+
+  })
+
+}
+
+
+async function salvarAvaliacaoJogo(){
+
+  const jogo = window.jogoPendenteAvaliacao
+
+  if(!jogo || !jogo.jogo_id){
+    alert("Não foi possível identificar o jogo.")
+    return
+  }
+
+  const notas = {}
+
+  document.querySelectorAll(".estrelas-avaliacao").forEach(container => {
+    notas[container.dataset.campo] = Number(container.dataset.nota || 0)
+  })
+
+  const campos = [
+    "nota_equipe",
+    "nota_defesa",
+    "nota_ataque",
+    "nota_organizacao",
+    "nota_adversario",
+    "nota_nivel_jogo"
+  ]
+
+  if(campos.some(campo => notas[campo] < 1 || notas[campo] > 5)){
+    alert("Selecione de 1 a 5 estrelas em todos os critérios.")
+    return
+  }
+
+  const botao = document.querySelector(
+    '#formularioAvaliacao button[onclick="salvarAvaliacaoJogo()"]'
+  )
+
+  botao.disabled = true
+
+  try {
+
+    const resposta = await apiPost("/avaliacoes", {
+      jogo_id: jogo.jogo_id,
+      ...notas,
+      comentario: document.getElementById("comentarioAvaliacao").value.trim()
+    })
+
+    if(resposta && resposta.erro){
+      throw new Error(resposta.erro)
+    }
+
+    
+mostrarToast("Avaliação registrada com sucesso!", "success")
+
+
+
+    fecharModalAvaliacao()
+
+  } catch(err) {
+
+    console.error("Erro ao salvar avaliação:", err)
+
+    mostrarToast(
+      err.message || "Não foi possível salvar a avaliação.",
+      "error"
+    )
+
+  } finally {
+
+    botao.disabled = false
+
+  }
 
 }
 
@@ -1130,110 +1701,157 @@ mostrarToast("Links gerados! Veja no console (F12).")
 
 function atualizarPainel(){
 
-let mesAtual = new Date().toLocaleString('pt-BR',{month:'long'})
-mesAtual = mesAtual.charAt(0).toUpperCase()+mesAtual.slice(1)
+  let mesAtual = new Date().toLocaleString('pt-BR', {
+    month: 'long'
+  });
 
+  mesAtual = mesAtual.charAt(0).toUpperCase() + mesAtual.slice(1);
 
-let total = jogadores.length
-let ativos = 0
-let inativos = 0
+  // =========================
+  // ELENCO
+  // =========================
 
-for(let i = 0; i < jogadores.length; i++){
+  let total = jogadores.length;
+  let ativos = 0;
+  let inativos = 0;
 
-  if(jogadores[i].status === "ativo"){
-    ativos++
-  } else {
-    inativos++
-  }
-}
-
-document.getElementById("totalJogadores").innerHTML =
-`
-<strong>Total:</strong> ${total}<br>
-🟢 Ativos: ${ativos}<br>
-🔴 Inativos: ${inativos}
-`
-
-let totalMesPagamentos = 0
-
-for(let i=0;i<pagamentos.length;i++){
-
-  if(pagamentos[i].mes === mesAtual){
-    totalMesPagamentos++
-  }
-
-}
-
-document.getElementById("totalPagamentos").innerHTML =
-`
-Pagamentos em ${mesAtual}: <br>
-<strong>${totalMesPagamentos}</strong>
-`
-
-let totalAno = 0
-
-// PAGAMENTOS
-for(let i=0;i<pagamentos.length;i++){
-  totalAno += Number(pagamentos[i].valor || 0)
-}
-
-// RECEITAS
-if(receitas && receitas.length){
-  for(let i=0;i<receitas.length;i++){
-    totalAno += Number(receitas[i].valor || 0)
-  }
-}
-
-document.getElementById("totalAno").innerText=
-"Total Recebido no Ano: "+formatarMoeda(Number(totalAno || 0))
-
-let totalMes = 0
-
-// PAGAMENTOS
-for(let i=0;i<pagamentos.length;i++){
-  if(pagamentos[i].mes === mesAtual){
-    totalMes += Number(pagamentos[i].valor || 0)
-  }
-}
-
-if(receitas && receitas.length){
-  for(let i=0;i<receitas.length;i++){
-
-    let data = new Date(receitas[i].data)
-
-    let mes = data.toLocaleString('pt-BR',{month:'long'})
-    mes = mes.charAt(0).toUpperCase()+mes.slice(1)
-
-    if(mes === mesAtual){
-      totalMes += Number(receitas[i].valor || 0)
+  for(let i = 0; i < jogadores.length; i++){
+    if(jogadores[i].status === "ativo"){
+      ativos++;
+    } else {
+      inativos++;
     }
   }
-}
 
-document.getElementById("totalMesAtual").innerText=
-"Recebido em "+mesAtual+": "+formatarMoeda(totalMes)
+  document.getElementById("totalJogadores").innerHTML = `
+    <span class="indicador-valor">${total}</span>
+    <span class="indicador-detalhe">
+      <span class="status-ativo">●</span> Ativos: ${ativos}
+    </span>
+    <span class="indicador-detalhe">
+      <span class="status-inativo">●</span> Inativos: ${inativos}
+    </span>
+  `;
 
-let totalDespesas = 0
+  // =========================
+  // PAGAMENTOS DO MÊS
+  // =========================
 
-for(let i=0;i<despesas.length;i++){
-totalDespesas += Number(despesas[i].valor || 0)
-}
+  let totalMesPagamentos = 0;
 
-let totalReceitas = 0
-
-if(typeof receitas !== "undefined"){
-  for(let i=0;i<receitas.length;i++){
-    totalReceitas += Number(receitas[i].valor || 0)
+  for(let i = 0; i < pagamentos.length; i++){
+    if(pagamentos[i].mes === mesAtual){
+      totalMesPagamentos++;
+    }
   }
-}
 
-document.getElementById("totalDespesas").innerText =
-"Total de Despesas: "+formatarMoeda(totalDespesas)
+  document.getElementById("totalPagamentos").innerHTML = `
+    <span class="indicador-valor">${totalMesPagamentos}</span>
+    <span class="indicador-detalhe">
+      Registros em ${mesAtual}
+    </span>
+  `;
 
-let saldo = Number(totalAno || 0) - Number(totalDespesas || 0)
+  // =========================
+  // TOTAL RECEBIDO
+  // =========================
 
-document.getElementById("saldoTurma").innerText =
-"Saldo da Turma: "+formatarMoeda(saldo)
+  let totalAno = 0;
+
+  for(let i = 0; i < pagamentos.length; i++){
+    totalAno += Number(pagamentos[i].valor || 0);
+  }
+
+  if(receitas && receitas.length){
+    for(let i = 0; i < receitas.length; i++){
+      totalAno += Number(receitas[i].valor || 0);
+    }
+  }
+
+  document.getElementById("totalAno").innerHTML = `
+    <span class="indicador-valor">
+      ${formatarMoeda(totalAno)}
+    </span>
+    <span class="indicador-detalhe">
+      Total acumulado registrado
+    </span>
+  `;
+
+  // =========================
+  // RECEITA DO MÊS
+  // =========================
+
+  let totalMes = 0;
+
+  for(let i = 0; i < pagamentos.length; i++){
+    if(pagamentos[i].mes === mesAtual){
+      totalMes += Number(pagamentos[i].valor || 0);
+    }
+  }
+
+  if(receitas && receitas.length){
+    for(let i = 0; i < receitas.length; i++){
+
+      let data = new Date(receitas[i].data);
+
+      let mes = data.toLocaleString('pt-BR', {
+        month: 'long'
+      });
+
+      mes = mes.charAt(0).toUpperCase() + mes.slice(1);
+
+      if(mes === mesAtual){
+        totalMes += Number(receitas[i].valor || 0);
+      }
+    }
+  }
+
+  document.getElementById("totalMesAtual").innerHTML = `
+    <span class="indicador-valor">
+      ${formatarMoeda(totalMes)}
+    </span>
+    <span class="indicador-detalhe">
+      Receitas de ${mesAtual}
+    </span>
+  `;
+
+  // =========================
+  // DESPESAS
+  // =========================
+
+  let totalDespesas = 0;
+
+  for(let i = 0; i < despesas.length; i++){
+    totalDespesas += Number(despesas[i].valor || 0);
+  }
+
+  document.getElementById("totalDespesas").innerHTML = `
+    <span class="indicador-valor">
+      ${formatarMoeda(totalDespesas)}
+    </span>
+    <span class="indicador-detalhe">
+      Total de despesas registradas
+    </span>
+  `;
+
+  // =========================
+  // SALDO
+  // =========================
+
+  let saldo = Number(totalAno || 0) - Number(totalDespesas || 0);
+
+  document.getElementById("saldoTurma").innerHTML = `
+    <span class="indicador-valor">
+      ${formatarMoeda(saldo)}
+    </span>
+    <span class="indicador-detalhe">
+      Saldo acumulado da turma
+    </span>
+  `;
+
+  
+  atualizarGraficoMensalidades();
+  atualizarGraficoParticipacoes();
 
 }
 
@@ -1806,17 +2424,46 @@ async function carregarUsuarios(){
   }
 }
 
-async function excluirUsuario(id){
+let usuarioParaExcluir = null
 
-  let confirmar = confirm("Deseja excluir este usuário?")
 
-  if(!confirmar) return
+function excluirUsuario(id){
 
-  await apiDelete(`/usuarios/${id}`)
+  usuarioParaExcluir = id
 
-  mostrarToast("Usuário excluído")
+  document.getElementById("modalConfirmacao").style.display = "flex"
+}
 
-  carregarUsuarios()
+
+function fecharModalConfirmacao(){
+
+  usuarioParaExcluir = null
+
+  document.getElementById("modalConfirmacao").style.display = "none"
+}
+
+
+async function confirmarExclusaoUsuario(){
+
+  if(!usuarioParaExcluir) return
+
+  try {
+
+    await apiDelete(`/usuarios/${usuarioParaExcluir}`)
+
+    mostrarToast("Usuário excluído")
+
+    fecharModalConfirmacao()
+
+    carregarUsuarios()
+
+  } catch(err) {
+
+    console.error("Erro ao excluir usuário:", err)
+
+    mostrarToast("Erro ao excluir usuário", "error")
+
+  }
 }
 
 let usuarioEditando = null
@@ -1965,29 +2612,37 @@ function confirmarTurma(){
   )
 
   // 🔐 Ajusta os menus conforme o perfil
+
 const menuPainel = document.getElementById("menuPainel")
+const menuRelatorios = document.getElementById("menuRelatorios")
 const menuFinanceiro = document.getElementById("menuFinanceiro")
 const btnConfiguracoes = document.getElementById("btnConfiguracoes")
+
+
 
 if(turma.perfil === "JOGADOR"){
 
   menuPainel.style.display = "none"
+  menuRelatorios.style.display = "none"
   menuFinanceiro.style.display = "none"
   btnConfiguracoes.style.display = "none"
 
 }else{
 
   menuPainel.style.display = ""
+  menuRelatorios.style.display = ""
   menuFinanceiro.style.display = ""
   btnConfiguracoes.style.display = ""
 
 }
 
+
   console.log("✅ Turma selecionada:", turma)
 
   document.getElementById("modalTurma").style.display = "none"
 
-  // 🔥 Carrega o sistema
+
+  // Carrega o sistema
   carregarJogadores()
   carregarPagamentos()
   carregarDespesas()
@@ -1996,7 +2651,13 @@ if(turma.perfil === "JOGADOR"){
   atualizarPainel()
   renderPagamentos()
   mostrarDespesas()
+
+  // Verifica avaliações pendentes para jogadores
+  if(turma.perfil === "JOGADOR"){
+    verificarAvaliacoesPendentes()
+  }
 }
+
 
 async function salvarConfiguracoesSistema(){
 
@@ -2177,20 +2838,101 @@ async function mostrarSecao(id){
     await carregarJogosAgendados()
   }
 
+if(id === "relatorios"){
+  await carregarJogosRelatorioAvaliacao()
+}
+
+}
+
+// FILTRO RELATORIO
+
+function toggleFiltrosRelatorio(idFiltros, idSeta){
+
+  const filtros = document.getElementById(idFiltros)
+  const seta = document.getElementById(idSeta)
+
+  if(!filtros || !seta) return
+
+  const vaiAbrir = filtros.style.display === "none"
+
+  filtros.style.display = vaiAbrir ? "block" : "none"
+  seta.textContent = vaiAbrir ? "▲" : "▼"
+
+  if(idFiltros === "filtrosRanking"){
+
+    const ranking = document.getElementById("rankingAvaliacoes")
+
+    if(ranking){
+      ranking.style.display = vaiAbrir ? "block" : "none"
+    }
+
+  }
+
+  if(idFiltros === "filtrosAvaliacao"){
+
+    const resultado = document.getElementById("resultadoRelatorioAvaliacao")
+
+    if(resultado){
+      resultado.style.display = vaiAbrir ? "block" : "none"
+    }
+
+  }
+  
+  if(idFiltros === "filtrosReceitas"){
+
+    const resultado = document.getElementById("resultadoRelatorioReceitas")
+
+    if(resultado){
+      resultado.style.display = vaiAbrir ? "block" : "none"
+    }
+
+  }
+
+  if(idFiltros === "filtrosDespesasRelatorio"){
+
+    const resultado = document.getElementById("resultadoRelatorioDespesas")
+
+    if(resultado){
+      resultado.style.display = vaiAbrir ? "block" : "none"
+    }
+
+  }
+
+  if(idFiltros === "filtrosResultadoPeriodo"){
+
+    const resultado = document.getElementById("resultadoRelatorioPeriodo")
+
+    if(resultado){
+      resultado.style.display = vaiAbrir ? "block" : "none"
+    }
+
+  }
+
+
+if(idFiltros === "filtrosParticipacoes"){
+
+  const resultado = document.getElementById("resultadoRelatorioParticipacoes")
+
+  if(resultado){
+    resultado.style.display = vaiAbrir ? "block" : "none"
+  }
+
+}
+
 }
 
 function logout(){
 
-  // 🔥 LIMPA SESSÃO
+  //  LIMPA SESSÃO
   localStorage.removeItem("usuarioLogado")
 
-  // 🔥 LIMPA TOKEN (ESSENCIAL AGORA)
+  //  LIMPA TOKEN (ESSENCIAL AGORA)
   localStorage.removeItem("token")
 
-  // 🔥 LIMPA TURMA
+  //  LIMPA TURMA
   localStorage.removeItem("turmaSelecionada")
 
-  // 🔥 VOLTA PRO LOGIN
+  //  VOLTA PRO LOGIN
   document.getElementById("sistema").style.display = "none"
   document.getElementById("telaLogin").style.display = "flex"
 
@@ -2319,6 +3061,84 @@ if ("serviceWorker" in navigator) {
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+<div id="modalAvaliacaoJogo" style="display:none; position:fixed; inset:0; z-index:999999; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+  <div class="modal-avaliacao-conteudo" style="background:#fff; color:#222; padding:24px; border-radius:12px; width:100%; max-width:500px; max-height:85vh; overflow-y:auto; box-sizing:border-box;">
+
+    <h2>⚽ Avalie o jogo</h2>
+
+    <p id="textoJogoAvaliacao">
+      Queremos saber como foi o jogo!
+    </p>
+
+    <div id="introducaoAvaliacao">
+      <div class="botoes-avaliacao">
+        <button type="button" onclick="abrirFormularioAvaliacao()">
+          Avaliar jogo
+        </button>
+
+        <button type="button" onclick="fecharModalAvaliacao()">
+          Agora não
+        </button>
+      </div>
+    </div>
+
+    <div id="formularioAvaliacao" style="display:none;">
+
+      <div class="campo-nota">
+        <label>Desempenho da equipe</label>
+        <div class="estrelas-avaliacao" data-campo="nota_equipe"></div>
+      </div>
+
+      <div class="campo-nota">
+        <label>Sistema defensivo</label>
+        <div class="estrelas-avaliacao" data-campo="nota_defesa"></div>
+      </div>
+
+      <div class="campo-nota">
+        <label>Sistema ofensivo</label>
+        <div class="estrelas-avaliacao" data-campo="nota_ataque"></div>
+      </div>
+
+      <div class="campo-nota">
+        <label>Organização do jogo</label>
+        <div class="estrelas-avaliacao" data-campo="nota_organizacao"></div>
+      </div>
+
+      <div class="campo-nota">
+        <label>Equipe adversária</label>
+        <div class="estrelas-avaliacao" data-campo="nota_adversario"></div>
+      </div>
+
+      <div class="campo-nota">
+        <label>Nível do jogo</label>
+        <div class="estrelas-avaliacao" data-campo="nota_nivel_jogo"></div>
+      </div>
+
+      <label for="comentarioAvaliacao">Deixe sua avaliação</label>
+      <textarea
+        id="comentarioAvaliacao"
+        maxlength="2000"
+        placeholder="Conte como foi o jogo..."
+        rows="4"
+      ></textarea>
+
+      <div class="botoes-avaliacao">
+        <button type="button" onclick="salvarAvaliacaoJogo()">
+          Enviar avaliação
+        </button>
+
+        <button type="button" onclick="fecharModalAvaliacao()">
+          Agora não
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
 
 </body>
 </html>

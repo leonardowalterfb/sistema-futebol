@@ -256,6 +256,202 @@ a:hover{ text-decoration: underline; }
   color: var(--text);
   margin-bottom: 14px;
 }
+/* =========================================
+   SYNGEST — DASHBOARD REFINADO
+   ========================================= */
+
+#painel {
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(37, 99, 235, 0.045),
+      transparent 35%
+    ),
+    var(--surface);
+}
+
+/* Cabeçalho do painel */
+#painel .painel-cabecalho {
+  margin-bottom: 26px;
+}
+
+#painel .painel-cabecalho h1 {
+  margin-bottom: 6px;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+}
+
+#painel .painel-cabecalho h2 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+#painel .painel-descricao {
+  color: var(--text-dim);
+  font-size: 0.92rem;
+}
+
+/* Indicadores principais */
+#painel .painel-indicadores {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+#painel .painel-indicadores > .card {
+  min-width: 0;
+  min-height: 138px;
+  padding: 23px 22px;
+  border: 1px solid #e5eaf3;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #ffffff, #fbfcff);
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.035);
+}
+
+#painel .painel-indicadores > .card::before {
+  width: 3px;
+  background: linear-gradient(
+    180deg,
+    #3b82f6,
+    #2563eb
+  );
+}
+
+#painel .painel-indicadores > .card:hover {
+  transform: translateY(-3px);
+  border-color: #cbdaf5;
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.08);
+}
+
+#painel .painel-indicadores > .card h3 {
+  margin-bottom: 13px;
+  color: #64748b;
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+}
+
+#painel .painel-indicadores > .card p {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+#painel .painel-indicadores > .card p strong {
+  color: #2563eb;
+}
+
+/* Conteúdo complementar */
+#painel .painel-conteudo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+
+#painel .painel-conteudo > .card {
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid #e5eaf3;
+  border-radius: 16px;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.035);
+}
+
+#painel .painel-conteudo > .card h3 {
+  margin-bottom: 18px;
+  color: #172033;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  text-transform: none;
+}
+
+/* Adaptação para telas menores */
+@media (max-width: 900px) {
+  #painel .painel-indicadores {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  #painel .painel-cabecalho h1 {
+    font-size: 1.35rem;
+  }
+
+  #painel .painel-indicadores > .card {
+    min-height: 120px;
+    padding: 16px 14px;
+  }
+
+  #painel .painel-indicadores > .card p {
+    font-size: 0.9rem;
+  }
+
+  #painel .painel-conteudo > .card {
+    padding: 17px;
+  }
+}
+
+/* =========================================
+   SYNGEST — VALORES DOS INDICADORES
+   ========================================= */
+
+#painel .indicador-valor {
+  display: block;
+  margin: 2px 0 8px;
+  color: #0f172a;
+  font-size: 1.65rem;
+  line-height: 1.25;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  overflow-wrap: anywhere;
+}
+
+#painel .indicador-detalhe {
+  display: block;
+  margin-top: 5px;
+  color: #64748b;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+#painel .status-ativo {
+  color: #10b981;
+  margin-right: 5px;
+}
+
+#painel .status-inativo {
+  color: #ef4444;
+  margin-right: 5px;
+}
+
+#painel #totalJogadores .indicador-valor {
+  color: #2563eb;
+}
+
+#painel #totalMesAtual .indicador-valor,
+#painel #totalAno .indicador-valor {
+  color: #047857;
+}
+
+#painel #saldoTurma .indicador-valor {
+  color: #047857;
+}
+
+@media (max-width: 480px) {
+  #painel .indicador-valor {
+    font-size: 1.3rem;
+  }
+
+  #painel .indicador-detalhe {
+    font-size: 0.76rem;
+  }
+}
 
 /* =========================
    TABELAS
@@ -1371,4 +1567,678 @@ hr{
   margin-right: -30px !important;
   margin-top: -26px !important;
   box-sizing: border-box;
+}
+
+/* ============================= */
+/* MODAL DE CONFIRMAÇÃO */
+/* ============================= */
+
+.modal-confirmacao {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(3px);
+}
+
+.modal-confirmacao-box {
+  width: min(420px, calc(100% - 32px));
+  padding: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  animation: fadeUp .2s ease;
+}
+
+.modal-confirmacao-icone {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fee2e2;
+  border-radius: 50%;
+  font-size: 24px;
+}
+
+.modal-confirmacao-box h3 {
+  margin-bottom: 10px;
+  color: var(--text);
+  font-size: 1.2rem;
+}
+
+.modal-confirmacao-box p {
+  margin-bottom: 6px;
+  color: var(--text-2);
+  font-size: .95rem;
+}
+
+.modal-confirmacao-box > span {
+  display: block;
+  margin-bottom: 24px;
+  color: var(--text-dim);
+  font-size: .85rem;
+}
+
+.modal-confirmacao-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-cancelar-confirmacao,
+.btn-excluir-confirmacao {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-cancelar-confirmacao {
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+.btn-excluir-confirmacao {
+  background: var(--danger);
+  color: white;
+  border-color: var(--danger);
+}
+
+.btn-cancelar-confirmacao:hover {
+  background: var(--surface-3);
+}
+
+.btn-excluir-confirmacao:hover {
+  background: var(--danger-2);
+}
+
+
+/* ============================= */
+/* RELATÓRIOS */
+/* ============================= */
+
+.relatorio-card{
+  margin-bottom: 18px;
+  padding: 22px;
+  border: 1px solid #dbe3ef;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+}
+
+.relatorio-cabecalho{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+}
+
+.relatorio-cabecalho h3{
+  margin: 0 0 7px;
+  color: #172033;
+  font-size: 17px;
+}
+
+.relatorio-cabecalho p{
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.relatorio-cabecalho > span{
+  color: #2563eb;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.relatorio-filtros{
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.filtros-relatorio{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.filtros-relatorio > div{
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.relatorio-filtros label{
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.relatorio-filtros input,
+.relatorio-filtros select,
+.relatorio-filtros > select{
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.relatorio-filtros button{
+  margin-top: 4px;
+}
+
+#resultadoRelatorioAvaliacao,
+#rankingAvaliacoes{
+  margin-top: 16px;
+}
+
+@media (max-width: 700px){
+
+  .relatorio-card{
+    padding: 16px;
+  }
+
+  .filtros-relatorio{
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .relatorio-cabecalho h3{
+    font-size: 15px;
+  }
+
+}
+/* =====================================
+   PAINEL — PRÓXIMOS JOGOS
+===================================== */
+
+#painelProximosJogos .historico-card {
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  border-radius: 14px;
+  border-left: 4px solid var(--primary, #356dff);
+  background: var(--surface);
+  box-shadow: var(--shadow-xs);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+#painelProximosJogos .historico-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+#painelProximosJogos .historico-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+#painelProximosJogos .historico-header > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+
+#painelProximosJogos .historico-header strong {
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+#painelProximosJogos .historico-header > span {
+  color: var(--text-muted, #64748b);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  #painelProximosJogos .historico-card {
+    padding: 15px;
+  }
+
+  #painelProximosJogos .historico-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  #painelProximosJogos .historico-header > div {
+    gap: 10px;
+  }
+}
+/* Ajustes finais — Próximos jogos */
+
+#painel .painel-proximos-jogos {
+  margin-top: 28px;
+  margin-bottom: 12px;
+}
+
+#painel .painel-proximos-jogos .painel-bloco-titulo {
+  margin-bottom: 14px;
+}
+
+#painel .painel-proximos-jogos .painel-bloco-titulo h3 {
+  margin-bottom: 6px;
+}
+
+#painel .painel-proximos-jogos .painel-bloco-titulo p {
+  margin-top: 0;
+}
+
+/* ========================================
+   GRÁFICO DE MENSALIDADES — DASHBOARD
+======================================== */
+
+.grafico-mensalidade {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 180px minmax(0, 1fr);
+    align-items: center;
+    gap: 24px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.grafico-mensalidade-info {
+    min-width: 0;
+}
+
+.grafico-mensalidade-info h4 {
+    margin: 0 0 8px;
+}
+
+.grafico-mensalidade-info p {
+    margin: 0 0 16px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.grafico-legenda {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.grafico-legenda-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.grafico-legenda-item strong {
+    margin-left: auto;
+}
+
+.grafico-ponto {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.grafico-pago {
+    background: #3478F6;
+}
+
+.grafico-nao-pago {
+    background: #DC4545;
+}
+
+.grafico-mensalidade-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.grafico-circular {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.grafico-circular-centro {
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.grafico-circular-centro strong {
+    font-size: 27px;
+    color: #1e293b;
+}
+
+.grafico-circular-centro span {
+    font-size: 12px;
+    color: #64748b;
+}
+
+@media (max-width: 700px) {
+    .grafico-mensalidade {
+        grid-template-columns: minmax(0, 1fr) 130px;
+        gap: 12px;
+    }
+
+    .grafico-mensalidade-visual {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .grafico-circular {
+        width: 120px;
+        height: 120px;
+    }
+
+    .grafico-circular-centro {
+        width: 84px;
+        height: 84px;
+    }
+
+    .grafico-circular-centro strong {
+        font-size: 22px;
+    }
+}
+
+@media (max-width: 380px) {
+    .grafico-mensalidade {
+        grid-template-columns: 1fr;
+    }
+
+    .grafico-mensalidade-visual {
+        grid-column: 1;
+        grid-row: auto;
+    }
+}
+
+/* Visão da turma — card compacto */
+
+.card.card-grande.painel-destaques {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+
+.card.card-grande.painel-destaques .grafico-mensalidade {
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.card.card-grande.painel-destaques .grafico-mensalidade-visual {
+    grid-column: 1;
+    grid-row: auto;
+}
+
+.card.card-grande.painel-destaques .grafico-circular {
+    width: 140px;
+    height: 140px;
+}
+
+.card.card-grande.painel-destaques .grafico-circular-centro {
+    width: 98px;
+    height: 98px;
+}
+
+@media (max-width: 900px) {
+    .card.card-grande.painel-destaques {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* CABEÇALHO DA VISÃO DA TURMA */
+.painel-destaques-cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.painel-destaques-cabecalho h3 {
+    margin: 0 0 6px;
+}
+
+.painel-destaques-cabecalho p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.painel-destaques-icone {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eff6ff;
+    border-radius: 12px;
+    font-size: 19px;
+}
+
+/* ORGANIZAÇÃO DO GRÁFICO */
+
+
+.card.card-grande.painel-destaques #resumoTurma {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 32px;
+    row-gap: 24px;
+    align-items: start;
+}
+
+.card.card-grande.painel-destaques .grafico-mensalidade {
+    min-width: 0;
+}
+
+.card.card-grande.painel-destaques .grafico-mensalidade-info {
+    padding: 0 4px;
+}
+
+
+.card.card-grande.painel-destaques .grafico-mensalidade {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    min-width: 0;
+}
+
+
+.card.card-grande.painel-destaques .grafico-mensalidade-info {
+    width: 100%;
+}
+
+.grafico-mensalidade-titulo h4 {
+    margin: 0 0 8px;
+    font-size: 14px;
+}
+
+.grafico-mensalidade-titulo p {
+    margin: 0 0 18px;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.grafico-legenda-identificacao {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.card.card-grande.painel-destaques .grafico-legenda {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.card.card-grande.painel-destaques .grafico-legenda-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 13px;
+}
+
+.card.card-grande.painel-destaques .grafico-mensalidade-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.card.card-grande.painel-destaques .grafico-circular {
+    width: 150px;
+    height: 150px;
+    flex-shrink: 0;
+}
+
+.card.card-grande.painel-destaques .grafico-circular-centro {
+    width: 106px;
+    height: 106px;
+}
+
+@media (max-width: 900px) {
+    .card.card-grande.painel-destaques {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Refinamento visual do card de mensalidades */
+.card.card-grande.painel-destaques .painel-destaques-cabecalho {
+    margin-bottom: 20px;
+}
+
+.card.card-grande.painel-destaques .grafico-mensalidade {
+    gap: 16px;
+}
+
+.card.card-grande.painel-destaques .grafico-mensalidade-titulo p {
+    margin-bottom: 14px;
+}
+
+.card.card-grande.painel-destaques .grafico-legenda {
+    gap: 10px;
+}
+
+.card.card-grande.painel-destaques .grafico-mensalidade-visual {
+    margin-top: 0;
+}
+
+.card.card-grande.painel-destaques .grafico-circular {
+    width: 132px;
+    height: 132px;
+}
+
+.card.card-grande.painel-destaques .grafico-circular-centro {
+    width: 94px;
+    height: 94px;
+}
+
+/* Espaçamento entre os painéis do dashboard */
+.painel-proximos-jogos {
+    margin-top: 24px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.painel-proximos-jogos .painel-bloco-titulo {
+    margin-bottom: 16px;
+}
+
+.painel-proximos-jogos .painel-bloco-titulo h3 {
+    margin-top: 0;
+}
+
+@media (max-width: 600px) {
+    .card.card-grande.painel-destaques #resumoTurma {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* DASHBOARD — CARDS DE GRÁFICOS INDEPENDENTES */
+
+#painel .painel-conteudo {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    align-items: start;
+}
+
+#painel .painel-conteudo > .card-grafico-individual {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+#painel .card-grafico-individual .painel-destaques-cabecalho {
+    margin-bottom: 18px;
+}
+
+#painel .card-grafico-individual .grafico-mensalidade-info {
+    width: 100%;
+}
+
+#painel .card-grafico-individual .grafico-mensalidade-visual {
+    width: 100%;
+    margin-top: 20px;
+}
+
+#painel .painel-conteudo > .painel-proximos-jogos {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    min-width: 0;
+}
+
+#painel .painel-conteudo > .painel-aniversarios {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    min-width: 0;
+}
+
+@media (max-width: 900px) {
+    #painel .painel-conteudo {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #painel .painel-conteudo > .painel-proximos-jogos {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 600px) {
+    #painel .painel-conteudo {
+        grid-template-columns: 1fr;
+    }
+
+    #painel .painel-conteudo > .painel-aniversarios {
+        grid-column: 1;
+    }
 }
