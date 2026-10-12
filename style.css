@@ -2238,7 +2238,18 @@ hr{
         grid-template-columns: 1fr;
     }
 
+    #painel .painel-conteudo > .card-grafico-individual {
+        grid-column: 1;
+        grid-row: auto;
+    }
+
+    #painel .painel-conteudo > .painel-proximos-jogos {
+        grid-column: 1;
+        grid-row: auto;
+    }
+
     #painel .painel-conteudo > .painel-aniversarios {
         grid-column: 1;
+        grid-row: auto;
     }
 }

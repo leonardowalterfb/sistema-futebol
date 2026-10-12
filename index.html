@@ -61,7 +61,7 @@
 
 <div class="sidebar">
 
-<h2>Gew Sports</h2>
+<h2>SYNGEST        Gestão Esportiva</h2>
 
 <p id="nomeUsuarioLogado" style="margin-bottom:10px;font-weight:bold;"></p>
 
@@ -516,7 +516,7 @@
 
 <select id="jogadorPagamento"></select>
 
-<select id="mesPagamento">
+<select id="mesPagamento" data-mes-automatico="true">
 <option>Janeiro</option>
 <option>Fevereiro</option>
 <option>Março</option>
@@ -542,15 +542,15 @@
 
   <!-- 💻 DESKTOP -->
   <table id="tabelaPagamentos">
-    <thead>
-      <tr>
-        <th>Nome</th>
-        <th>Mês</th>
-        <th>Valor</th>
-        <th>Data</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
+    <thead style="display: none;">
+  <tr>
+    <th>Nome</th>
+    <th>Mês</th>
+    <th>Valor</th>
+    <th>Data</th>
+    <th>Ações</th>
+  </tr>
+</thead>
 
     <tbody id="listaPagamentos"></tbody>
   </table>
@@ -2006,23 +2006,23 @@ linhas[i].style.display = "none"
 
 // Expandir/Recolher Mes //
 
-function toggleMes(mes, el){
 
-  let linhas = document.querySelectorAll(".mes-" + mes)
+function toggleMes(mes, el) {
+  const linhas = document.querySelectorAll(".mes-" + mes)
 
-  if(!linhas.length){
+  if (!linhas.length) {
     console.warn("Nenhuma linha encontrada:", mes)
     return
   }
 
-  let aberto = linhas[0].style.display !== "none"
+  const aberto = linhas[0].style.display !== "none"
 
-  linhas.forEach(l => {
-    l.style.display = aberto ? "none" : ""
+  linhas.forEach(linha => {
+    linha.style.display = aberto ? "none" : ""
   })
 
-  if(el){
-    el.innerHTML = `<td colspan="5">${aberto ? "▶" : "▼"} ${mes}`
+  if (el) {
+    el.innerHTML = `<td colspan="5">${aberto ? "▶" : "▼"} ${mes}</td>`
   }
 }
 

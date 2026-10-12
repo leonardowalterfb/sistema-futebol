@@ -67,7 +67,22 @@ renderizarPainelCompleto()
 
 }
 
+function selecionarMesAtual() {
+  const seletor = document.getElementById("mesPagamento");
+  if (!seletor) return;
+
+  const meses = [
+    "Janeiro", "Fevereiro", "Março", "Abril",
+    "Maio", "Junho", "Julho", "Agosto",
+    "Setembro", "Outubro", "Novembro", "Dezembro"
+  ];
+
+  seletor.value = meses[new Date().getMonth()];
+}
+
 async function carregarPagamentos(){
+
+    selecionarMesAtual();
 
   let turmaSelecionada = JSON.parse(
     localStorage.getItem("turmaSelecionada")
@@ -113,7 +128,11 @@ function mostrarPagamentos(){
     "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
   ]
 
-  ordemMeses.forEach(mes => {
+  const mesAtual = ordemMeses[new Date().getMonth()]
+
+ordemMeses
+  .filter(mes => mes === mesAtual)
+  .forEach(mes => {
 
     //if(!pagamentosPorMes[mes]) return
     let chave = Object.keys(pagamentosPorMes).find(m => 
@@ -122,17 +141,37 @@ function mostrarPagamentos(){
 
 if(!chave) return
 
-    // 🔥 LINHA DE TÍTULO (CLICÁVEL)
+    // LINHA DE TÍTULO (CLICÁVEL)
+    // Linha de título do mês
     let titulo = document.createElement("tr")
+    titulo.classList.add("titulo-mes-" + mes)
 
     titulo.innerHTML = `
-      <td colspan="5" style="cursor:pointer;font-weight:bold;background:#eee;text-align:left;padding-left:20px"
-      onclick="toggleMes('${mes}', this)">
+      <td colspan="5"
+        style="cursor:pointer;font-weight:bold;background:#eee;text-align:left;padding-left:20px"
+        onclick="toggleMes('${mes}', this)">
         ▶ ${mes}
       </td>
     `
 
     lista.appendChild(titulo)
+
+    // Cabeçalho das colunas dentro do mês
+    let cabecalhoMes = document.createElement("tr")
+    cabecalhoMes.classList.add("mes-" + mes)
+    cabecalhoMes.style.display = "none"
+    cabecalhoMes.style.background = "#f8fafc"
+
+    cabecalhoMes.innerHTML = `
+      <th>Nome</th>
+      <th>Mês</th>
+      <th>Valor</th>
+      <th>Data</th>
+      <th>Ações</th>
+    `
+
+    lista.appendChild(cabecalhoMes)
+
 
     // 🔹 Ordena jogadores
     pagamentosPorMes[chave].sort((a,b) =>
@@ -961,5 +1000,226 @@ function extrairMes(data){
 }
 
 
+function gerarRelatorioReceitas() {
+  const resultado = document.getElementById("resultadoRelatorioReceitas");
+  const dataInicial = document.getElementById("dataInicialReceitas").value;
+  const dataFinal = document.getElementById("dataFinalReceitas").value;
 
+  if (dataInicial && dataFinal && dataInicial > dataFinal) {
+    mostrarToast("A data inicial não pode ser posterior à data final.");
+    return;
+  }
+
+  const movimentos = [];
+
+  function adicionarMovimento(item, origem, descricao) {
+    if (!item.data) return;
+
+    const data = String(item.data).slice(0, 10);
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) return;
+    if (dataInicial && data < dataInicial) return;
+    if (dataFinal && data > dataFinal) return;
+
+    movimentos.push({
+      data,
+      origem,
+      descricao,
+      valor: Number(item.valor) || 0
+    });
+  }
+
+  pagamentos.forEach(p => {
+    adicionarMovimento(
+      p,
+      "Mensalidade",
+      p.jogador_nome || p.jogador || "Pagamento"
+    );
+  });
+
+  receitas.forEach(r => {
+    adicionarMovimento(
+      r,
+      "Outra receita",
+      r.descricao || "Receita"
+    );
+  });
+
+  movimentos.sort((a, b) => b.data.localeCompare(a.data));
+
+  const total = movimentos.reduce((soma, item) => soma + item.valor, 0);
+
+  resultado.style.display = "block";
+  resultado.innerHTML = "";
+
+  const resumo = document.createElement("div");
+  resumo.className = "card";
+  resumo.style.marginTop = "16px";
+  resumo.style.padding = "16px";
+
+  const titulo = document.createElement("h3");
+  titulo.textContent = "Total de receitas no período";
+
+  const valorTotal = document.createElement("strong");
+  valorTotal.textContent = formatarMoeda(total);
+  valorTotal.style.fontSize = "1.4rem";
+
+  resumo.append(titulo, valorTotal);
+  resultado.appendChild(resumo);
+
+  if (movimentos.length === 0) {
+    const mensagem = document.createElement("p");
+    mensagem.textContent = "Nenhuma receita encontrada no período selecionado.";
+    resultado.appendChild(mensagem);
+    return;
+  }
+
+  const tabela = document.createElement("table");
+  tabela.style.width = "100%";
+  tabela.style.marginTop = "16px";
+
+  const cabecalho = document.createElement("thead");
+  cabecalho.innerHTML = `
+    <tr>
+      <th>Data</th>
+      <th>Descrição</th>
+      <th>Tipo</th>
+      <th>Valor</th>
+    </tr>
+  `;
+
+  const corpo = document.createElement("tbody");
+
+  movimentos.forEach(item => {
+    const linha = document.createElement("tr");
+
+    const data = item.data.split("-");
+    const dataFormatada = `${data[2]}/${data[1]}/${data[0]}`;
+
+    [
+      dataFormatada,
+      item.descricao,
+      item.origem,
+      formatarMoeda(item.valor)
+    ].forEach((texto, indice) => {
+      const celula = document.createElement("td");
+      celula.textContent = texto;
+
+      if (indice === 3) {
+        celula.style.whiteSpace = "nowrap";
+      }
+
+      linha.appendChild(celula);
+    });
+
+    corpo.appendChild(linha);
+  });
+
+  tabela.append(cabecalho, corpo);
+  resultado.appendChild(tabela);
+}
+
+
+function gerarRelatorioDespesas() {
+  const resultado = document.getElementById("resultadoRelatorioDespesas");
+  const dataInicial = document.getElementById("dataInicialDespesasRelatorio").value;
+  const dataFinal = document.getElementById("dataFinalDespesasRelatorio").value;
+
+  if (dataInicial && dataFinal && dataInicial > dataFinal) {
+    mostrarToast("A data inicial não pode ser posterior à data final.");
+    return;
+  }
+
+  const movimentos = [];
+
+  despesas.forEach(d => {
+    if (!d.data) return;
+
+    const dataOriginal = String(d.data);
+    let data;
+
+    if (/^\d{4}-\d{2}-\d{2}/.test(dataOriginal)) {
+      data = dataOriginal.slice(0, 10);
+    } else if (/^\d{2}\/\d{2}\/\d{4}$/.test(dataOriginal)) {
+      const [dia, mes, ano] = dataOriginal.split("/");
+      data = `${ano}-${mes}-${dia}`;
+    } else {
+      return;
+    }
+
+    if (dataInicial && data < dataInicial) return;
+    if (dataFinal && data > dataFinal) return;
+
+    movimentos.push({
+      data,
+      descricao: d.descricao || "Despesa",
+      valor: Number(d.valor) || 0
+    });
+  });
+
+  movimentos.sort((a, b) => b.data.localeCompare(a.data));
+
+  const total = movimentos.reduce(
+    (soma, item) => soma + item.valor,
+    0
+  );
+
+  resultado.style.display = "block";
+  resultado.innerHTML = "";
+
+  const resumo = document.createElement("div");
+  resumo.className = "card";
+  resumo.style.marginTop = "16px";
+  resumo.style.padding = "16px";
+
+  const titulo = document.createElement("h3");
+  titulo.textContent = "Total de despesas no período";
+
+  const valorTotal = document.createElement("strong");
+  valorTotal.textContent = formatarMoeda(total);
+  valorTotal.style.fontSize = "1.4rem";
+
+  resumo.append(titulo, valorTotal);
+  resultado.appendChild(resumo);
+
+  if (movimentos.length === 0) {
+    const mensagem = document.createElement("p");
+    mensagem.textContent = "Nenhuma despesa encontrada no período.";
+    resultado.appendChild(mensagem);
+    return;
+  }
+
+  const tabela = document.createElement("table");
+  tabela.style.width = "100%";
+  tabela.style.marginTop = "16px";
+
+  const cabecalho = document.createElement("thead");
+  cabecalho.innerHTML = `
+    <tr>
+      <th>Data</th>
+      <th>Descrição</th>
+      <th>Valor</th>
+    </tr>
+  `;
+
+  const corpo = document.createElement("tbody");
+
+  movimentos.forEach(item => {
+    const linha = document.createElement("tr");
+    const [ano, mes, dia] = item.data.split("-");
+    const dataFormatada = `${dia}/${mes}/${ano}`;
+
+    [dataFormatada, item.descricao, formatarMoeda(item.valor)]
+      .forEach(texto => {
+        const celula = document.createElement("td");
+        celula.textContent = texto;
+        linha.appendChild(celula);
+      });
+
+    corpo.appendChild(linha);
+  });
+
+  tabela.append(cabecalho, corpo);
+  resultado.appendChild(tabela);
+}
 
