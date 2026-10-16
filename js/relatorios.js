@@ -2432,3 +2432,397 @@ resultado.appendChild(resumo);
     console.error("Erro ao gerar relatório de participações:", erro);
   }
 }
+
+
+async function gerarRelatorioAdimplencia() {
+  const resultado = document.getElementById("resultadoRelatorioAdimplencia");
+  const mes = document.getElementById("mesReferenciaAdimplencia").value;
+  const filtro = document.getElementById("filtroSituacaoAdimplencia").value;
+
+  const turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada") || "null"
+  );
+
+  if (!turmaSelecionada?.turma_id) {
+    mostrarToast("Nenhuma turma selecionada.", "error");
+    return;
+  }
+
+  resultado.style.display = "block";
+  resultado.innerHTML = "<p>Carregando relatório de adimplência...</p>";
+
+  try {
+    const turmaId = Number(turmaSelecionada.turma_id);
+
+    const [jogadores, pagamentosTurma] = await Promise.all([
+      apiGet(`/jogadores/${turmaId}`),
+      apiGet(`/pagamentos/${turmaId}`)
+    ]);
+
+    if (!Array.isArray(jogadores) || !Array.isArray(pagamentosTurma)) {
+      throw new Error("Não foi possível carregar jogadores e pagamentos.");
+    }
+
+    const normalizar = texto =>
+      String(texto || "").trim().toLocaleLowerCase("pt-BR");
+
+    const jogadoresAtivos = jogadores
+      .filter(jogador => jogador.status === "ativo")
+      .map(jogador => {
+        const pagamentoEncontrado = pagamentosTurma.some(pagamento =>
+          pagamento.mes === mes &&
+          (
+            (
+              pagamento.jogador_id != null &&
+              jogador.id != null &&
+              String(pagamento.jogador_id) === String(jogador.id)
+            ) ||
+            (
+              normalizar(pagamento.jogador_nome || pagamento.jogador) ===
+              normalizar(jogador.nome)
+            )
+          )
+        );
+
+        return {
+          nome: jogador.nome,
+          adimplente: pagamentoEncontrado
+        };
+      })
+      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+
+    const totalAdimplentes = jogadoresAtivos.filter(
+      jogador => jogador.adimplente
+    ).length;
+
+    const totalInadimplentes = jogadoresAtivos.length - totalAdimplentes;
+
+    const jogadoresFiltrados = jogadoresAtivos.filter(jogador => {
+      if (filtro === "adimplentes") return jogador.adimplente;
+      if (filtro === "inadimplentes") return !jogador.adimplente;
+      return true;
+    });
+
+    window.adimplenciaRelatorioPDF = {
+  mes,
+  jogadores: jogadoresFiltrados,
+  totalAdimplentes,
+  totalInadimplentes,
+  totalJogadores: jogadoresAtivos.length,
+  nomeTurma:
+    turmaSelecionada.nome ||
+    turmaSelecionada.turma_nome ||
+    "Turma não identificada"
+};
+
+    resultado.innerHTML = `
+      <div class="card" style="margin-top:16px;padding:20px;">
+        <h3 style="margin-top:0;">📋 Adimplência — ${mes}</h3>
+
+        <button
+  type="button"
+  onclick="exportarAdimplenciaPDF()"
+  style="margin-top:10px;"
+>
+  📄 Salvar em PDF
+</button>
+
+        <div style="
+          display:grid;
+          grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+          gap:12px;
+          margin:16px 0;
+        ">
+          <div style="padding:16px;background:#f0fdf4;border-radius:10px;">
+            <p style="margin:0 0 8px;color:#166534;">Adimplentes</p>
+            <strong style="font-size:26px;color:#15803d;">
+              ${totalAdimplentes}
+            </strong>
+          </div>
+
+          <div style="padding:16px;background:#fef2f2;border-radius:10px;">
+            <p style="margin:0 0 8px;color:#991b1b;">Inadimplentes</p>
+            <strong style="font-size:26px;color:#dc2626;">
+              ${totalInadimplentes}
+            </strong>
+          </div>
+
+          <div style="padding:16px;background:#eff6ff;border-radius:10px;">
+            <p style="margin:0 0 8px;color:#1d4ed8;">Total de jogadores</p>
+            <strong style="font-size:26px;color:#2563eb;">
+              ${jogadoresAtivos.length}
+            </strong>
+          </div>
+        </div>
+
+        <p style="color:#64748b;font-size:13px;">
+          Exibindo ${jogadoresFiltrados.length} jogador(es).
+        </p>
+
+        ${
+          jogadoresFiltrados.length === 0
+            ? "<p>Nenhum jogador encontrado para esse filtro.</p>"
+            : `
+              <div style="overflow-x:auto;">
+                <table style="width:100%;">
+                  <thead>
+                    <tr>
+                      <th style="text-align:left;">Jogador</th>
+                      <th style="text-align:left;">Situação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${jogadoresFiltrados.map(jogador => `
+                      <tr>
+                        <td>${jogador.nome}</td>
+                        <td>
+                          <span style="
+                            display:inline-block;
+                            padding:5px 10px;
+                            border-radius:20px;
+                            font-size:12px;
+                            font-weight:700;
+                            color:${jogador.adimplente ? "#166534" : "#991b1b"};
+                            background:${jogador.adimplente ? "#dcfce7" : "#fee2e2"};
+                          ">
+                            ${jogador.adimplente ? "Adimplente" : "Inadimplente"}
+                          </span>
+                        </td>
+                      </tr>
+                    `).join("")}
+                  </tbody>
+                </table>
+              </div>
+            `
+        }
+      </div>
+    `;
+  } catch (erro) {
+    console.error("Erro ao gerar relatório de adimplência:", erro);
+
+    resultado.innerHTML = `
+      <div class="card" style="margin-top:16px;">
+        <p>Não foi possível gerar o relatório de adimplência.</p>
+        <p>${erro.message || "Erro desconhecido."}</p>
+      </div>
+    `;
+  }
+}
+
+
+function exportarAdimplenciaPDF() {
+  const relatorio = window.adimplenciaRelatorioPDF;
+
+  if (!relatorio || !Array.isArray(relatorio.jogadores)) {
+    mostrarToast("Consulte a adimplência antes de exportar.", "error");
+    return;
+  }
+
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    mostrarToast("A biblioteca de PDF não está disponível.", "error");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  const azul = [37, 99, 235];
+  const azulClaro = [239, 246, 255];
+  const cinza = [100, 116, 139];
+  const texto = [30, 41, 59];
+  const verde = [22, 163, 74];
+  const vermelho = [220, 38, 38];
+
+  const largura = doc.internal.pageSize.getWidth();
+  const altura = doc.internal.pageSize.getHeight();
+  const margem = 15;
+  const larguraUtil = largura - margem * 2;
+
+  let y = 20;
+
+  // Cabeçalho
+  doc.setFillColor(...azul);
+  doc.rect(0, 0, largura, 38, "F");
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.text("Relatório de adimplência", margem, 17);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.text(
+    `SYNGEST - Gestão Esportiva | ${relatorio.nomeTurma}`,
+    margem,
+    26
+  );
+
+  doc.setFontSize(9);
+  doc.text(
+    `Gerado em ${new Date().toLocaleDateString("pt-BR")}`,
+    largura - margem,
+    33,
+    { align: "right" }
+  );
+
+  y = 49;
+
+  // Mês de referência
+  doc.setFillColor(...azulClaro);
+  doc.roundedRect(margem, y, larguraUtil, 20, 3, 3, "F");
+
+  doc.setTextColor(...cinza);
+  doc.setFontSize(10);
+  doc.text("MÊS DE REFERÊNCIA", margem + 5, y + 8);
+
+  doc.setTextColor(...azul);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(13);
+  doc.text(relatorio.mes, margem + 5, y + 16);
+
+  y += 30;
+
+  // Cartões de resumo
+  const espacamento = 4;
+  const larguraCartao = (larguraUtil - espacamento * 2) / 3;
+
+  const cartoes = [
+    {
+      titulo: "ADIMPLENTES",
+      valor: relatorio.totalAdimplentes,
+      cor: verde
+    },
+    {
+      titulo: "INADIMPLENTES",
+      valor: relatorio.totalInadimplentes,
+      cor: vermelho
+    },
+    {
+      titulo: "TOTAL DE JOGADORES",
+      valor: relatorio.totalJogadores,
+      cor: azul
+    }
+  ];
+
+  cartoes.forEach((cartao, index) => {
+    const x = margem + index * (larguraCartao + espacamento);
+
+    doc.setFillColor(...azulClaro);
+    doc.roundedRect(x, y, larguraCartao, 27, 3, 3, "F");
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(...cinza);
+    doc.text(cartao.titulo, x + 4, y + 8);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(17);
+    doc.setTextColor(...cartao.cor);
+    doc.text(String(cartao.valor), x + 4, y + 20);
+  });
+
+  y += 39;
+
+  // Título da tabela
+  doc.setTextColor(...texto);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(13);
+  doc.text("Situação dos jogadores", margem, y);
+
+  y += 9;
+
+  const colunaNome = margem + 3;
+  const colunaSituacao = largura - margem - 3;
+
+  function cabecalhoTabela() {
+    doc.setFillColor(...azul);
+    doc.rect(margem, y, larguraUtil, 9, "F");
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(255, 255, 255);
+
+    doc.text("Jogador", colunaNome, y + 6);
+    doc.text("Situação", colunaSituacao, y + 6, {
+      align: "right"
+    });
+
+    y += 9;
+  }
+
+  cabecalhoTabela();
+
+  if (relatorio.jogadores.length === 0) {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(...cinza);
+    doc.text(
+      "Nenhum jogador encontrado para o filtro selecionado.",
+      margem + 3,
+      y + 9
+    );
+    y += 15;
+  } else {
+    relatorio.jogadores.forEach((jogador, index) => {
+      const alturaLinha = 10;
+
+      if (y + alturaLinha > altura - 18) {
+        doc.addPage();
+        y = 20;
+        cabecalhoTabela();
+      }
+
+      if (index % 2 === 0) {
+        doc.setFillColor(248, 250, 252);
+        doc.rect(margem, y, larguraUtil, alturaLinha, "F");
+      }
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...texto);
+
+      const nome = String(jogador.nome || "Jogador");
+      const nomeLimitado = doc.splitTextToSize(nome, larguraUtil - 45);
+
+      doc.text(nomeLimitado[0], colunaNome, y + 6);
+
+      if (jogador.adimplente) {
+        doc.setTextColor(...verde);
+        doc.setFont("helvetica", "bold");
+        doc.text("Adimplente", colunaSituacao, y + 6, {
+          align: "right"
+        });
+      } else {
+        doc.setTextColor(...vermelho);
+        doc.setFont("helvetica", "bold");
+        doc.text("Inadimplente", colunaSituacao, y + 6, {
+          align: "right"
+        });
+      }
+
+      doc.setDrawColor(226, 232, 240);
+      doc.line(margem, y + alturaLinha, largura - margem, y + alturaLinha);
+
+      y += alturaLinha;
+    });
+  }
+
+  // Rodapé e numeração das páginas
+  const totalPaginas = doc.internal.getNumberOfPages();
+
+  for (let pagina = 1; pagina <= totalPaginas; pagina++) {
+    doc.setPage(pagina);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(...cinza);
+
+    doc.text(
+      `SYNGEST - Gestão Esportiva | Página ${pagina} de ${totalPaginas}`,
+      largura / 2,
+      altura - 7,
+      { align: "center" }
+    );
+  }
+
+  doc.save("relatorio-adimplencia-syngest.pdf");
+}

@@ -1336,23 +1336,44 @@ app.post("/criar-senha", async (req, res) => {
 
 //RANKING
 
+
 app.get("/ranking/:turmaId", verificarToken, verificarAcessoTurma, async (req, res) => {
   try {
-
     const { turmaId } = req.params
 
     const jogos = await pool.query(
-      "SELECT * FROM jogos WHERE turma_id = $1",
+      `SELECT
+         j.presentes,
+         COALESCE(
+           (
+             SELECT jsonb_agg(c.nome)
+             FROM convidados_jogos c
+             WHERE c.jogo_id = j.id
+           ),
+           '[]'::jsonb
+         ) AS nomes_convidados
+       FROM jogos j
+       WHERE j.turma_id = $1`,
       [turmaId]
     )
 
-    let ranking = {}
+    const jogadoresResult = await pool.query(
+      `SELECT nome
+       FROM jogadores
+       WHERE turma_id = $1`,
+      [turmaId]
+    )
 
-    for(let jogo of jogos.rows){
+    const nomesCadastrados = new Set(
+      jogadoresResult.rows.map(j => j.nome.trim().toLowerCase())
+    )
 
+    const ranking = {}
+
+    for (const jogo of jogos.rows) {
       let presentes = jogo.presentes
 
-      if(typeof presentes === "string"){
+      if (typeof presentes === "string") {
         try {
           presentes = JSON.parse(presentes)
         } catch {
@@ -1360,11 +1381,23 @@ app.get("/ranking/:turmaId", verificarToken, verificarAcessoTurma, async (req, r
         }
       }
 
-      if(!Array.isArray(presentes)) continue
+      if (!Array.isArray(presentes)) continue
 
-      for(let nome of presentes){
+      const nomesConvidados = new Set(
+        (jogo.nomes_convidados || []).map(nome =>
+          String(nome).trim().toLowerCase()
+        )
+      )
 
-        if(!ranking[nome]){
+      for (const nome of presentes) {
+        if (typeof nome !== "string") continue
+
+        const nomeNormalizado = nome.trim().toLowerCase()
+
+        if (!nomesCadastrados.has(nomeNormalizado)) continue
+        if (nomesConvidados.has(nomeNormalizado)) continue
+
+        if (!ranking[nome]) {
           ranking[nome] = 0
         }
 
@@ -1372,16 +1405,12 @@ app.get("/ranking/:turmaId", verificarToken, verificarAcessoTurma, async (req, r
       }
     }
 
-    let resultado = []
-
-    for(let nome in ranking){
-      resultado.push({
-        nome: nome,
-        presencas: ranking[nome]
-      })
-    }
-
-    res.json(resultado)
+    res.json(
+      Object.entries(ranking).map(([nome, presencas]) => ({
+        nome,
+        presencas
+      }))
+    )
 
   } catch (err) {
     console.error("ERRO RANKING:", err)

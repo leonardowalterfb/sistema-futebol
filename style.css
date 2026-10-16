@@ -686,19 +686,25 @@ button[onclick*="remover"]:hover,
   width: 100%;
   cursor: pointer;
 }
-.ranking-left{
-  display: flex;
+
+.ranking-left {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex: 1;
+  min-width: 0;
 }
-.ranking-right{
+
+.ranking-right {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-width: 120px;
   justify-content: flex-end;
+  flex: 0 0 78px;
+  min-width: 78px;
+  white-space: nowrap;
 }
+
 .ranking-pontos, .ranking-nome{ white-space: nowrap; }
 .ranking-right button{
   background: var(--grad-danger);

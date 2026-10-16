@@ -2110,14 +2110,7 @@ function mostrarHistorico(){
             📍 ${jogo.local}
           </span>
 
-          <button
-            onclick="event.stopPropagation(); removerJogo(${jogo.id})"
-          >
-            🗑️
-          </button>
-
         </div>
-
 
         <div
           class="historico-body"
@@ -2250,9 +2243,9 @@ function mostrarRanking(){
   rankingArray.sort((a,b) => b.presencas - a.presencas)
 
  // let limite = mostrarTodosRanking ? rankingArray.length : 3
- let limite = mostrarTodosRanking 
-  ? rankingArray.length 
-  : Math.min(3, rankingArray.length)
+ let limite = mostrarTodosRanking
+  ? rankingArray.length
+  : Math.min(8, rankingArray.length)
 
   for(let i=0; i < limite; i++){
 
@@ -2272,11 +2265,11 @@ lista.innerHTML += `
         <span class="ranking-pos">${medalha} ${posicao}º</span>
         <span class="ranking-nome">${rankingArray[i].nome}</span>
       </div>
-
+      
       <div class="ranking-right">
         <span class="ranking-pontos">${rankingArray[i].presencas} jogos</span>
-        <button onclick='event.stopPropagation(); removerRanking("${rankingArray[i].nome}")'>🗑️</button>
       </div>
+
 
     </div>
 

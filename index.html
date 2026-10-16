@@ -846,6 +846,74 @@
   </div>
 
   
+<!-- RELATÓRIO DE ADIMPLÊNCIA MENSAL -->
+<div class="card relatorio-card">
+
+  <div
+    class="relatorio-cabecalho"
+    onclick="toggleFiltrosRelatorio('filtrosAdimplencia', 'setaAdimplencia')"
+  >
+    <div>
+      <h3>📋 Relatório de Adimplência</h3>
+      <p>Consulte a situação das mensalidades por mês e por jogador.</p>
+    </div>
+
+    <span id="setaAdimplencia">▼</span>
+  </div>
+
+  <div
+    id="filtrosAdimplencia"
+    class="relatorio-filtros"
+    style="display:none"
+  >
+
+    <div class="filtros-relatorio">
+
+      <div>
+        <label for="mesReferenciaAdimplencia">Mês de referência</label>
+        <select id="mesReferenciaAdimplencia">
+          <option value="Janeiro">Janeiro</option>
+          <option value="Fevereiro">Fevereiro</option>
+          <option value="Março">Março</option>
+          <option value="Abril">Abril</option>
+          <option value="Maio">Maio</option>
+          <option value="Junho">Junho</option>
+          <option value="Julho">Julho</option>
+          <option value="Agosto">Agosto</option>
+          <option value="Setembro">Setembro</option>
+          <option value="Outubro">Outubro</option>
+          <option value="Novembro">Novembro</option>
+          <option value="Dezembro">Dezembro</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="filtroSituacaoAdimplencia">Situação</label>
+        <select id="filtroSituacaoAdimplencia">
+          <option value="todos">Todos os jogadores</option>
+          <option value="adimplentes">Somente adimplentes</option>
+          <option value="inadimplentes">Somente inadimplentes</option>
+        </select>
+      </div>
+
+    </div>
+
+    <button
+      type="button"
+      onclick="gerarRelatorioAdimplencia()"
+    >
+      Consultar adimplência
+    </button>
+
+  </div>
+
+  <div
+    id="resultadoRelatorioAdimplencia"
+    style="display:none"
+  ></div>
+
+</div>
+  
   <!-- RELATÓRIO FINANCEIRO: DESPESAS POR MÊS -->
   <div class="card relatorio-card">
 
