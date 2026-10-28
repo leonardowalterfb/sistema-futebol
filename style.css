@@ -2296,3 +2296,34 @@ hr{
         grid-row: auto;
     }
 }
+
+/*Formulario Jogador continuação mobile*/
+
+@media (max-width: 600px) {
+  #formularioCadastroJogador {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  #formularioCadastroJogador > #nascimento {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    justify-self: stretch;
+  }
+
+  #formularioCadastroJogador > input,
+  #formularioCadastroJogador > select,
+  #formularioCadastroJogador > button {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
