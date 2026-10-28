@@ -1274,6 +1274,43 @@ button[onclick*="remover"]:hover,
   color: var(--text);
 }
 
+
+/* =========================================
+   CADASTRO DE JOGADOR - AJUSTE MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+  #formularioCadastroJogador {
+    width: 100%;
+    min-width: 0;
+    padding: 16px;
+    box-sizing: border-box;
+  }
+
+  .formulario-cadastro-jogador {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .formulario-cadastro-jogador input,
+  .formulario-cadastro-jogador select,
+  .formulario-cadastro-jogador textarea {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .formulario-cadastro-jogador button {
+    width: 100%;
+    min-height: 48px;
+    box-sizing: border-box;
+  }
+}
+
+
 /* =========================
    UTILIDADES
 ========================= */
