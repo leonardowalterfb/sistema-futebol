@@ -1,51 +1,30 @@
-// utils.js
-
-//=====================
-// HELPERS DE STORAGE
-//=====================
-
-function getTurmaSelecionada(){
-  try {
-    return JSON.parse(localStorage.getItem("turmaSelecionada"))
-  } catch(err) {
-    console.error("Erro ao ler turmaSelecionada do localStorage:", err)
-    return null
-  }
-}
-
-function getUsuarioLogado(){
-  try {
-    return JSON.parse(localStorage.getItem("usuarioLogado"))
-  } catch(err) {
-    console.error("Erro ao ler usuarioLogado do localStorage:", err)
-    return null
-  }
-}
-
-
-//=====================
-// FORMATAÇÕES
-//=====================
+//FORMATAÇÕES//
 
 function formatarMoeda(valor){
 
-  let num = Number(valor)
-
-  if(isNaN(num)) num = 0
-
-  return num.toLocaleString("pt-BR", {
+  return Number(valor).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL"
   })
 }
 
-function formatarData(data){
+function formatarData(dataISO){
+  if(!dataISO) return "-"
+
+  const data = new Date(dataISO)
+
+  if(isNaN(data)) return "-"
+
+  return data.toLocaleDateString("pt-BR")
+}
+
+function formatarDataBR(data){
 
   if(!data) return "-"
 
   let d = new Date(data)
 
-  if(isNaN(d)) return "-"
+  if(isNaN(d)) return data
 
   let dia = String(d.getDate()).padStart(2, "0")
   let mes = String(d.getMonth() + 1).padStart(2, "0")
@@ -54,34 +33,23 @@ function formatarData(data){
   return `${dia}/${mes}/${ano}`
 }
 
-// Mantido por compatibilidade com código existente que já usa esse nome
-const formatarDataBR = formatarData
-
 function calcularIdade(data){
 
-  if(!data) return null
+let hoje = new Date()
+let nascimento = new Date(data)
 
-  let hoje = new Date()
-  let nascimento = new Date(data)
+let idade = hoje.getFullYear() - nascimento.getFullYear()
 
-  if(isNaN(nascimento)) return null
+let mes = hoje.getMonth() - nascimento.getMonth()
 
-  let idade = hoje.getFullYear() - nascimento.getFullYear()
-  let mes = hoje.getMonth() - nascimento.getMonth()
-
-  if(mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())){
-    idade--
-  }
-
-  return idade
+if(mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())){
+idade--
 }
 
+return idade
 
-//=====================
-// TOAST
-//=====================
+}
 
-let _toastTimeoutId = null
 
 function mostrarToast(mensagem, tipo = "success"){
 
@@ -109,13 +77,6 @@ function mostrarToast(mensagem, tipo = "success"){
 
   }
 
-  // Cancela qualquer timeout pendente de um toast anterior,
-  // evitando que um toast novo seja escondido antes da hora
-  if(_toastTimeoutId){
-    clearTimeout(_toastTimeoutId)
-    _toastTimeoutId = null
-  }
-
   toast.innerText = mensagem
   toast.className = ""
 
@@ -125,60 +86,45 @@ function mostrarToast(mensagem, tipo = "success"){
   toast.style.display = "block"
   toast.classList.add("show")
 
-  _toastTimeoutId = setTimeout(() => {
+  setTimeout(() => {
 
     toast.classList.remove("show")
     toast.style.display = "none"
-    _toastTimeoutId = null
 
   }, 8000)
 
 }
 
-
-//=====================
 // LOGOUT
-//=====================
-
 function logout(){
-
-  // Remove todos os dados da sessão para evitar vazamento
-  // de informações entre usuários no mesmo navegador
-  localStorage.clear()
-
+  localStorage.removeItem("usuarioLogado")
   location.reload()
 }
 
-
-//=====================
-// VALOR MENSALIDADE
-//=====================
+//VALOR MENSALIDADE 
 
 function setMensalidade(valor){
 
-  let turmaSelecionada = getTurmaSelecionada()
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
 
   if(!turmaSelecionada){
     console.warn("Nenhuma turma selecionada")
     return
   }
 
-  let num = Number(valor)
-
-  if(isNaN(num) || num < 0){
-    console.warn("Valor de mensalidade inválido:", valor)
-    return
-  }
-
   let turmaId = Number(turmaSelecionada.turma_id)
 
-  localStorage.setItem("mensalidade_" + turmaId, num)
+  localStorage.setItem("mensalidade_" + turmaId, valor)
 
 }
 
 function getMensalidade(){
 
-  let turmaSelecionada = getTurmaSelecionada()
+  let turmaSelecionada = JSON.parse(
+    localStorage.getItem("turmaSelecionada")
+  )
 
   if(!turmaSelecionada){
     console.warn("Nenhuma turma selecionada")
