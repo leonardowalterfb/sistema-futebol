@@ -2297,33 +2297,35 @@ hr{
     }
 }
 
-/*Formulario Jogador continuação mobile*/
-
+/* Campo de nascimento no cadastro mobile */
 @media (max-width: 600px) {
-  #formularioCadastroJogador {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
+  #formularioCadastroJogador .campo-data-jogador {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
-  #formularioCadastroJogador > #nascimento {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    margin: 0 !important;
-    box-sizing: border-box !important;
-    justify-self: stretch;
+  #formularioCadastroJogador .campo-data-jogador label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
   }
 
-  #formularioCadastroJogador > input,
-  #formularioCadastroJogador > select,
-  #formularioCadastroJogador > button {
-    min-width: 0 !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
+  #formularioCadastroJogador .campo-data-jogador input[type="date"] {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    height: 54px;
+    padding: 0 12px;
+    margin: 0;
+    font: inherit;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
   }
 }
+
